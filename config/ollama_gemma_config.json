@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "S4TuringPoissonOllamaGemmaConfig",
+  "description": "Operational configuration for headless local gemma4:12B via Ollama for S4TuringPoisson Lean 4 autoformalization.",
+  "version": "1.0.0",
+  "service": {
+    "default_host": "http://localhost:11434",
+    "endpoints": {
+      "tags": "/api/tags",
+      "chat": "/api/chat",
+      "generate": "/api/generate",
+      "version": "/api/version"
+    },
+    "connect_timeout_seconds": 3.0,
+    "request_timeout_seconds": 120.0,
+    "keep_alive": "30m"
+  },
+  "primary_model": "gemma4:12B",
+  "model_fallback_cascade": [
+    "gemma4:12B",
+    "gemma-lean4:latest",
+    "gemma2:9b-instruct-q5_K_M",
+    "gemma2:9b"
+  ],
+  "parameter_profiles": {
+    "autoformalize": {
+      "temperature": 0.1,
+      "top_p": 0.9,
+      "top_k": 40,
+      "num_predict": 768,
+      "num_ctx": 8192,
+      "repeat_penalty": 1.1
+    },
+    "tactic": {
+      "temperature": 0.35,
+      "top_p": 0.95,
+      "top_k": 50,
+      "num_predict": 256,
+      "num_ctx": 8192,
+      "repeat_penalty": 1.05
+    },
+    "premise": {
+      "temperature": 0.0,
+      "top_p": 0.85,
+      "top_k": 20,
+      "num_predict": 384,
+      "num_ctx": 8192,
+      "repeat_penalty": 1.15
+    },
+    "skeleton": {
+      "temperature": 0.25,
+      "top_p": 0.9,
+      "top_k": 40,
+      "num_predict": 1536,
+      "num_ctx": 8192,
+      "repeat_penalty": 1.1
+    }
+  }
+}

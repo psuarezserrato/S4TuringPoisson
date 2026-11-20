@@ -1,0 +1,16 @@
+name = "S4TuringPoisson"
+version = "0.1.0"
+defaultTargets = ["S4TuringPoisson"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "TauCeti"
+git = "https://github.com/TauCetiProject/TauCeti"
+rev = "v4.36.0"
+
+[[lean_lib]]
+name = "S4TuringPoisson"
