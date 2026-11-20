@@ -34,36 +34,32 @@ DEFAULT_CASCADE = [
 
 DEFAULT_PROFILES: Dict[str, Dict[str, Any]] = {
     "autoformalize": {
-        "temperature": 0.1,
-        "top_p": 0.9,
-        "top_k": 40,
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
         "num_predict": 768,
-        "num_ctx": 8192,
-        "repeat_penalty": 1.1,
+        "num_ctx": 32768,
     },
     "tactic": {
-        "temperature": 0.35,
+        "temperature": 1.0,
         "top_p": 0.95,
-        "top_k": 50,
+        "top_k": 64,
         "num_predict": 256,
-        "num_ctx": 8192,
-        "repeat_penalty": 1.05,
+        "num_ctx": 32768,
     },
     "premise": {
-        "temperature": 0.0,
-        "top_p": 0.85,
-        "top_k": 20,
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
         "num_predict": 384,
-        "num_ctx": 8192,
-        "repeat_penalty": 1.15,
+        "num_ctx": 32768,
     },
     "skeleton": {
-        "temperature": 0.25,
-        "top_p": 0.9,
-        "top_k": 40,
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 64,
         "num_predict": 1536,
-        "num_ctx": 8192,
-        "repeat_penalty": 1.1,
+        "num_ctx": 32768,
     },
 }
 
@@ -177,8 +173,12 @@ def ensure_ollama_daemon(
     if not ollama_bin:
         return False, "ollama executable not found in PATH or /usr/local/bin", None
     try:
+        daemon_env = os.environ.copy()
+        daemon_env["OLLAMA_NUM_PARALLEL"] = "1"
+        daemon_env["OLLAMA_CONTEXT_LENGTH"] = "32768"
         proc = subprocess.Popen(
             [ollama_bin, "serve"],
+            env=daemon_env,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             start_new_session=True,
