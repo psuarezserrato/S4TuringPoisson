@@ -5,6 +5,8 @@ Authors: Pablo Suárez-Serrato
 -/
 module
 
+public import S4TuringPoisson.Dynamics.GeneralizedShift
+public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Interfaces
 
 /-!
@@ -286,5 +288,209 @@ theorem sliceDiffeomorph_one_ne_refl [HasTuringCompleteAreaPreservingDiskIsotopy
   exact Subtype.ext (DFunLike.congr_fun heq y.1)
 
 end DiskIsotopyAudit
+
+/-! ## 4. Milestone M3.1 Generalized Shift & Square Cantor Audit -/
+
+section M3GeneralizedShiftAudit
+
+/-- `M_halt.toGeneralizedShift` acts on the canonical 3-cell domain `shiftDom3 = {-1, 0, 1}`. -/
+theorem shiftDom_M_halt : M_halt.toGeneralizedShift.D = shiftDom3 :=
+  rfl
+
+/-- `M_loop.toGeneralizedShift` acts on the canonical 3-cell domain `shiftDom3 = {-1, 0, 1}`. -/
+theorem shiftDom_M_loop : M_loop.toGeneralizedShift.D = shiftDom3 :=
+  rfl
+
+/-- Concrete verification that `cantorBase` for `M_halt.ShiftAlphabet` (`|A| = 8`) equals
+`2 * 8 - 1 = 15`. -/
+theorem cantorBase_M_halt_shiftAlphabet :
+    cantorBase (Fintype.card M_halt.ShiftAlphabet) = 15 := by
+  decide
+
+/-- Concrete 2-state reversible Turing machine flipping its internal state while shifting right. -/
+def R_flipRight : ReversibleTM where
+  Γ := Bool
+  Q := Bool
+  stepPerm :=
+    { toFun := fun p ↦ (!p.1, p.2)
+      invFun := fun p ↦ (!p.1, p.2)
+      left_inv := fun ⟨q, a⟩ ↦ by cases q <;> rfl
+      right_inv := fun ⟨q, a⟩ ↦ by cases q <;> rfl }
+  dirIn _ := ShiftDir.right
+
+/-- `R_flipRight.toGeneralizedShift.eval` is a global bijection on `ℤ → R_flipRight.ShiftAlphabet`
+(`CMPP21` Proposition 4.4). -/
+theorem bijective_R_flipRight_shift : Function.Bijective R_flipRight.toGeneralizedShift.eval :=
+  R_flipRight.bijective_eval
+
+/-- `R_flipRight.toGeneralizedShift.eval` is non-trivial (`≠ id`). -/
+theorem R_flipRight_shift_ne_id : R_flipRight.toGeneralizedShift.eval ≠ id := by
+  intro heq
+  let c₀ : R_flipRight.Cfg := ⟨false, default⟩
+  have h0 := congrArg Prod.snd (congrFun (congrFun heq (R_flipRight.encodeCfg c₀)) 0)
+  rw [R_flipRight.eval_encodeCfg] at h0
+  cases h0
+
+/-- `M_halt`'s initial shift encoding lies outside its halting cylinder at `n = 0`. -/
+theorem encodeInit_M_halt_notMem_haltCylinder :
+    M_halt.encodeInit default ∉ cylinderIcc 1 (M_halt.haltWindow 1 w_halt) :=
+  M_halt.encodeInit_notMem_haltCylinder default 1 w_halt
+
+/-- Positive M3.1 shift-orbit witness: `M_halt.toGeneralizedShift.eval` drives
+`M_halt.encodeInit default` into `cylinderIcc 1 (M_halt.haltWindow 1 w_halt)`. -/
+theorem exists_shift_orbit_M_halt :
+    ∃ n : ℕ, M_halt.toGeneralizedShift.eval^[n] (M_halt.encodeInit default) ∈
+      cylinderIcc 1 (M_halt.haltWindow 1 w_halt) :=
+  (M_halt.orbit_mem_haltCylinder_iff_haltsWithWindow default 1 w_halt).mpr haltsWithWindow_M_halt
+
+/-- Negative M3.1 shift-orbit witness: `M_loop.toGeneralizedShift.eval` never enters
+`cylinderIcc 1 (M_loop.haltWindow 1 w_loop)` for any iterate `n : ℕ`. -/
+theorem forall_shift_orbit_notMem_M_loop (n : ℕ) :
+    M_loop.toGeneralizedShift.eval^[n] (M_loop.encodeInit default) ∉
+      cylinderIcc 1 (M_loop.haltWindow 1 w_loop) := by
+  intro hmem
+  exact not_haltsWithWindow_M_loop_default
+    ((M_loop.orbit_mem_haltCylinder_iff_haltsWithWindow default 1 w_loop).mp ⟨n, hmem⟩)
+
+/-- Canonical `Fin` numbering of `M_halt.ShiftAlphabet`. -/
+noncomputable def encS_M_halt :
+    M_halt.ShiftAlphabet ≃ Fin (Fintype.card M_halt.ShiftAlphabet) :=
+  shiftAlphabetEquivFin M_halt (Fintype.equivFin _) (Fintype.equivFin _)
+
+/-- Canonical `Fin` numbering of `M_loop.ShiftAlphabet`. -/
+noncomputable def encS_M_loop :
+    M_loop.ShiftAlphabet ≃ Fin (Fintype.card M_loop.ShiftAlphabet) :=
+  shiftAlphabetEquivFin M_loop (Fintype.equivFin _) (Fintype.equivFin _)
+
+/-- Non-vacuity of the open Cantor rectangle for `M_loop`'s target window in `UnitDisk2`. -/
+theorem cantorRect_M_loop_nonempty :
+    (cantorCylinderRect encS_M_loop 1 (M_loop.haltWindow 1 w_loop) : Set UnitDisk2).Nonempty :=
+  cantorCylinderRect_nonempty encS_M_loop 1 (M_loop.haltWindow 1 w_loop)
+
+/-- Square Cantor embedding orbit separation in `UnitDisk2` for `M_halt` vs. `M_loop`. -/
+theorem cantorDisk_shift_orbit_separation :
+    (∃ n : ℕ,
+      cantorDiskEmbed encS_M_halt
+        (M_halt.toGeneralizedShift.eval^[n] (M_halt.encodeInit default)) ∈
+      cantorCylinderRect encS_M_halt 1 (M_halt.haltWindow 1 w_halt)) ∧
+    (∀ n : ℕ,
+      cantorDiskEmbed encS_M_loop
+        (M_loop.toGeneralizedShift.eval^[n] (M_loop.encodeInit default)) ∉
+      cantorCylinderRect encS_M_loop 1 (M_loop.haltWindow 1 w_loop)) := by
+  refine ⟨?_, fun n ↦ ?_⟩
+  · obtain ⟨n, hn⟩ := exists_shift_orbit_M_halt
+    exact ⟨n, (cantorDiskEmbed_mem_cantorCylinderRect_iff _ _ _ _).mpr hn⟩
+  · rw [cantorDiskEmbed_mem_cantorCylinderRect_iff]
+    exact forall_shift_orbit_notMem_M_loop n
+
+end M3GeneralizedShiftAudit
+
+/-! ## 5. Milestone M3.2 Universal Halting, Undecidability & 4D Fiber Transfer Audit -/
+
+section M3UndecidabilityAndTransferAudit
+
+/-- Concrete halting test on `universalHaltingTM0`: `Nat.Partrec.Code.zero` terminates with the
+universal target window. -/
+theorem haltsWithWindow_universalHaltingTM0_zero :
+    HaltsWithWindow universalHaltingTM0 (universalInputTape Nat.Partrec.Code.zero) 0
+      universalTargetWindow := by
+  rw [haltsWithWindow_universalHaltingTM0_iff]
+  exact Part.some_dom 0
+
+/-- Concrete diverging partial recursive code `rfind' (const 1)` whose evaluation at `0` is
+`Part.none`. -/
+def divergingPartrecCode : Nat.Partrec.Code :=
+  Nat.Partrec.Code.rfind' (Nat.Partrec.Code.const 1)
+
+/-- Concrete non-halting test on `universalHaltingTM0`: `divergingPartrecCode` never halts on
+`universalHaltingTM0`. -/
+theorem not_haltsWithWindow_universalHaltingTM0_diverging :
+    ¬ HaltsWithWindow universalHaltingTM0 (universalInputTape divergingPartrecCode) 0
+      universalTargetWindow := by
+  rw [haltsWithWindow_universalHaltingTM0_iff]
+  dsimp only [divergingPartrecCode, Nat.Partrec.Code.eval, Nat.unpaired]
+  simp only [Nat.Partrec.Code.eval_const, Part.map_eq_map, Part.map_some]
+  intro hdom
+  have hrf : (Nat.rfind fun _ : ℕ ↦ Part.some false).Dom := hdom
+  obtain ⟨n, hn⟩ := Part.dom_iff_mem.mp hrf
+  obtain ⟨ht, _⟩ := Nat.mem_rfind.mp hn
+  simp at ht
+
+/-- Model 4D product open embedding `ℝ² × UnitDisk2 ↪ ℝ² × ℝ²` representing a trivialized regular
+fibration neighborhood `B × D²`. -/
+def psiModel4D (p : EuclideanPlane × UnitDisk2) : EuclideanPlane × EuclideanPlane :=
+  (p.1, p.2.1)
+
+/-- `psiModel4D` is a topological open embedding. -/
+theorem isOpenEmbedding_psiModel4D : Topology.IsOpenEmbedding psiModel4D :=
+  Topology.IsOpenEmbedding.id.prodMap Metric.isOpen_ball.isOpenEmbedding_subtypeVal
+
+set_option linter.concreteInstances false
+
+open HasTuringCompleteAreaPreservingDiskIsotopy
+
+/-- End-to-end M3.2 undecidability check on `diskTimeOneMap` under
+`[HasTuringCompleteAreaPreservingDiskIsotopy]`. -/
+theorem diskTimeOneMap_undecidable_orbit_reachability
+    [HasTuringCompleteAreaPreservingDiskIsotopy] :
+    ∃ (U : Opens UnitDisk2) (chart : UnitDisk2 → UnitDisk2)
+      (coord : Nat.Partrec.Code → UnitDisk2)
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      U.1.Nonempty ∧
+      Continuous chart ∧
+      Function.Injective chart ∧
+      Computable approx ∧
+      (∀ (c : Nat.Partrec.Code) (m : ℕ),
+        ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
+      REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, diskTimeOneMap^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ComputablePred
+        (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, diskTimeOneMap^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ∃ dec : Nat.Partrec.Code → Bool,
+          Computable dec ∧
+          ∀ c : Nat.Partrec.Code,
+            dec c = true ↔ ∃ n : ℕ, diskTimeOneMap^[n] (chart (coord c)) ∈ U :=
+  isTuringComplete_diskTimeOneMap.undecidable_orbit_reachability
+
+/-- Model 4D leaf-preserving map `(b, y) ↦ (b, d (1, y))` on `ℝ² × ℝ²`. -/
+noncomputable def dBarModel4D [HasTuringCompleteAreaPreservingDiskIsotopy]
+    (q : EuclideanPlane × EuclideanPlane) : EuclideanPlane × EuclideanPlane :=
+  (q.1, d (1, q.2))
+
+/-- End-to-end M3.2 fiber-to-4-manifold transfer check: `dBarModel4D` is `IsTuringComplete` via
+`IsTuringComplete.transfer` over `B₀ = Metric.ball 0 (1 / 2)`. -/
+theorem isTuringComplete_dBarModel4D [HasTuringCompleteAreaPreservingDiskIsotopy] :
+    IsTuringComplete dBarModel4D :=
+  isTuringComplete_diskTimeOneMap.transfer isOpenEmbedding_psiModel4D Metric.isOpen_ball
+    (by simp : (0 : EuclideanPlane) ∈ Metric.ball (0 : EuclideanPlane) (1 / 2))
+    (fun _ _ _ ↦ rfl)
+
+/-- Full Gate 6 foliation-tangency + halting separation + undecidability check on `dBarModel4D`,
+verifying end-to-end M3 usability for M4/M5. -/
+theorem dBarModel4D_gate6_and_undecidability [HasTuringCompleteAreaPreservingDiskIsotopy] :
+    (∃ (p_h p_l : EuclideanPlane × EuclideanPlane)
+        (U_h U_l : Opens (EuclideanPlane × EuclideanPlane)),
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      (∃ n : ℕ, dBarModel4D^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, dBarModel4D^[n] p_l ∉ U_l) ∧
+      Prod.fst ∘ dBarModel4D = Prod.fst ∧
+      (∀ (n : ℕ) (x : EuclideanPlane × EuclideanPlane), (dBarModel4D^[n] x).1 = x.1) ∧
+      dBarModel4D ≠ id) ∧
+    (∃ (U : Opens (EuclideanPlane × EuclideanPlane))
+        (chart : UnitDisk2 → EuclideanPlane × EuclideanPlane)
+        (coord : Nat.Partrec.Code → UnitDisk2)
+        (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      U.1.Nonempty ∧
+      Computable approx ∧
+      ¬ ComputablePred
+        (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, dBarModel4D^[n] (chart (coord c)) ∈ U)) := by
+  refine ⟨gate6_foliation_and_halting_separation Prod.fst dBarModel4D rfl
+    isTuringComplete_dBarModel4D, ?_⟩
+  obtain ⟨U, chart, coord, approx, hU, _, _, hcomp, _, _, _, hnotcomp, _⟩ :=
+    isTuringComplete_dBarModel4D.undecidable_orbit_reachability
+  exact ⟨U, chart, coord, approx, hU, hcomp, hnotcomp⟩
+
+end M3UndecidabilityAndTransferAudit
 
 end S4TuringPoisson.Checks
