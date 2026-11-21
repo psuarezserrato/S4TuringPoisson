@@ -8,6 +8,7 @@ module
 public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Interfaces
+public import S4TuringPoisson.Smoothing.DiskSmoothing
 
 /-!
 # Adversarial Computability & Anti-Vacuity Checks (`MISSION_DIRECTIVE.md` §6 Gate 6)
@@ -492,5 +493,69 @@ theorem dBarModel4D_gate6_and_undecidability [HasTuringCompleteAreaPreservingDis
   exact ⟨U, chart, coord, approx, hU, hcomp, hnotcomp⟩
 
 end M3UndecidabilityAndTransferAudit
+
+/-! ## 6. Milestone M3.3 `CMPP21` Cantor-Circulation to Gate 6 Bridge Audit -/
+
+section M3DiskSmoothingBridgeAudit
+
+/-- Unconditional M3.3 rational Cantor approximation check on `M_halt`'s initial shift sequence. -/
+theorem approxCantorList_M_halt_bound (m : ℕ) :
+    let B := cantorBase (Fintype.card M_halt.ShiftAlphabet)
+    let s := M_halt.encodeInit default
+    let q₀ := approxCantorList B ((List.range (m + 1)).map fun j ↦ (encS_M_halt (negHalf s j)).1)
+    let q₁ := approxCantorList B
+      ((List.range (m + 1)).map fun j ↦ (encS_M_halt (nonnegHalf s j)).1)
+    ‖ratFracPairToEuclidean2 (q₀, q₁) - (cantorDiskEmbed encS_M_halt s).1‖ ≤ (1 / 2 : ℝ) ^ m :=
+  norm_approxCantorList_pair_sub_cantorDiskEmbed_le encS_M_halt (M_halt.encodeInit default) m
+
+set_option linter.concreteInstances false
+
+/-- Anti-vacuity check on `HasCMPPCantorCirculationHamiltonians`: the generating list of
+`CompactlySupportedPlanarHamiltonian`s can never be empty (`[]`), since an empty list integrates to
+`id` on `UnitDisk2`, contradicting `isTuringComplete_cmppDiskIsotopy.ne_id`. -/
+theorem cmpp_generators_ne_nil [C : HasCMPPCantorCirculationHamiltonians] :
+    C.generators ≠ [] := by
+  intro hnil
+  apply isTuringComplete_cmppDiskIsotopy.ne_id
+  simp [cmppDiskIsotopy, hnil]
+
+/-- Under `[HasCMPPCantorCirculationHamiltonians]`, `cmppDiskIsotopy.diskTimeOneMap` satisfies the
+full Gate 6 2-state halting/looping separation and `≠ id`. -/
+theorem cmppDiskIsotopy_gate6_separation [HasCMPPCantorCirculationHamiltonians] :
+    ∃ (p_h p_l : UnitDisk2) (U_h U_l : Opens UnitDisk2),
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      p_h ∉ U_h ∧
+      (∃ n : ℕ, cmppDiskIsotopy.diskTimeOneMap^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, cmppDiskIsotopy.diskTimeOneMap^[n] p_l ∉ U_l) ∧
+      cmppDiskIsotopy.diskTimeOneMap ≠ id :=
+  gate6_halting_separation_of_isTuringComplete isTuringComplete_cmppDiskIsotopy
+
+/-- **Milestone M3.3 End-to-End Bridge Verification**:
+Verifies that `instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP` automatically synthesizes
+`HasTuringCompleteAreaPreservingDiskIsotopy` from `[HasCMPPCantorCirculationHamiltonians]` and feeds
+directly into Gate 6's `dBarModel4D_gate6_and_undecidability` (leaf preservation, 2-state halting
+separation, `dBarModel4D ≠ id`, and `¬ ComputablePred` undecidability). -/
+theorem cmpp_dBarModel4D_gate6_and_undecidability [HasCMPPCantorCirculationHamiltonians] :
+    (∃ (p_h p_l : EuclideanPlane × EuclideanPlane)
+        (U_h U_l : Opens (EuclideanPlane × EuclideanPlane)),
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      (∃ n : ℕ, dBarModel4D^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, dBarModel4D^[n] p_l ∉ U_l) ∧
+      Prod.fst ∘ dBarModel4D = Prod.fst ∧
+      (∀ (n : ℕ) (x : EuclideanPlane × EuclideanPlane), (dBarModel4D^[n] x).1 = x.1) ∧
+      dBarModel4D ≠ id) ∧
+    (∃ (U : Opens (EuclideanPlane × EuclideanPlane))
+        (chart : UnitDisk2 → EuclideanPlane × EuclideanPlane)
+        (coord : Nat.Partrec.Code → UnitDisk2)
+        (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      U.1.Nonempty ∧
+      Computable approx ∧
+      ¬ ComputablePred
+        (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, dBarModel4D^[n] (chart (coord c)) ∈ U)) :=
+  dBarModel4D_gate6_and_undecidability
+
+end M3DiskSmoothingBridgeAudit
 
 end S4TuringPoisson.Checks
