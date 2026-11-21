@@ -1,3 +1,14 @@
 module
 
 public import S4TuringPoisson.Interfaces
+public import S4TuringPoisson.Poisson.BivectorAndModular
+public import S4TuringPoisson.Poisson.JacobianPoisson
+public import S4TuringPoisson.Poisson.SingularCircleNormalForm
+public import S4TuringPoisson.Fibration.LocalSingularModels
+public import S4TuringPoisson.Fibration.S4Fibration
+public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
+public import S4TuringPoisson.Dynamics.GeneralizedShift
+public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
+public import S4TuringPoisson.Smoothing.DiskSmoothing
+public import S4TuringPoisson.Checks.GeomChecks
+public import S4TuringPoisson.Checks.CompChecks
