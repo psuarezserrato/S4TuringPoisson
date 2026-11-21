@@ -12,13 +12,14 @@ public import S4TuringPoisson.Poisson.SingularCircleNormalForm
 public import S4TuringPoisson.Fibration.LocalSingularModels
 public import S4TuringPoisson.Fibration.S4Fibration
 public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
+public import S4TuringPoisson.Smoothing.DiskSmoothing
 public import TauCeti.Geometry.Symplectic.Manifold.Sphere
 
 /-!
 # Adversarial Geometry, Poisson, Fibration & Volume Verification Checks (`GeomChecks`)
 
-This file implements the Milestone M0–M2 geometric verification gates from Section 6 of
-`MISSION_DIRECTIVE.md` together with cross-track M1+M2 integration checks:
+This file implements the Milestone M0–M3.3 geometric verification gates from Section 6 of
+`MISSION_DIRECTIVE.md` together with cross-track M1+M2+M3.3 integration checks:
 
 - **M0 Non-Zero Top-Form & Pullback Sanity**:
   - `planeAreaForm_zero_ne_zero` & `planeAreaForm_ne_zero_smoothForm`: confirms `planeAreaForm` on
@@ -52,6 +53,16 @@ This file implements the Milestone M0–M2 geometric verification gates from Sec
   - `m2_s2_liftSliceDiffeomorph_witness`: instantiates `liftSliceDiffeomorph` on `Sphere2` under
     `[HasTuringCompleteAreaPreservingDiskIsotopy]`, verifying area pullback preservation,
     `MeasurePreserving`, `IsTuringComplete`, and `≠ id`.
+- **Unconditional M3.3 Hamiltonian Disk-Smoothing & $S^2$ Symplectomorphism Lift Witnesses**:
+  - `m33_elementary_disk_moves_witness`: unconditionally instantiates `bumpedRotationIsotopy`
+    (Figure 1 `ρ`), `canonicalSectorSwapIsotopy` (Figure 1 `σ`), and
+    `bumpedHyperbolicStretchIsotopy` (Figure 2) at explicit radii and rational test points,
+    verifying ODE core action, compact-support vanishing, `det (fderiv) = 1`, `planeAreaForm`
+    pullback preservation, and `diskTimeOneMap ≠ id`.
+  - `m33_unconditional_s2_sectorSwap_witness`: unconditionally lifts `canonicalSectorSwapIsotopy`
+    through `s2DiskChart` onto `Sphere2` (zero typeclasses!), verifying smooth isotopy to
+    `Diffeomorph.refl`, `S2PositiveVolumeForm.Ω` pullback invariance, `MeasurePreserving`, and
+    `≠ id`.
 -/
 
 @[expose] public section
@@ -700,5 +711,314 @@ theorem m2_s2_liftSliceDiffeomorph_witness :
     s2DiskChart.isTuringComplete_liftTimeOne.ne_id⟩
 
 end S2LiftCheck
+
+/-! ## 7. Unconditional Milestone M3.3 Hamiltonian Disk-Smoothing & $S^2$ Lift Witnesses -/
+
+section M33SmoothingChecks
+
+/-- Explicit outer compact-support radius `r₀ = 3 / 4 ∈ (0, 1)` for M3.3 concrete witnesses. -/
+noncomputable def m33SupportRadius : ℝ := 3 / 4
+
+theorem m33SupportRadius_mem_Ioo : m33SupportRadius ∈ Set.Ioo (0 : ℝ) 1 := by
+  norm_num [m33SupportRadius]
+
+/-- Explicit inner rotation-core radius `r_in = 1 / 4 ∈ (0, 3 / 4)` for M3.3 concrete witnesses. -/
+noncomputable def m33InnerRadius : ℝ := 1 / 4
+
+theorem m33InnerRadius_mem_Ioo : m33InnerRadius ∈ Set.Ioo (0 : ℝ) m33SupportRadius := by
+  norm_num [m33InnerRadius, m33SupportRadius]
+
+/-- Concrete inner test point `(1 / 8, 0)` inside `Metric.closedBall 0 (1 / 4)`. -/
+noncomputable def m33InnerTestPoint : EuclideanPlane :=
+  (1 / 8 : ℝ) • planeBasis0
+
+/-- Concrete exterior test point `(7 / 8, 0)` outside `Metric.ball 0 (3 / 4)`. -/
+noncomputable def m33OuterTestPoint : EuclideanPlane :=
+  (7 / 8 : ℝ) • planeBasis0
+
+theorem norm_m33InnerTestPoint : ‖m33InnerTestPoint‖ = 1 / 8 := by
+  rw [m33InnerTestPoint, norm_smul, Real.norm_of_nonneg (by norm_num),
+    EuclideanSpace.norm_eq, Fin.sum_univ_two]
+  simp
+
+theorem m33InnerTestPoint_mem_closedBall :
+    m33InnerTestPoint ∈ Metric.closedBall (0 : EuclideanPlane) m33InnerRadius := by
+  rw [Metric.mem_closedBall, dist_zero_right, norm_m33InnerTestPoint, m33InnerRadius]
+  norm_num
+
+theorem m33OuterTestPoint_notMem_ball :
+    m33OuterTestPoint ∉ Metric.ball (0 : EuclideanPlane) m33SupportRadius := by
+  have hnorm : ‖m33OuterTestPoint‖ = 7 / 8 := by
+    rw [m33OuterTestPoint, norm_smul, Real.norm_of_nonneg (by norm_num),
+      EuclideanSpace.norm_eq, Fin.sum_univ_two]
+    simp
+  rw [Metric.mem_ball, dist_zero_right, hnorm, m33SupportRadius]
+  norm_num
+
+/-- Unconditional M3.3 instantiation of Figure 1 elementary move `ρ` (`bumpedRotationIsotopy`). -/
+noncomputable def m33BumpedRotation : AreaPreservingDiskIsotopy m33SupportRadius :=
+  bumpedRotationIsotopy m33SupportRadius_mem_Ioo m33InnerRadius_mem_Ioo
+
+/-- Unconditional M3.3 instantiation of Figure 1 elementary move `σ`
+(`canonicalSectorSwapIsotopy`). -/
+noncomputable def m33SectorSwap : AreaPreservingDiskIsotopy m33SupportRadius :=
+  canonicalSectorSwapIsotopy m33SupportRadius_mem_Ioo
+
+/-- Unconditional M3.3 instantiation of Figure 2 elementary hyperbolic squeeze
+(`bumpedHyperbolicStretchIsotopy` with `μ = Real.log 3`, scaling by `(1/3, 3)` near `0`). -/
+noncomputable def m33HyperbolicStretch : AreaPreservingDiskIsotopy m33SupportRadius :=
+  bumpedHyperbolicStretchIsotopy m33SupportRadius_mem_Ioo 0 (r_out := 1 / 2) (by norm_num)
+    (Metric.ball_subset_ball (by norm_num [m33SupportRadius])) (Real.log 3)
+
+/-- Pythagorean rational test point `(3 / 200, 4 / 200)` of exact Euclidean norm `1 / 40`. -/
+noncomputable def m33StretchTestPoint : EuclideanPlane :=
+  WithLp.toLp 2 ![3 / 200, 4 / 200]
+
+theorem norm_m33StretchTestPoint : ‖m33StretchTestPoint‖ = 1 / 40 := by
+  rw [m33StretchTestPoint, EuclideanSpace.norm_eq, Fin.sum_univ_two]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one,
+    Real.norm_eq_abs, sq_abs]
+  have hsq : (3 / 200 : ℝ) ^ 2 + (4 / 200 : ℝ) ^ 2 = (1 / 40 : ℝ) ^ 2 := by norm_num
+  rw [hsq, Real.sqrt_sq (by norm_num)]
+
+/-- At `t = 1`, `m33HyperbolicStretch` maps `(3 / 200, 4 / 200)` to `(1 / 200, 3 / 50)`,
+preserving the hyperbolic product `(3/200)*(4/200) = (1/200)*(3/50) = 3/10000`. -/
+theorem m33HyperbolicStretch_apply_testPoint :
+    m33HyperbolicStretch.d (1, m33StretchTestPoint) = WithLp.toLp 2 ![1 / 200, 3 / 50] := by
+  have hlog_pos : 0 < Real.log (3 : ℝ) := Real.log_pos (by norm_num)
+  have hδ : Real.exp (2 * |Real.log (3 : ℝ)|) * (1 / 40) < (1 / 2 : ℝ) / 2 := by
+    rw [abs_of_pos hlog_pos]
+    have h2 : (2 : ℝ) * Real.log 3 = ((2 : ℕ) : ℝ) * Real.log 3 := by norm_num
+    rw [h2, Real.exp_nat_mul, Real.exp_log (by norm_num)]
+    norm_num
+  have hy₀ : m33StretchTestPoint ∈ Metric.closedBall (0 : EuclideanPlane) (1 / 40) := by
+    rw [Metric.mem_closedBall, dist_zero_right, norm_m33StretchTestPoint]
+  have hact := bumpedHyperbolicStretchIsotopy_timeOne_of_mem_closedBall
+    m33SupportRadius_mem_Ioo 0 (r_out := 1 / 2) (δ := 1 / 40) (by norm_num)
+    (Metric.ball_subset_ball (by norm_num [m33SupportRadius])) (Real.log 3) hδ hy₀
+  change (bumpedHyperbolicStretchIsotopy m33SupportRadius_mem_Ioo 0 (r_out := 1 / 2) (by norm_num)
+    (Metric.ball_subset_ball (by norm_num [m33SupportRadius])) (Real.log 3)).d
+    (1, m33StretchTestPoint) = WithLp.toLp 2 ![1 / 200, 3 / 50]
+  rw [hact, Real.exp_neg, Real.exp_log (by norm_num : (0 : ℝ) < 3)]
+  ext i
+  fin_cases i <;> simp [m33StretchTestPoint] <;> norm_num
+
+theorem m33HyperbolicStretch_diskTimeOneMap_ne_id :
+    m33HyperbolicStretch.diskTimeOneMap ≠ id := by
+  intro hid
+  have hmem : m33StretchTestPoint ∈ UnitDisk2 := by
+    rw [UnitDisk2, Metric.mem_ball, dist_zero_right, norm_m33StretchTestPoint]
+    norm_num
+  have heq := congrArg (fun u : UnitDisk2 ↦ u.1 0) (congrFun hid ⟨m33StretchTestPoint, hmem⟩)
+  change m33HyperbolicStretch.d (1, m33StretchTestPoint) 0 = m33StretchTestPoint 0 at heq
+  rw [m33HyperbolicStretch_apply_testPoint] at heq
+  simp [m33StretchTestPoint] at heq
+  norm_num at heq
+
+/-- **M3.3 Elementary Hamiltonian Disk-Moves Verification Bundle**:
+Unconditionally verifies all three `CMPP21` Figures 1–2 Hamiltonian disk moves (`ρ`, `σ`, and the
+hyperbolic Cantor squeeze) integrated via `TauCeti.timeDependentFlowOf`: exact inner-core action,
+exterior support fixing, `det (fderiv) = 1`, `planeAreaForm` pullback invariance, and `≠ id`. -/
+theorem m33_elementary_disk_moves_witness :
+    m33BumpedRotation.d (0, m33InnerTestPoint) = m33InnerTestPoint ∧
+      m33BumpedRotation.d (1, m33InnerTestPoint) = -m33InnerTestPoint ∧
+      m33BumpedRotation.d (1, m33OuterTestPoint) = m33OuterTestPoint ∧
+      LinearMap.det (fderiv ℝ (fun y ↦ m33BumpedRotation.d (1, y)) m33InnerTestPoint).toLinearMap =
+        1 ∧
+      TauCeti.SmoothForm.mpullback (fun y ↦ m33BumpedRotation.d (1, y))
+        (m33BumpedRotation.contDiff_slice 1).contMDiff planeAreaForm = planeAreaForm ∧
+      m33BumpedRotation.diskTimeOneMap ≠ id ∧
+      TauCeti.SmoothForm.mpullback (fun y ↦ m33SectorSwap.d (1, y))
+        (m33SectorSwap.contDiff_slice 1).contMDiff planeAreaForm = planeAreaForm ∧
+      m33SectorSwap.diskTimeOneMap ≠ id ∧
+      m33HyperbolicStretch.d (1, m33StretchTestPoint) = WithLp.toLp 2 ![1 / 200, 3 / 50] ∧
+      TauCeti.SmoothForm.mpullback (fun y ↦ m33HyperbolicStretch.d (1, y))
+        (m33HyperbolicStretch.contDiff_slice 1).contMDiff planeAreaForm = planeAreaForm ∧
+      m33HyperbolicStretch.diskTimeOneMap ≠ id :=
+  ⟨m33BumpedRotation.time_zero m33InnerTestPoint,
+    bumpedRotationIsotopy_timeOne_eq_neg m33SupportRadius_mem_Ioo m33InnerRadius_mem_Ioo
+      m33InnerTestPoint_mem_closedBall,
+    m33BumpedRotation.eq_self_of_notMem_ball 1 m33OuterTestPoint m33OuterTestPoint_notMem_ball,
+    m33BumpedRotation.det_fderiv_eq_one 1 m33InnerTestPoint,
+    m33BumpedRotation.mpullback_planeAreaForm_eq 1,
+    bumpedRotationIsotopy_diskTimeOneMap_ne_id m33SupportRadius_mem_Ioo m33InnerRadius_mem_Ioo,
+    m33SectorSwap.mpullback_planeAreaForm_eq 1,
+    (canonicalSectorSwapIsotopy_properties m33SupportRadius_mem_Ioo).2.2.2.2.2,
+    m33HyperbolicStretch_apply_testPoint,
+    m33HyperbolicStretch.mpullback_planeAreaForm_eq 1,
+    m33HyperbolicStretch_diskTimeOneMap_ne_id⟩
+
+private theorem mpullback_congr_fun_two_checks {E₁ H₁ M₁ E₂ H₂ M₂ : Type*}
+    [NormedAddCommGroup E₁] [NormedSpace ℝ E₁] [TopologicalSpace H₁]
+    {I₁ : ModelWithCorners ℝ E₁ H₁} [TopologicalSpace M₁] [ChartedSpace H₁ M₁]
+    [IsManifold I₁ 1 M₁]
+    [NormedAddCommGroup E₂] [NormedSpace ℝ E₂] [TopologicalSpace H₂]
+    {I₂ : ModelWithCorners ℝ E₂ H₂} [TopologicalSpace M₂] [ChartedSpace H₂ M₂]
+    [IsManifold I₂ 1 M₂] {f g : M₁ → M₂}
+    (hf : ContMDiff I₁ I₂ ∞ f) (hg : ContMDiff I₁ I₂ ∞ g) (hfg : f = g)
+    (α : TauCeti.SmoothForm I₂ M₂ ℝ 2) :
+    TauCeti.SmoothForm.mpullback f hf α = TauCeti.SmoothForm.mpullback g hg α := by
+  subst hfg
+  rfl
+
+/-- Unconditional $C^\infty$ `Diffeomorph` of `Sphere2` obtained by lifting any
+`AreaPreservingDiskIsotopy r₀` through a `SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω`. -/
+noncomputable def liftDiskIsotopyDiffeomorph
+    (C : SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω)
+    {r₀ : ℝ} (I : AreaPreservingDiskIsotopy r₀) (t : ℝ) :
+    Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 where
+  toFun z := C.liftThroughChart I.d (t, z)
+  invFun z := C.liftThroughChart I.dInv (t, z)
+  left_inv z := C.liftThroughChart_comp_of_inv (fun s _ hw ↦ I.mem_unitDisk2 s hw)
+    I.left_inv t z
+  right_inv z := C.liftThroughChart_comp_of_inv (fun s _ hw ↦ I.symm.mem_unitDisk2 s hw)
+    I.right_inv t z
+  contMDiff_toFun :=
+    (C.contMDiff_liftThroughChart I.contDiff_d (fun s _ hw ↦ I.mem_unitDisk2 s hw)
+      I.r₀_lt_one I.eq_self_of_notMem_ball).comp (contMDiff_const.prodMk contMDiff_id)
+  contMDiff_invFun :=
+    (C.contMDiff_liftThroughChart I.contDiff_dInv (fun s _ hw ↦ I.symm.mem_unitDisk2 s hw)
+      I.r₀_lt_one (fun s _ hw ↦ I.dInv_eq_self_of_notMem_ball s hw)).comp
+      (contMDiff_const.prodMk contMDiff_id)
+
+theorem liftDiskIsotopyDiffeomorph_zero
+    (C : SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω)
+    {r₀ : ℝ} (I : AreaPreservingDiskIsotopy r₀) :
+    liftDiskIsotopyDiffeomorph C I 0 = Diffeomorph.refl (𝓡 2) Sphere2 ∞ := by
+  refine Diffeomorph.ext fun z ↦ ?_
+  by_cases hz : z ∈ C.sourceOpen.1
+  · obtain ⟨y, rfl⟩ := C.range_embed.symm.subset hz
+    change C.liftThroughChart I.d (0, C.embed y) = C.embed y
+    rw [C.liftThroughChart_embed (fun s _ hw ↦ I.mem_unitDisk2 s hw) 0 y]
+    exact congrArg C.embed (Subtype.ext (I.time_zero y.1))
+  · exact C.liftThroughChart_of_notMem _ 0 hz
+
+theorem mpullback_liftDiskIsotopyDiffeomorph_eq
+    (C : SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω)
+    {r₀ : ℝ} (I : AreaPreservingDiskIsotopy r₀) (t : ℝ) :
+    TauCeti.SmoothForm.mpullback (liftDiskIsotopyDiffeomorph C I t)
+        (liftDiskIsotopyDiffeomorph C I t).contMDiff S2PositiveVolumeForm.Ω =
+      S2PositiveVolumeForm.Ω := by
+  let Φ := liftDiskIsotopyDiffeomorph C I t
+  let δ : diskOpen → diskOpen := fun y ↦ ⟨I.d (t, y.1), I.mem_unitDisk2 t y.2⟩
+  have hδ : ContMDiff (𝓡 2) (𝓡 2) ∞ δ :=
+    (TauCeti.ContMDiff.subtypeVal_comp_iff diskOpen _).mp
+      ((I.contDiff_slice t).contMDiff.comp contMDiff_subtype_val)
+  have hδ_area :
+      TauCeti.SmoothForm.mpullback δ hδ
+          (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val planeAreaForm) =
+        TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val planeAreaForm := by
+    have hval_δ : (Subtype.val : diskOpen → _) ∘ δ =
+        (fun w ↦ I.d (t, w)) ∘ Subtype.val := rfl
+    calc
+      TauCeti.SmoothForm.mpullback δ hδ
+          (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val planeAreaForm)
+        = TauCeti.SmoothForm.mpullback ((fun w ↦ I.d (t, w)) ∘ Subtype.val)
+            ((I.contDiff_slice t).contMDiff.comp contMDiff_subtype_val) planeAreaForm := by
+          rw [TauCeti.SmoothForm.mpullback_mpullback]
+          exact mpullback_congr_fun_two_checks _ _ hval_δ planeAreaForm
+      _ = TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val
+            (TauCeti.SmoothForm.mpullback (fun w ↦ I.d (t, w))
+              (I.contDiff_slice t).contMDiff planeAreaForm) := by
+          rw [← TauCeti.SmoothForm.mpullback_mpullback (Subtype.val : diskOpen → EuclideanPlane)
+            (fun w ↦ I.d (t, w)) contMDiff_subtype_val (I.contDiff_slice t).contMDiff
+            planeAreaForm]
+      _ = TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val planeAreaForm := by
+          rw [I.mpullback_planeAreaForm_eq t]
+  have hpull_embed :
+      TauCeti.SmoothForm.mpullback C.embed C.contMDiff_embed
+          (TauCeti.SmoothForm.mpullback Φ Φ.contMDiff S2PositiveVolumeForm.Ω) =
+        TauCeti.SmoothForm.mpullback C.embed C.contMDiff_embed S2PositiveVolumeForm.Ω := by
+    have hcomm : ⇑Φ ∘ C.embed = C.embed ∘ δ :=
+      funext fun y ↦ C.liftThroughChart_embed (fun s _ hw ↦ I.mem_unitDisk2 s hw) t y
+    calc
+      TauCeti.SmoothForm.mpullback C.embed C.contMDiff_embed
+          (TauCeti.SmoothForm.mpullback Φ Φ.contMDiff S2PositiveVolumeForm.Ω)
+        = TauCeti.SmoothForm.mpullback (C.embed ∘ δ) (C.contMDiff_embed.comp hδ)
+            S2PositiveVolumeForm.Ω := by
+          rw [TauCeti.SmoothForm.mpullback_mpullback]
+          exact mpullback_congr_fun_two_checks _ _ hcomm S2PositiveVolumeForm.Ω
+      _ = TauCeti.SmoothForm.mpullback δ hδ
+            (TauCeti.SmoothForm.mpullback C.embed C.contMDiff_embed S2PositiveVolumeForm.Ω) := by
+          rw [← TauCeti.SmoothForm.mpullback_mpullback δ C.embed hδ C.contMDiff_embed
+            S2PositiveVolumeForm.Ω]
+      _ = TauCeti.SmoothForm.mpullback C.embed C.contMDiff_embed S2PositiveVolumeForm.Ω := by
+          rw [C.mpullback_embed_eq, map_smul, hδ_area]
+  refine Subtype.ext (funext fun z ↦ ?_)
+  by_cases hz : z ∈ C.sourceOpen.1
+  · obtain ⟨y, rfl⟩ := C.range_embed.symm.subset hz
+    have hsurj : Function.Surjective (mfderiv (𝓡 2) (𝓡 2) C.embed y) :=
+      (C.isLocalDiffeomorph_embed.isInvertible_mfderiv (by simp) y).surjective
+    refine (TauCeti.mpullback_apply_eq_mpullback_apply_iff hsurj).mp ?_
+    simpa only [TauCeti.SmoothForm.coe_mpullback] using
+      congrFun (congrArg Subtype.val hpull_embed) y
+  · have hz_not_supp : z ∉ C.supportSet I.r₀_lt_one :=
+      fun hmem ↦ hz (C.supportSet_subset_sourceOpen I.r₀_lt_one hmem)
+    have hclosed : IsClosed (C.supportSet I.r₀_lt_one) :=
+      (C.isCompact_supportSet I.r₀_lt_one).isClosed
+    let V_compl : Opens Sphere2 := ⟨(C.supportSet I.r₀_lt_one)ᶜ, hclosed.isOpen_compl⟩
+    let zV : V_compl := ⟨z, hz_not_supp⟩
+    have hΦ_compl : ⇑Φ ∘ (Subtype.val : V_compl → Sphere2) = (Subtype.val : V_compl → Sphere2) :=
+      funext fun w ↦ C.liftThroughChart_eq_self_of_notMem_supportSet
+        I.r₀_lt_one I.eq_self_of_notMem_ball t w.2
+    have hpull_compl :
+        TauCeti.SmoothForm.mpullback (Subtype.val : V_compl → Sphere2) contMDiff_subtype_val
+            (TauCeti.SmoothForm.mpullback Φ Φ.contMDiff S2PositiveVolumeForm.Ω) =
+          TauCeti.SmoothForm.mpullback (Subtype.val : V_compl → Sphere2) contMDiff_subtype_val
+            S2PositiveVolumeForm.Ω := by
+      rw [TauCeti.SmoothForm.mpullback_mpullback]
+      exact mpullback_congr_fun_two_checks _ _ hΦ_compl S2PositiveVolumeForm.Ω
+    have hsurj_compl :
+        Function.Surjective (mfderiv (𝓡 2) (𝓡 2) (Subtype.val : V_compl → Sphere2) zV) :=
+      ((TauCeti.isLocalDiffeomorph_subtype_val (I := 𝓡 2) (n := ∞) zV).isInvertible_mfderiv
+        (by simp)).surjective
+    refine (TauCeti.mpullback_apply_eq_mpullback_apply_iff hsurj_compl).mp ?_
+    simpa only [TauCeti.SmoothForm.coe_mpullback] using
+      congrFun (congrArg Subtype.val hpull_compl) zV
+
+theorem liftDiskIsotopyDiffeomorph_ne_id
+    (C : SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω)
+    {r₀ : ℝ} (I : AreaPreservingDiskIsotopy r₀) (hne : I.diskTimeOneMap ≠ id) :
+    (⇑(liftDiskIsotopyDiffeomorph C I 1) : Sphere2 → Sphere2) ≠ id := by
+  intro hid
+  apply hne
+  funext y
+  have hemb :
+      C.embed ⟨(I.diskTimeOneMap y).1, (I.diskTimeOneMap y).2⟩ = C.embed ⟨y.1, y.2⟩ := by
+    calc
+      C.embed ⟨(I.diskTimeOneMap y).1, (I.diskTimeOneMap y).2⟩
+          = C.liftThroughChart I.d (1, C.embed ⟨y.1, y.2⟩) :=
+            (C.liftThroughChart_embed (fun s _ hw ↦ I.mem_unitDisk2 s hw) 1 ⟨y.1, y.2⟩).symm
+      _ = liftDiskIsotopyDiffeomorph C I 1 (C.embed ⟨y.1, y.2⟩) := rfl
+      _ = C.embed ⟨y.1, y.2⟩ := congrFun hid (C.embed ⟨y.1, y.2⟩)
+  exact Subtype.ext (congrArg Subtype.val (C.injective_embed hemb))
+
+/-- Unconditional nontrivial area-preserving $C^\infty$ symplectomorphism of `Sphere2` obtained by
+lifting `m33SectorSwap` (`canonicalSectorSwapIsotopy`) through `s2DiskChart`. -/
+noncomputable def s2UnconditionalSectorSwap : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 :=
+  liftDiskIsotopyDiffeomorph s2DiskChart m33SectorSwap 1
+
+/-- **Cross-Track M2+M3.3 Unconditional $S^2$ Symplectomorphism Witness**:
+With **zero** typeclass assumptions, lifting `m33SectorSwap` through `s2DiskChart` produces a
+smooth 1-parameter family of `Sphere2` diffeomorphisms starting at `Diffeomorph.refl` (`t = 0`),
+preserving `S2PositiveVolumeForm.Ω` at every time `t : ℝ`, whose time-`1` map
+`s2UnconditionalSectorSwap` is `MeasurePreserving` for `S2PositiveVolumeForm.μ` and strictly
+nontrivial (`≠ id`). -/
+theorem m33_unconditional_s2_sectorSwap_witness :
+    liftDiskIsotopyDiffeomorph s2DiskChart m33SectorSwap 0 = Diffeomorph.refl (𝓡 2) Sphere2 ∞ ∧
+      (∀ t : ℝ,
+        TauCeti.SmoothForm.mpullback (liftDiskIsotopyDiffeomorph s2DiskChart m33SectorSwap t)
+          (liftDiskIsotopyDiffeomorph s2DiskChart m33SectorSwap t).contMDiff
+          S2PositiveVolumeForm.Ω = S2PositiveVolumeForm.Ω) ∧
+      MeasurePreserving ⇑s2UnconditionalSectorSwap S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ ∧
+      (⇑s2UnconditionalSectorSwap : Sphere2 → Sphere2) ≠ id :=
+  ⟨liftDiskIsotopyDiffeomorph_zero s2DiskChart m33SectorSwap,
+    mpullback_liftDiskIsotopyDiffeomorph_eq s2DiskChart m33SectorSwap,
+    S2PositiveVolumeForm.measurePreserving_of_mpullback_eq s2UnconditionalSectorSwap
+      (mpullback_liftDiskIsotopyDiffeomorph_eq s2DiskChart m33SectorSwap 1),
+    liftDiskIsotopyDiffeomorph_ne_id s2DiskChart m33SectorSwap
+      (canonicalSectorSwapIsotopy_properties m33SupportRadius_mem_Ioo).2.2.2.2.2⟩
+
+end M33SmoothingChecks
 
 end S4TuringPoisson.Checks
