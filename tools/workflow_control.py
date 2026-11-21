@@ -37,6 +37,9 @@ CONTRACT_FILES: Dict[str, str] = {
     "M3.1": "S4TuringPoisson/Dynamics/GeneralizedShift.lean",
     "M3.2": "S4TuringPoisson/Dynamics/UndecidabilityAndTransfer.lean",
     "M3.3": "S4TuringPoisson/Smoothing/DiskSmoothing.lean",
+    "M4.1": "S4TuringPoisson/Extension/AlignedUnimodularVolume.lean",
+    "M4.2": "S4TuringPoisson/Extension/BumpIsotopyLift.lean",
+    "M5": "S4TuringPoisson/Main.lean",
     "C.Geom": "S4TuringPoisson/Checks/GeomChecks.lean",
     "C.Comp": "S4TuringPoisson/Checks/CompChecks.lean",
 }
