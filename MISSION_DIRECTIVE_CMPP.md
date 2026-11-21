@@ -105,7 +105,7 @@ Today `cantorDiskEmbed` fills `(−1/2,1/2)²` of the unit disc, support radius 
 
 ### 4.4 H1 route (largest uncertainty)
 - **B1 Bennett reversibilization (generic).** Any `FinTM0` `U` gives a `ReversibleTM` `R_U` (history track): from `init'(c)` it reaches an accepting cylinder iff `U` halts; `stepPerm`/`dirIn` bijective.
-- **B2 Universal `FinTM0` with windowed output.** One `U` such that for all `(M,t)`, `U` on `enc(M,t)` halts with an encoding of `M`'s final tape. Route via `Nat.Partrec.Code` + `PartrecToTM2 → TM2to1 → TM1to0` (as M3.2 did). **Known gap: Mathlib proves partrec → TM, not TM → partrec; the interpreter-is-partrec direction must be proved.** Under D2 there is no fixed-machine fallback.
+- **B2 Universal `FinTM0` with windowed output.** One `U` such that for all `(M,t)`, `U` on `enc(M,t)` halts with an encoding of `M`'s final tape. **Blocked on `MISSION_DIRECTIVE_TMPARTREC.md`** (Mathlib proves partrec → TM only; the TM → partrec direction is formalized there as T-A/T-C, and the windowed universal TM0 as T-E(3)). B2 here reduces to transporting T-E(3) to `FinTM0`/`HaltsWithWindow` by relabeling. Under D2 there is no fixed-machine fallback.
 - **B3 Assemble** into `UniversalReversibleSimulator` with primitive-recursive digit enumerators, using relaxed acceptance (I2).
 
 ### 4.5 R5: Poisson-Hamiltonian realization on S⁴ (new, from D2)
@@ -252,4 +252,5 @@ theorem exists_poisson_hamiltonian_realization_S4 :
 CMPP21 (Cardona-Miranda-Peralta-Salas-Presas, PNAS 2021, arXiv:2012.12828) §4-5, Thm 5.2; Moore 1990; Bennett 1973; Lecerf 1963; Morita (small universal reversible TMs); Guibas-Yao (translating sets of rectangles); Moser 1965 and Dacorogna-Moser 1990 (appendix only); Palais 1960 / Hirsch Ch. 8 (not needed by the main route).
 
 ## 12. Immediate next action
-Launch **W0**: C0 (Python spike) in parallel with GI (gemma infra). Then GM1 calibration. Do not start any frontier Lean worker before `docs/cmpp/routing.md` exists.
+**Prerequisite:** `MISSION_DIRECTIVE_TMPARTREC.md` runs first. Its W0 builds the local-model engine (GI/GM1 here reuse it, recalibrated on CMPP-style lemmas), and its T-C/T-E deliver what B2 needs.
+Then launch **W0** here: C0 (Python spike) in parallel with GI adaptation, then GM1. Do not start any frontier Lean worker before `docs/cmpp/routing.md` exists. The A-chain (geometry) does not depend on TM→Partrec and may start once the engine exists.
