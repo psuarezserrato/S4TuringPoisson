@@ -1,158 +1,255 @@
 # MISSION DIRECTIVE (CMPP): Discharge `HasCMPPCantorCirculationHamiltonians`
+## Merged directive v2: formalize the CMPP21 smoothing result as Hamiltonian flows, local-model-first
 
-**Goal.** Remove the last external hypothesis from the Turing-complete headline theorems of `S4TuringPoisson`
-by constructing an instance of `HasCMPPCantorCirculationHamiltonians`
-(`S4TuringPoisson/Smoothing/DiskSmoothing.lean:1696`), i.e. formalize the smoothing step of
-Cardona–Miranda–Peralta-Salas–Presas (CMPP21, §4–5, Thm 5.2) in Lean 4 (`v4.36.0`, Mathlib + TauCeti `v4.36.0`).
-
-Prerequisite reading: `AUDIT.md`, `MISSION_DIRECTIVE.md` (§1.3 axiom standard, §2 swarm rules, §6 gates),
-`.agents/rules/lean-integrity.md`. All rules there (zero `sorry`/`axiom`, junk-value vigilance, 24 GB RAM
-guardrails, 5-retry escalation to Carbon, exclusive file ownership, isolated `.worktrees/<worker>`) apply unchanged.
+Repo: `/Users/pablosuarez/Desktop/S4TuringPoisson` (`main`, Lean `v4.36.0`, Mathlib + TauCeti `v4.36.0`).
+Prior art repo: `/Users/pablosuarez/Desktop/SympTopAutoForm` (Mathlib `v4.35.0`, no TauCeti).
+Inputs merged here: (a) my first draft of this directive, (b) `/Users/pablosuarez/.gemini/antigravity/brain/745c86d2-.../CMPP_MISSION_DIRECTIVE.md`,
+(c) the user's decisions below. Standing rules from `MISSION_DIRECTIVE.md` §1.3, §2, §6 and `.agents/rules/lean-integrity.md` apply
+(zero `sorry`/`axiom`, junk-value vigilance, exclusive file ownership, isolated `.worktrees/<worker>`, 5-retry escalation, 24 GB RAM guardrails).
 
 ---
 
-## 0. What the audit established (facts, verified in the repo)
+## 0. Resolved decisions and how the two drafts were reconciled
 
-| Fact | Evidence |
+| ID | User decision | Consequence in this directive |
+|---|---|---|
+| **D1** | **Hamiltonian flows are mandatory** (important for the theory) | Target is the CMPP class itself. Every generator is a `CompactlySupportedPlanarHamiltonian`. My Moser route (non-Hamiltonian) is demoted to an emergency appendix; the other draft's route (translations + exact stretch) is Hamiltonian by construction and is now the **main route** |
+| **D2** | **No fixed-machine fallback.** Recreate a full universal machine as a Hamiltonian flow using Poisson geometry on S⁴ | `IsTuringComplete` stays universal over all `FinTM0`. The other draft's "D4 = `hasCMPP_of_simulator`" is kept only as an **interim, explicitly CONDITIONAL checkpoint (R4)**, never as an endpoint. New deliverable **R5**: the final diffeomorphism of S⁴ is exhibited as a composition of time-1 flows of **Poisson-Hamiltonian vector fields of π_f** (§4.5) |
+| **D3** | Cantor-set design stays as is (improving Moore's shift is a separate project) | `cantorDiskEmbed`, base `2N−1`, digit scheme, `GeneralizedShift`, `shiftDom3` are **frozen**. The other draft's refactor I1 (chart scale) is **only allowed as a pure similarity rescaling with the default behaviour recoverable, and only after C0 proves it is necessary and the user signs off** (§5). Its I3 (conjugacy bypass) is **removed** (it would replace the Cantor design and escape D1) |
+| **D4** | `gemma4:12B` was called only 7 times; maximize local use to cut wall-clock and frontier compute | New §6 **Local-Model-First Engine**: compiler-in-the-loop prover, retrieval, measured tiers, enforced provenance gate, outcome-logging ledger |
+
+Naming fix: the other draft's deliverables "D1–D4" collided with the user's decisions. They are renamed **R1–R4** below; R5 is new.
+
+Reconciled discrepancies:
+1. *Geometry route*: other draft (Sliding Lemma + rigid translations + exact hyperbolic stretch) replaces my parametric Moser plan. Reasons: no Moser/isotopy-extension exists in TauCeti; the route reuses already-proved primitives; it yields Hamiltonians directly.
+2. *Ledger evidence*: the other draft cites the gromov campaign's 499 local calls as a good baseline. I checked: **all 499 records have `accepted = null`**, so that ledger shows usage but never recorded success. The new ledger must record verified outcomes (§6.4).
+3. *Concurrency*: the 2-Lean-worker cap now includes the local-model daemon (§6.6).
+
+---
+
+## 1. Objective and deliverables
+
+| ID | Deliverable | Label |
+|---|---|---|
+| **R1 (main)** | `noncomputable instance : HasCMPPCantorCirculationHamiltonians`, no hypotheses, in `Smoothing/CMPPInstance.lean`. `#print axioms` ⊆ `{propext, Classical.choice, Quot.sound}` | UNCONDITIONAL |
+| **R2** | Unconditional versions of the four `Main.lean` theorems on `Sphere4` (no `[HasTuringComplete…]`/`[HasCMPP…]` argument); old `*_of_cmpp` kept as corollaries | UNCONDITIONAL |
+| **R3** | Gate 6 re-proved unconditionally in `CompChecks.lean`; `AUDIT.md` regenerated | UNCONDITIONAL |
+| **R4 (interim)** | `theorem hasCMPP_of_simulator (S : UniversalReversibleSimulator) : HasCMPPCantorCirculationHamiltonians` | CONDITIONAL-ON-simulator S |
+| **R5 (D2)** | **Poisson-Hamiltonian realization on S⁴**: there are finitely many `H̃ⱼ : Sphere4 → ℝ` (smooth) such that `d̄` equals the composition of the time-1 flows of the Hamiltonian vector fields of `s4AdaptedPoisson` for `H̃ⱼ`, and `IsTuringComplete ⇑d̄` | UNCONDITIONAL (statement finalized in Phase 0, §4.5) |
+
+Frozen (no statement changes): `IsTuringComplete`, `TuringCompleteWitness`, `HaltsWithWindow`, `HasTuringCompleteAreaPreservingDiskIsotopy`,
+`cantorDiskEmbed` and the generalized-shift definitions, all `Main.lean` conclusions.
+
+---
+
+## 2. Problem anatomy (verified in the repo and in the audit)
+
+`HasCMPPCantorCirculationHamiltonians` has four fields: `sim : UniversalReversibleSimulator`, `r₀ ∈ (0,1)`,
+`generators : List (CompactlySupportedPlanarHamiltonian r₀)`, and `realizes_shift`
+(time-1 map of `listToDiskIsotopy generators` sends `cantorDiskEmbed enc s` to `cantorDiskEmbed enc (Φ.eval s)` for **all** `s : ℤ → A`).
+
+Two independent missing halves:
+
+| Half | Content | Status |
+|---|---|---|
+| **H2 smooth realization** | finite Hamiltonian list realizing the shift exactly on the Cantor set | Not started. Engine exists in `DiskSmoothing.lean` (flows, exact hyperbolic stretch on a ball, composition, area preservation) |
+| **H1 universal reversible simulator** | one `ReversibleTM` + encoding simulating every `FinTM0` with windowed output, with primitive-recursive digit enumerators | **No `UniversalReversibleSimulator` exists anywhere.** `universalHaltingTM0` (M3.2) is an irreversible machine for one halting question, not a universal simulator |
+
+Interface facts: `computable_approx` is per machine `M` (no uniformity in `M`), so `M ↦ table` may be noncomputable. `HaltsWithWindow` equivalence is halting-with-window, not step-exact.
+`acceptBlocks` currently uses cylinders at one fixed radius `windowRadius M k`, which forces cell-faithful readout (see I2).
+
+---
+
+## 3. Reuse from `SympTopAutoForm` (gromov-genus0-compactness)
+
+Checked by grep over its 57k lines: **no mathematical reuse** (no Moser, isotopy, Hamiltonian, shift or Cantor content; Mathlib 4.35, no TauCeti, so nothing can be imported). **High process reuse; port these:**
+
+| Asset | Use here |
 |---|---|
-| No instance of `HasCMPPCantorCirculationHamiltonians` or `HasTuringCompleteAreaPreservingDiskIsotopy` exists | `grep` over all of `S4TuringPoisson/` |
-| The class has **two** non-trivial fields, not one: `sim : UniversalReversibleSimulator` and `generators`/`realizes_shift` | `DiskSmoothing.lean:1553,1696` |
-| **No `UniversalReversibleSimulator` is constructed anywhere** | only the `structure` and consumers exist |
-| `realizes_shift` demands **exact** equality `time-1 map (cantorDiskEmbed enc s) = cantorDiskEmbed enc (Φ.eval s)` for **all** `s : ℤ → A` | `RealizesGeneralizedShiftByHamiltonians` |
-| TauCeti has **no** Moser trick, disc theorem, or isotopy-extension for embedded discs. It has Palais-style extension by the identity (`IsLocalDiffeomorph.exists_diffeomorph_extend`), Schoenflies, time-dependent flows, Hamiltonian vector fields, and `mpullback_timeDependentFlowOf_of_mextDeriv_interior_eq_zero` | grep of `.lake/packages/TauCeti` |
-| Already available and proved | exact bumped rotation / hyperbolic stretch / rigid translations on balls (`bumpedRotationIsotopy`, `bumpedHyperbolicStretchIsotopy`, `sectorSwapIsotopy`); groupoid closure of `AreaPreservingDiskIsotopy`; `FinTM0.toGeneralizedShift`; `ReversibleTM` with `bijective_eval`; `universalHaltingTM0` + `primrec_map_universalInputList`; `IsTuringComplete.undecidable_orbit_reachability` |
+| `tests/PhaseAxiomCensus.lean` (`#phase_axiom_census`, `#audit_wiring`) | Gate G4: the final instance's transitive closure must contain the load-bearing lemmas (catches decorative `have`s) |
+| `tests/CertificateSanity.lean` | Gate G5 satisfiability pattern for every new structure/hypothesis |
+| Route-1 incident (`COMPLETION_PLAN.md`, 7 Nov) | A fake "unconditional" result forced all maps constant, making theorems vacuous. Source of the anti-vacuity gate |
+| `tests/Adversarial*Challenger*.lean` | Verifiers write refutation attempts, not only confirmations |
+| Labels *unconditional* / *certificate-parameterized* | Reused as the labels in §1 |
+| `tools/build_bm25_index.py`, `premise_retrieval.py`, `extract_diffgeo_dataset.py`, `data/bm25_index.pkl` | Port to S4TP for retrieval (§6.3). Its corpora (`mathlib_v435_accepted_proofs.jsonl` 4000, `diffgeo_accepted_proofs.jsonl` 3330, `gemma_accepted_proofs.jsonl` 2670) are **Mathlib 4.35: stale names, syntax few-shot only** |
+| `gemma-lean4:latest`, LoRA adapters | `gemma2:9b`-based, not portable to `gemma4:12B`. Syntax-scaffolding fallback only; **no fine-tuning in this mission** |
 
-So the mission splits into two independent tracks that meet in one assembly step.
+---
 
-```mermaid
-flowchart TD
-  A["Track A: computability<br/>universal reversible simulator"] --> C
-  B["Track B: geometry<br/>finite rectangle rearrangement<br/>by area-preserving isotopy"] --> C
-  C["Track C: assembly<br/>cylinders = rectangles, pieces = affine,<br/>RealizesGeneralizedShiftByHamiltonians"] --> D["instance HasCMPPCantorCirculationHamiltonians"]
+## 4. Mathematical route (Hamiltonian, Moser-free)
+
+TauCeti has no Moser trick or embedded-disc isotopy extension (only Palais-style extension by the identity, Schoenflies, `Hamiltonian/{Quadratic,Hyperbolic,Localized,TimeDependent}`). The route below needs neither.
+
+### 4.1 Lemma G0 (disjointness; removes the feared obstruction)
+For a shift `Φ` on `D = {-1,0,1}` with `F(w) ∈ {-1,0,1}`: source rectangles `R_w` (`w ∈ A³`, size `B⁻²×B⁻¹`) are pairwise disjoint. The image of `R_w` is the full rectangle `R'_w` of the cylinder fixed at positions `D−F(w)`
+(`B⁻¹×B⁻²` for `F=+1`; `B⁻³×1` for `F=−1`; `B⁻²×B⁻¹` for `F=0`).
+**If `Φ.eval` is injective, the `R'_w` are pairwise disjoint** (a common point forces two compatible cylinders, hence a common configuration, hence `w = w'`; incompatible cylinders have disjoint closed intervals because middle-Cantor digits leave a gap).
+Hence on `R_w`, `Φ` is exactly the affine area-preserving map `A_w(x,y) = (B^{F}x + aw, B^{−F}y + bw)`, with disjoint axis-parallel sources and targets.
+(I re-derived `Φ(C_w)` and the positions `D−F` independently; they agree with the other draft. Signs of `F` against `Φ.eval`, and the fact that coordinate 0 carries the **negative** half, must be pinned in C0.)
+
+### 4.2 Relocation Theorem (RT): the whole of H2
+> Let `Pᵢ` (`i<n`) be pairwise-disjoint compact axis-parallel rectangles and `P'ᵢ = Aᵢ(Pᵢ)` pairwise disjoint, all in `ball 0 ρ`, with `Aᵢ = translation ∘ diag(λᵢ, λᵢ⁻¹)`, `λᵢ ∈ {B,1,1/B}`. Then there is a finite list of compactly supported planar **autonomous** Hamiltonians (support in `ball 0 r₀`) whose time-1 composite equals `Aᵢ` on `Pᵢ` for every `i`.
+
+Architecture (every step is an exact rigid translation of one compact rectangle, or an exact in-place stretch):
+1. **Sliding Lemma.** Sliding axis-parallel disjoint rectangles in `+x` in order of decreasing left edge is collision-free (a blocker overlapping in `y` is x-separated, so it has a larger left edge and moved earlier). First-moved goes farthest into its own parking slot.
+2. **Evacuate sources** to slots.
+3. **Workbench at the origin.** For each piece: lift to a corridor, travel, drop at the origin, apply the exact hyperbolic stretch (`bumpedHyperbolicStretchIsotopy`, `μ = log B`) for `F = ±1`, then move to its target-evacuation slot.
+4. **Reverse sliding** brings pieces to `P'ᵢ` (targets are a disjoint family, so the same lemma applies backwards).
+
+Only two primitives are needed: **L1** (new): exact rigid translation by `v` of a compact set `S`, identity outside a prescribed open `U ⊇ tube(S,v)` (a linear Hamiltonian times a cutoff `≡1` near the tube; generalizes `sectorSwapIsotopy`; reuses `timeDependentFlowOf_eq_of_hasMFDerivAt`); **L2** (exists): exact stretch on a closed ball.
+
+**Design constraint from D2/R5:** all generators must be **autonomous** (`CompactlySupportedPlanarHamiltonian.ofAutonomous`). L1 (linear × cutoff) and L2 (bump × `xy`) already are. This is what makes R5 (§4.5) possible.
+
+### 4.3 The room problem (decided by data, not assumed)
+Today `cantorDiskEmbed` fills `(−1/2,1/2)²` of the unit disc, support radius `r₀<1`. The other draft claims there is no room to park `n = N³` pieces and proposes chart scale `c ≤ 1/(16N³)`. My own count disagrees in spirit: the free area outside the square is ≈ `π−1`, but some images are full-height strips (`B⁻³×1`) that only fit near the vertical axis. **Therefore C0 (numeric spike) must decide whether the current chart suffices.** Only if it provably does not, request I1 (§5) and obtain user sign-off (D3).
+
+### 4.4 H1 route (largest uncertainty)
+- **B1 Bennett reversibilization (generic).** Any `FinTM0` `U` gives a `ReversibleTM` `R_U` (history track): from `init'(c)` it reaches an accepting cylinder iff `U` halts; `stepPerm`/`dirIn` bijective.
+- **B2 Universal `FinTM0` with windowed output.** One `U` such that for all `(M,t)`, `U` on `enc(M,t)` halts with an encoding of `M`'s final tape. Route via `Nat.Partrec.Code` + `PartrecToTM2 → TM2to1 → TM1to0` (as M3.2 did). **Known gap: Mathlib proves partrec → TM, not TM → partrec; the interpreter-is-partrec direction must be proved.** Under D2 there is no fixed-machine fallback.
+- **B3 Assemble** into `UniversalReversibleSimulator` with primitive-recursive digit enumerators, using relaxed acceptance (I2).
+
+### 4.5 R5: Poisson-Hamiltonian realization on S⁴ (new, from D2)
+Goal: not merely "a Turing-complete diffeomorphism that happens to preserve π_f", but one **generated by π_f-Hamiltonian flows**.
+Sketch (to be verified in Phase 0, question Q-P): `d̄(b,·) = ∏ᵢ φ^{ρ(b)}_{Hᵢ}` on the fibre, with autonomous `Hᵢ`, so `φ^{ρ(b)}_{Hᵢ} = φ¹_{ρ(b)Hᵢ}`. On a symplectic leaf (a fibre), the Hamiltonian field of `π_f` for `h̃` is leafwise: `X_h̃ = (density factor)·X_{h̃|leaf}` w.r.t. the leaf form, where the factor comes from the aligned volume's `c(b)>0` (`trivialization_pos_cooriented`). Take `H̃ᵢ = (ρ/c)·(Hᵢ ∘ chart⁻¹)`, extended by `0`. Compact support gives completeness of `X_{H̃ᵢ}`.
+Must pin: the exact normalization `{g,h}_{π_f}Ω = dg∧dh∧f^*μ_Σ` vs `s4AlignedPositiveVolume`; that `bumpProfile`-slicing equals the time-1 flow; that flows commute properly across the region where `χ≢1`. If the autonomous trick fails, fall back to **time-dependent** Hamiltonians (still Hamiltonian flows; D1 satisfied).
+
+### 4.6 Emergency appendix (only if sliding/relocation stalls, needs coordinator + user approval)
+Parametric Moser route from my first draft: (T1) isotopy extension by compactly supported fields; (T2) collision-free motion of shrunken pieces with parking trick; (T3) compactly supported divergence lemma; (T4) parametric Moser correction; (T5) divergence-free compactly supported fields are Hamiltonian (primitive along a ray). Heavier (new Moser development) but keeps D1 via T5.
+
+---
+
+## 5. Permitted interface refactors (each needs verifier statement-diff review)
+
+- **I1 (conditional, D3).** Similarity-rescale parameter `c` in `scaledCantorCoord`/`cantorDiskEmbed`, default recovering the current definition; no change to base, digits, or shift. Allowed **only if C0 proves necessity and the user signs off**. Existing lemma names preserved; root build + both `Checks` unchanged in meaning.
+- **I2.** Accepting sets as arbitrary open unions of cylinder rectangles of any radius (still nonempty, depending only on `(M,k,w)`; `HaltsWithWindow` equivalence unchanged; `encodeOpen` unchanged). Removes the cell-faithful-readout burden from B2 without weakening universality.
+- ~~I3 conjugacy bypass~~: **removed** (violates D1/D3).
+Forbidden: touching `IsTuringComplete`, `TuringCompleteWitness`, `HaltsWithWindow`; strengthening any definition so a proof becomes easy (Route-1 incident).
+
+---
+
+## 6. Local-Model-First Engine (D4)
+
+Facts measured: `gemma4:12B` (4-bit nvfp4, 7.7 GB, `num_ctx=32768`, `OLLAMA_NUM_PARALLEL=1`) runs at **≈7 tok/s** (92 tokens in 13.1 s on a trivial Lean goal). A 300-token proof ≈ 45 s plus a Lean check. Parallelism is capped at 1 by the RAM guardrail, so the gain is **frontier tokens and frontier wall-clock saved while the daemon works in the background**, not raw speed. Previous campaigns: S4TP 7 calls; gromov 499 calls with **no recorded outcomes**.
+
+### 6.1 Division of labour
+- Frontier (Carbon): architecture, **statements and `sorry` skeletons**, T2 core proofs, escalations, final integration.
+- Local `gemma4:12B`: fills `sorry`s for T0/T1 via the compiler-in-the-loop prover; drafts T2 skeletons and premise lists.
+- Argon (lint/docstring/import cleanup only, per `MISSION_DIRECTIVE.md` §2).
+
+### 6.2 Tiers (rubric; thresholds set empirically in §6.5)
+- **T0 algebra/combinatorics/boilerplate:** digit and geometric-series identities, interval/closed-interval disjointness, list/finset lemmas, slot ordering, `simp`/`ext`/API wrappers, instance plumbing, ≤100-col reflow.
+- **T1 structured routine:** induction over Hamiltonian lists, `listToDiskIsotopy` composition lemmas, `ContDiff`/continuity of explicit formulas, compact-set/tube topology, TM step-simulation case analysis.
+- **T2 core analysis/geometry:** flow exactness, Hamiltonian-field computations, pullback/Cartan, Bennett correctness architecture, partrec reasoning.
+
+### 6.3 Tools (built in Wave 0, Python stdlib where possible; owner `@gemma-infra`)
+1. `tools/gemma_loop.py`: **compiler-in-the-loop prover.** Input: declaration statement + module context. Prompt = system + top-8 retrieved premises + 3 retrieved accepted proofs + statement. Each candidate is written to `.agents/gemma_scratch/<decl>_<k>.lean`, checked with `LEAN_NUM_THREADS=2 lake env lean` (timeout 300 s), accepted iff exit 0 with no `sorry` and no warnings. On failure the first ≤30 error lines feed the next attempt. **≤5 attempts** (matches the 5-retry rule); attempts 4–5 enable thinking. Accepted proofs go to `.agents/gemma_accepted/<decl>.lean`. After 5 failures it writes `.agents/gemma_escalations/<decl>.json` (all attempts + errors), which Carbon reads, so frontier effort is not blind. Daemon/batch mode processes a queue of spec files in the background.
+2. `tools/s4tp_index.py`: BM25 index over (a) this repo's declarations (signature + docstring), (b) Mathlib/TauCeti `v4.36` declarations from `.lake/packages` (regex of `theorem|lemma|def` + docstrings). Also builds `data/s4tp_accepted.jsonl` from our own ~19.5k verified lines (version-matched gold few-shot). Port of `build_bm25_index.py`/`premise_retrieval.py`.
+3. `tools/gemma_bench.py`: calibration benchmark (§6.5).
+4. Extended `tools/ollama_lean4_client.py`: `--with-premises`, outcome fields.
+
+### 6.4 Ledger (fixes the gromov flaw)
+Every record: `declaration`, `tier`, `attempt`, `accepted` (verified by Lean, never self-reported), `error_class`, `tokens`, `latency_ms`, `lean_ms`. `ledger-summary` reports acceptance per tier and per milestone.
+
+### 6.5 Calibration before routing (gate GM1)
+Take ≥40 already-proved lemmas from this repo stratified over T0/T1/T2, hide the proofs, **exclude them and near duplicates from the retrieval index**, run the loop, report pass@1/pass@5 and wall time per tier to `docs/cmpp/gemma_calibration.md`.
+Routing rule (set by data, not hope): tier is **gemma-first** if pass@5 ≥ 30%; **gemma-draft-only** if 10–30%; **frontier** if < 10%. I do not assume 12B can do analysis; the pipeline is built so that failure costs little.
+
+### 6.6 Slot accounting (24 GB guardrail)
+Max 2 active Lean processes. The gemma daemon's `lake env lean` checks use **one slot**; at most **one frontier Lean worker** uses the other. Steady state: daemon + 1 frontier worker. The A-chain and B-chain therefore alternate on the frontier slot rather than run as two frontier workers.
+Wall-clock estimate to be refreshed after GM1: ≈ (45 s generation + Lean check) × (≈2–3 attempts) per declaration; 100 declarations ≈ 4–6 h in the background.
+
+### 6.7 Provenance enforcement (gate G8)
+`tools/check_gemma_provenance.py` lists every T0/T1 declaration added in a milestone diff and requires **either** a file in `.agents/gemma_accepted/` **or** an escalation file with **5 logged failed attempts**. A frontier-written T0/T1 proof without that record fails the gate. Milestone reports must state counts by origin (gemma-accepted / escalated-then-frontier / frontier) and the per-tier acceptance rate.
+
+---
+
+## 7. Milestones, ownership, waves
+
+Conventions: new files under `S4TuringPoisson/Smoothing/CMPP/` unless stated; exclusive ownership; every milestone ends with the §8 gates; merge `--no-ff` only after both verifiers pass.
+
+| ID | Milestone | Owner / files | Done when |
+|---|---|---|---|
+| **C0** | **Python spike, no Lean.** `tools/cmpp_planner.py`: toy `N=2,3` (`B=3,5`), random injective shift; generate rectangles, check G0, run the 4-step pipeline numerically, verify the composite reproduces `Φ` on random Cantor points, **decide the room question (§4.3)**, pin signs and slot coordinates, pin the R5 normalization numerically. Output `docs/cmpp/geometry_spec.md` | `@planner` (light) | exact on 10⁴ random points; I1 needed or not decided with evidence |
+| **GI** | Gemma infra §6.3 + census port (`#audit_wiring`) | `@gemma-infra` (Argon): `tools/`, `tests/` | tools run end to end on a toy lemma; ledger records `accepted` |
+| **GM1** | Calibration benchmark and routing | `@gemma-infra` | `docs/cmpp/gemma_calibration.md` + `docs/cmpp/routing.md` |
+| **A0** | Chart scale I1 (**only if C0 says so and user approves**) | `@chart`: `Dynamics/GeneralizedShift.lean` | root `--wfail` green, `Checks` unchanged in meaning |
+| **A1** | Digit algebra: `cantorCoord` under head replacement/shift; cylinder rectangle = interval product; **G0**; `A_w` formulas | `@digits`: `CMPP/Digits.lean` (T0-heavy: gemma-first) | `A_w(R_w)=R'_w`; `A_w(cantorDiskEmbed s) = cantorDiskEmbed (Φ.eval s)` on `cyl w` |
+| **A2** | L1 (compact-set rigid translation, autonomous) + L2 wrapper | `@flows`: `CMPP/Primitives.lean` (T2: Carbon, gemma drafts) | exact on `S`, identity off `U`, area-preserving, compact support |
+| **A3** | Sliding Lemma, slot permutation, **RT** (abstract rectangles) | `@relocate`: `CMPP/Relocation.lean` | RT generic in `n`, 0 `sorry` |
+| **A4** | `RealizesGeneralizedShiftByHamiltonians` for every injective `shiftDom3` shift; **R4** | `@assemble`: `CMPP/Realize.lean` | R4 delivered |
+| **B1** | Bennett reversibilization | `@bennett`: `Dynamics/Reversible/Bennett.lean` | orbit/accept equivalence + bijectivity |
+| **B2** | Universal `FinTM0`, TM → partrec lemma | `@universal`: `Dynamics/Reversible/Universal.lean` | simulation theorem for all `(M,t)` |
+| **B3** | Refactor I2; construct `UniversalReversibleSimulator` | `@simulator`: `CMPP/Simulator.lean` | inhabited, primrec digits |
+| **P** | **R5 Poisson-Hamiltonian realization** on S⁴ (Q-P resolved in C0) | `@poisson-ham`: `Extension/PoissonHamiltonian.lean` | statement of §4.5 proved for the final generators |
+| **Z** | Final instance, R1–R3, ported `#audit_wiring`, `AUDIT.md` | `@leaf-final` | all gates |
+
+Waves: **W0** = C0 ‖ GI (Python, negligible RAM) → GM1 (one Lean slot). **W1** = A0 (if approved), A1 (daemon-first). **W2** = A2, then A3, A4 (frontier slot) with the daemon filling T0/T1 `sorry`s. **W3** = B1, B2, B3 (frontier slot alternates with A-chain). **W4** = P, Z. Verifiers `@verifier-geom` (A-chain, P) and `@verifier-comp` (B-chain) stay parked until a milestone lands and must **attempt refutations**.
+
+Effort (honest): comparable to the previous campaign (10-25k lines). The A-chain is bounded and understood; **the B-chain, especially B2, is the dominant risk**.
+
+---
+
+## 8. Verification gates (a milestone cannot merge unless all apply and pass)
+
+- **G1 Build.** `LEAN_NUM_THREADS=2 lake build --wfail`: 0 errors/warnings, ≤100 columns.
+- **G2 Axioms.** `collectAxioms` over every new declaration ⊆ `{propext, Classical.choice, Quot.sound}`; comment-stripped scan finds none of `sorry|admit|axiom|unsafe|implemented_by|native_decide|opaque|maxHeartbeats`.
+- **G3 Statement freeze.** `git diff` shows no change to frozen statements (§1); I1/I2 reviewed line by line.
+- **G4 Wiring audit.** The final instance's transitive closure contains `toDiskIsotopy`, L1, L2, the Sliding Lemma, G0 and `ReversibleTM.bijective_eval`.
+- **G5 Anti-vacuity / satisfiability** (`CertificateSanity` pattern). For every new structure/hypothesis, a sanity file exhibits an inhabitant or proves non-contradiction. Required toy end-to-end test: realize a concrete 2-3 symbol reversible machine's shift (reuse `R_flipRight_shift` from `CompChecks`) through the pipeline and check exactness at specific Cantor points.
+- **G6 Regression.** Existing `GeomChecks`/`CompChecks` pass; `*_of_cmpp` theorems still hold.
+- **G7 Honest labelling.** Every deliverable is UNCONDITIONAL or CONDITIONAL-ON-<named object>. No relabelling by weakening.
+- **G8 Local-model provenance** (§6.7) and the ledger report (§6.4).
+- **G9 Final.** R1–R3 and R5 hold; `AUDIT.md` regenerated with Gap 1 closed or reduced to a named residual.
+
+---
+
+## 9. Risks, kill criteria
+
+| Risk | Mitigation |
+|---|---|
+| H1 larger than H2 | Ship **R4** as an interim CONDITIONAL checkpoint; continue B-chain. **No fixed-machine fallback (D2)** |
+| 12B model weak on Lean analysis | Calibrate first (GM1); T2 stays frontier; failure costs only background time. Ledger documents the real success rate |
+| Room problem (§4.3) | Decided by C0 data; I1 only with user sign-off (D3) |
+| `Real.ofDigits` algebra (A1) | Daemon-first; formulas validated numerically in C0 |
+| Flow exactness off balls (A2) | Reuse `timeDependentFlowOf_eq_of_hasMFDerivAt` pattern; smooth Urysohn cutoffs on compact tubes |
+| R5 normalization mismatch | Resolve in C0; fall back to time-dependent Hamiltonians |
+| TM → partrec absent in Mathlib (B2) | Budget explicitly; escalate to the user, not to a weaker theorem |
+| Vacuity temptation | G5, G7, refutation-seeking verifiers |
+| RAM pressure | Daemon + 1 frontier worker; `workflow_control.py pause` |
+
+Kill criterion: if a milestone exceeds 3x its estimate with no green gate, the coordinator **pauses, records the blocker, and consults the user** (no automatic weakening of the target).
+
+---
+
+## 10. Lean statement sketches (adapt to actual names)
+
+```lean
+theorem exists_translation_hamiltonian {S : Set EuclideanPlane} (hS : IsCompact S) (v : EuclideanPlane)
+    {U : Set EuclideanPlane} (hU : IsOpen U) (htube : tube S v ⊆ U) (hr : U ⊆ Metric.ball 0 r₀) :
+    ∃ P : CompactlySupportedPlanarHamiltonian r₀, P.IsAutonomous ∧
+      (∀ y ∈ S, P.toDiskIsotopy.diskTimeOneMap y = y + v) ∧
+      (∀ y ∉ U, P.toDiskIsotopy.diskTimeOneMap y = y)
+
+theorem image_rects_disjoint {Φ : GeneralizedShift A} (hinj : Function.Injective Φ.eval) ... :
+    Pairwise (Disjoint on fun w => imageRect Φ w)
+
+theorem relocation (P : Fin n → Set EuclideanPlane) (A : Fin n → AffineMap) ... :
+    ∃ Ps : List (CompactlySupportedPlanarHamiltonian r₀), (∀ H ∈ Ps, H.IsAutonomous) ∧
+      ∀ i, ∀ y ∈ P i, (listToDiskIsotopy hr₀ Ps).diskTimeOneMap y = A i y
+
+theorem hasCMPP_of_simulator (S : UniversalReversibleSimulator) : HasCMPPCantorCirculationHamiltonians
+
+-- R5 (final form fixed in C0)
+theorem exists_poisson_hamiltonian_realization_S4 :
+    ∃ Hs : List (Sphere4 → ℝ), (∀ H ∈ Hs, ContMDiff (𝓡 4) 𝓘(ℝ) ∞ H) ∧
+      ∃ d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4,
+        d_bar = composeTimeOneFlows s4AdaptedPoisson Hs ∧ IsTuringComplete ⇑d_bar
 ```
 
 ---
 
-## 1. Honest feasibility statement
+## 11. References
+CMPP21 (Cardona-Miranda-Peralta-Salas-Presas, PNAS 2021, arXiv:2012.12828) §4-5, Thm 5.2; Moore 1990; Bennett 1973; Lecerf 1963; Morita (small universal reversible TMs); Guibas-Yao (translating sets of rectangles); Moser 1965 and Dacorogna-Moser 1990 (appendix only); Palais 1960 / Hirsch Ch. 8 (not needed by the main route).
 
-This is **research-grade formalization**, likely comparable in size to M0–M5 (≈19.5k lines), and **either track can fail**.
-Rough ranges (to be re-estimated at Gate G0): Track A 4–8k lines, Track B 6–12k lines, Track C 2–3k lines.
-The plan therefore has: an early cheap milestone that improves honesty even if everything else stalls (Z), hard go/no-go gates,
-and named fallbacks. Math sketches below are **proof sketches to be re-verified in Phase 0**, not established facts.
-
----
-
-## 2. Decisions requested from the user before launch
-
-| ID | Question | Default if unanswered |
-|---|---|---|
-| **D1** | Accept target = instance of `HasTuringCompleteAreaPreservingDiskIsotopy` (the class the main theorems use) when that is cheaper than the CMPP-specific class? `AreaPreservingDiskIsotopy` needs only a smooth area-preserving isotopy, **not** Hamiltonians | Yes: prove CMPP-class instance if reachable, otherwise the Interfaces-class instance |
-| **D2** | `IsTuringComplete` quantifies over **all** `FinTM0 M`, forcing a *universal* reversible machine. Allow a fallback theorem "Turing complete relative to one fixed universal machine" (enough for undecidability)? This changes headline wording | **No** for the primary result; fallback allowed only as a clearly labelled weaker theorem |
-| **D3** | May `cantorDiskEmbed` / the bridge `UniversalReversibleSimulator.turingCompleteWitness` be redesigned (e.g. wider digit gaps, semiconjugacy instead of exact equality)? | Prefer **no**; allowed only if Gate G2 fails |
-| **D4** | Budget/time cap and whether to run Track A and Track B in parallel (2 Lean workers max under the RAM cap) | Parallel, 2 workers |
-
----
-
-## 3. Math architecture
-
-### 3.0 Notation
-`B := cantorBase N` (= `2N−1`), `K := range (cantorDiskEmbed enc)`, `ω := planeAreaForm`, `Φ` a bijective generalized shift on
-`shiftDom3 = {-1,0,1}` with local data `(F, G)`.
-
-### 3.1 Track C first-principles facts (Phase 0 must confirm each against the real definitions)
-- **C1 (prefix windows).** For `F ∈ {-1,0,1}` the window `D+F` contains `0`. Hence every cylinder on `D+F` is exactly
-  `K ∩ (axis-parallel closed rectangle)`: positions `≥ 0` form a prefix of the x-digits, positions `< 0` a prefix of the y-digits.
-- **C2 (disjointness).** Two such rectangles are disjoint iff the corresponding cylinders are disjoint (middle-Cantor gaps give positive distance).
-  Since `Φ` is bijective on all of `A^ℤ`, the image cylinders `Φ(C_w)` are pairwise disjoint, so the **image rectangles `Q_w` are pairwise disjoint**, as are the domain rectangles `P_w`.
-- **C3 (affine pieces).** On each domain cylinder `C_w`, `cantorDiskEmbed ∘ Φ = A_w ∘ cantorDiskEmbed` with `A_w(x,y) = (B^{F}x + a_w, B^{-F}y + b_w)`:
-  diagonal, `det = 1`, orientation preserving, and `A_w(P_w) = Q_w`.
-
-**Consequence (reduction).** `RealizesGeneralizedShiftByHamiltonians` follows from the **Finite Rectangle Extension Theorem (FRET)** below,
-applied to `{(P_w, A_w)}`, because the class only needs equality *on `K`*, and `K ∩ C_w ⊆ P_w`.
-
-### 3.2 Track B: FRET (the geometric heart)
-
-> **FRET.** Let `P_1..P_n` be pairwise disjoint compact sets in `Metric.ball 0 r` (`r<1`) with nonempty interior,
-> `Q_i = A_i(P_i)` pairwise disjoint in the ball, `A_i` affine with `det = 1`. Then there is a smooth area-preserving isotopy
-> `d : ℝ × ℝ² → ℝ²` (compact support in `ball 0 r'`, `r'<1`, `d 0 = id`, joint `C^∞`, with smooth inverse family) with `d 1 = A_i` on `P_i` for all `i`.
-
-Why not hand-routing: pieces are thin, interleaved, and the digit gap equals the piece width, so there is no clearance for rigid translation through channels.
-Hence the proof sketch below uses topology (free motion of shrunken pieces) plus a **parametric Moser correction**:
-
-1. **T1: isotopy extension in the plane.** A smooth family of globally defined invertible affine/scaling maps `e_t^i`, with images of thickened `P_i^+` pairwise disjoint for all `t`, is realized by the flow of a compactly supported time-dependent field `X_t = Σ χ_i · ė_t^i ∘ (e_t^i)^{-1}`. Uniform separation follows from compactness.
-2. **T2: collision-free motion (non-area-preserving).** Shrink each `P_i^+` radially to a tiny disc; move the discs to generic "parking" points, then to the targets (two-phase parking trick: parking points distinct from all sources/targets, so each single move avoids a finite set); expand via `A_i`-conjugated scaling. Paths: polygonal with smoothstep reparametrization (C^∞, zero velocity at corners). Result: smooth isotopy `ψ0_t`, `ψ0_1 = A_i` on `P_i^+`, **not** area preserving.
-3. **T3: compactly supported divergence lemma.** For `W ⊂ ℝ²` open connected and `σ ∈ C_c^∞(W)` with `∫σ = 0`, there is a compactly supported smooth field `v` in `W` with `div v = σ`, **linear in `σ` and smooth in parameters**. Sketch: 1D primitive trick on rectangles (`v₂ = ∫ (σ − θ(y)∫σ dy)`, `v₁ = θ(y)∫ s`), then a chain-of-rectangles argument to move mass between pieces of a partition of unity.
-4. **T4: parametric Moser.** With `ψ0_t^*ω = ρ_t ω`, `σ_t = ρ_t − 1`, `∫σ_t = 0` (compactly supported diffeo of `ℝ²`). Blend two primitive operators (`W = ℝ²` for `t ≤ 1−η`, `W = ℝ² ∖ N(P)` for `t ≥ 1−η/2`; valid because `ψ0_t` is constant `=ψ0_1` on `[1−η,1]` with `ρ = 1` near `P`). Moser flow `φ_t` gives `d_t = ψ0_t ∘ φ_t` area preserving, `φ_1 = id` near `P`, so `d_1 = A_i` on `P_i`.
-5. **T5 (optional, only for the Hamiltonian class).** A compactly supported divergence-free time-dependent field on `ℝ²` is Hamiltonian with compactly supported smooth `H_t` (primitive by integrating `ι_Xω` along a fixed ray; support inside the filled hull). Needed only for `CompactlySupportedPlanarHamiltonian`; **skipped under D1**.
-
-### 3.3 Track A: universal reversible simulator
-Required fields (see `UniversalReversibleSimulator`): a *fixed* `ReversibleTM` `R`, `initRevCfg M t` for **every** `FinTM0 M`, accepting cylinders `acceptBlocks`, orbit equivalence with `HaltsWithWindow`, non-terminal separation at `n = 0`, and primitive-recursive digit enumerators.
-Plan:
-- **A1 (Church–Turing, TM→Partrec).** Normalize `FinTM0` to `Fin a`/`Fin b` tables (halting equivalence under isomorphism); show the map `(M,t,k,w) ↦ code c` with `(c.eval 0).Dom ↔ HaltsWithWindow M t k w` is primitive recursive.
-- **A2 (universality).** Reuse `universalHaltingTM0` (halts iff `(c.eval 0).Dom`) as the fixed irreversible universal machine.
-- **A3 (Bennett).** Generic theorem: for any `FinTM0 U` there is a `ReversibleTM R` and a computable encoding with step-by-step simulation and halt detection (history track interleaved on one tape). **Biggest single risk in Track A.**
-- **A4.** Package digit enumerators (`primrec_initDigits`) and `acceptBlocks` (nonempty, independent of `t`, anti-vacuity as in `Interfaces.lean`).
-
----
-
-## 4. Milestones
-
-Conventions: each worker owns the listed files only; new files under `S4TuringPoisson/Smoothing/CMPP/`. Every milestone ends with the full gate (§6).
-
-| ID | Owner | Deliverable | DoD |
-|---|---|---|---|
-| **Z** (cheap, do first) | `@unbundle` | Split the assumption: `class HasReversibleUniversalSimulator` (Track A content) and `class HasFiniteRectangleRearrangement` (FRET content). Prove `HasCMPP` (or the Interfaces class) from the two. Re-export main theorems under the two smaller classes | Builds; `#print axioms` standard; no change to existing theorem statements |
-| **G0** | `@explorer-math`, `@explorer-lean` (read-only) | Confirm C1–C3 against `cantorDiskEmbed`/`GeneralizedShift.toGeneralizedShift`; inventory TauCeti/Mathlib for T1–T5 (time-dep. flows, `mextDeriv`, Cartan, bump functions, path-connectedness of `ball ∖ finite`); re-estimate lines; **go/no-go report** | Board post with exact signatures and a revised plan |
-| **B1** | `@geo-isotopy` | T1 + T2: `exists_smooth_isotopy_extending_affine_on_disjoint_rectangles` (non-area-preserving) | 0 `sorry`; includes parking lemma and smooth polygonal paths |
-| **B2** | `@geo-moser` | T3: `exists_compactSupport_div_eq` (connected `W`, `∫σ=0`), linear/parametric | 0 `sorry`; parameter-smoothness lemma |
-| **B3** | `@geo-moser` | T4: parametric Moser, `FRET` (+ T5 if Hamiltonian class kept) | `FRET` proved for `n` arbitrary |
-| **C1** | `@assemble` | C1–C3 lemmas; `RealizesGeneralizedShiftByHamiltonians` (or isotopy analogue) from FRET | Works for any bijective `Φ` on `shiftDom3` |
-| **A1–A4** | `@comp-universal` | Track A (above) | `UniversalReversibleSimulator` constructed |
-| **F** | `@assemble` | `instance : HasCMPPCantorCirculationHamiltonians` (or Interfaces class per D1); remove the hypothesis from `Main.lean` theorems; add *unconditional* `*_turingComplete_*` versions | Root `lake build --wfail`; global `collectAxioms` audit; `AUDIT.md` updated |
-
-**Verifiers** (`@verifier-geom`, `@verifier-comp`) keep the original gate duties. Additional required witnesses in `Checks/`:
-(i) FRET applied to a concrete 2-rectangle swap and to a concrete hyperbolic piece (non-vacuity, area, support radius `<1`);
-(ii) the final instance applied to `Sphere4` yields `IsTuringComplete` with **no typeclass argument**, and Gate 6 (`M_halt`/`M_loop`) holds unconditionally.
-
----
-
-## 5. Decision gates and fallbacks
-
-- **G0 (after exploration).** Stop and report if C1–C3 fail against the real definitions (then D3 applies) or if T1–T4 cannot be mapped onto TauCeti's API with a credible plan.
-- **G1 (after B1).** If T2 (parking-trick isotopy) exceeds ~3k lines, escalate to Carbon-only and re-plan before B2.
-- **G2 (after B2/B3).** If parametric Moser (T4) stalls: fallback **F-sem**: weaken to semiconjugacy (chart of the invariant Cantor set of a constructed horseshoe-type map) per D3, accepting redesign of the bridge.
-- **GA (Track A, A3).** If Bennett's construction exceeds budget: fallback **F-fixed**: per D2, deliver "Turing complete relative to the fixed universal machine `universalHaltingTM0`" with explicit labelling; this still yields undecidability.
-- **Never** introduce `axiom`/`sorry`; any residual external input stays an explicit `class` (mission rule §1.3), and `AUDIT.md` must list it.
-
----
-
-## 6. Verification rubric (all must hold per milestone)
-
-1. `LEAN_NUM_THREADS=2 lake build --wfail` on the worker branch and on merged `main` (0 errors/warnings, ≤100 columns).
-2. Comment-stripped scan: no `sorry|admit|axiom|unsafe|implemented_by|native_decide|opaque|maxHeartbeats`.
-3. `Lean.collectAxioms` over every new declaration: subset of `{propext, Classical.choice, Quot.sound}`.
-4. Non-vacuity witnesses (concrete instances of every new structure/class/theorem hypothesis).
-5. Junk-value vigilance: explicit `ContDiff`/`det = 1`/nonvanishing hypotheses; no hidden `fderiv = 0` cases.
-6. Final: updated `AUDIT.md`; the two audit gaps from the previous audit are either closed or restated honestly.
-
----
-
-## 7. Roster, models, resources
-
-- Coordinator, verifiers, `@geo-moser`, `@comp-universal` (Bennett): **Gemini 4 Carbon (High)**.
-- Routine algebra, bump/inequality boilerplate, polygonal-path bookkeeping: headless local `gemma4:12B` via `tools/ollama_lean4_client.py` (`num_ctx=32768`, `OLLAMA_NUM_PARALLEL=1`); escalate after **>5** failed tactic cycles.
-- At most **2** concurrent Lean workers (Track A ∥ Track B); all others parked. `export LEAN_NUM_THREADS=2`.
-- Isolated worktrees: `bash tools/bootstrap_worktree.sh <worker> main`; merge `--no-ff` only after both verifiers pass.
-- Pause / resume: `python3 tools/workflow_control.py pause|resume|status` (extend `CONTRACT_FILES` with the new modules).
-
-## 8. Phase 0 explorer questions (read-only)
-
-1. Exact coordinate formulas of `cantorDiskEmbed`, `cantorCylinderRect`, `cylinderIcc`, `negHalf`/`nonnegHalf`; confirm C1–C3 including signs of `F`.
-2. How `FinTM0.toGeneralizedShift` and `ReversibleTM.toGeneralizedShift` define `(F, G)`; is `F` a function of the leading digit only (simplifies `Σ'`)?
-3. TauCeti inventory for T1–T5 (time-dependent flow of non-Hamiltonian fields, pullback of time-dependent forms, `ContDiffBump` of compact sets, `IsOpen.exists_smooth...`, path-connectedness of `ball ∖ finite`).
-4. Is Mathlib's `Turing.TM0` ↔ `Nat.Partrec.Code` direction (TM→Partrec) available anywhere? Estimate A1.
-5. Check whether `AreaPreservingDiskIsotopy` really suffices downstream (M4/M5 use only the isotopy fields, not the Hamiltonian structure) to justify D1.
-
-## 9. References
-CMPP21 (arXiv:2012.12828) §4–5 and Thm 5.2; Moore, *Unpredictability and undecidability in dynamical systems* (1990); Bennett 1973;
-Moser 1965; Dacorogna–Moser 1990; Palais 1960; Guibas–Yao (translation separability, background only).
+## 12. Immediate next action
+Launch **W0**: C0 (Python spike) in parallel with GI (gemma infra). Then GM1 calibration. Do not start any frontier Lean worker before `docs/cmpp/routing.md` exists.
