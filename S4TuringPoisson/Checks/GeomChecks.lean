@@ -9,13 +9,16 @@ public import S4TuringPoisson.Interfaces
 public import S4TuringPoisson.Poisson.BivectorAndModular
 public import S4TuringPoisson.Poisson.JacobianPoisson
 public import S4TuringPoisson.Poisson.SingularCircleNormalForm
+public import S4TuringPoisson.Fibration.LocalSingularModels
+public import S4TuringPoisson.Fibration.S4Fibration
+public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
 public import TauCeti.Geometry.Symplectic.Manifold.Sphere
 
 /-!
-# Adversarial Geometry, Poisson & Volume Verification Checks (`GeomChecks`)
+# Adversarial Geometry, Poisson, Fibration & Volume Verification Checks (`GeomChecks`)
 
 This file implements the Milestone M0–M2 geometric verification gates from Section 6 of
-`MISSION_DIRECTIVE.md`:
+`MISSION_DIRECTIVE.md` together with cross-track M1+M2 integration checks:
 
 - **M0 Non-Zero Top-Form & Pullback Sanity**:
   - `planeAreaForm_zero_ne_zero` & `planeAreaForm_ne_zero_smoothForm`: confirms `planeAreaForm` on
@@ -28,10 +31,10 @@ This file implements the Milestone M0–M2 geometric verification gates from Sec
     instantiates `euclideanJacobianPoisson` on `(x₀, x₁, x₂, x₃) ↦ (x₀, x₁)` (`ℝ⁴ → ℝ²`) and proves
     `{x₂, x₃}_{π_f} = 1 ≠ 0` (i.e. `{x₃, x₄}_{π_f} = 1 ≠ 0` in 1-indexed coordinates), `rankAt = 2`,
     and Casimirs `x₀, x₁`, ruling out zero-bivector junk-value bugs.
-- **Gate 4 (Singular-to-Regular Rank-2 Witness for Equation (2))**:
-  - `gate4_eq2_singular_to_regular_witness`: instantiates Equation (2)
-    `(y₁, y₂, y₃, t) ↦ (y₁² - (y₂² + y₃²) / 2, t)` on `ℝ⁴ → ℝ²` and proves that for every `t : ℝ`,
-    `(0, 0, 0, t) ∈ Crit` has `rankAt = 0`, while `(1, 0, 0, t) ∉ Crit` has `rankAt = 2` with
+- **Gate 4 (Singular-to-Regular Rank-2 Witness for Equation (2) & `indefiniteFoldMap`)**:
+  - `gate4_eq2_singular_to_regular_witness` & `m1_m2_indefiniteFoldMap_gate4_witness`: instantiates
+    Equation (2) / `LocalSingularModels.indefiniteFoldMap` on `ℝ⁴ → ℝ²` and proves for every `t : ℝ`
+    that `(0, 0, 0, t) ∈ Crit` has `rankAt = 0`, while `(1, 0, 0, t) ∉ Crit` has `rankAt = 2` with
     `{y₂, y₃}_{π_f} = 2 ≠ 0` and global unimodularity across both loci.
 - **M1.3 Singular-Circle Normal Form Witness**:
   - `m1_singular_circle_normal_form_witness`: concrete singular (`(0, 0, 0, 0)`, `rankAt = 0`) and
@@ -41,12 +44,20 @@ This file implements the Milestone M0–M2 geometric verification gates from Sec
   - `s4_volume_ball_half_pos` & `s4_volume_ball_half_lt_univ` (for every `p : Sphere4`) and concrete
     witness `gate5_s4_nontrivial_volume_witness` at `s4BasePoint : Sphere4`, ruling out zero,
     infinite, and Dirac measures on $S^4$.
+- **Cross-Track M1+M2 $S^4$ Jacobian–Poisson & $S^2$ Symplectic Isotopy Lift Witnesses**:
+  - `m1_m2_s4Fibration_jacobianPoisson_witness`: instantiates `jacobianPoissonOfPositiveVolume` on
+    `s4Fibration : Sphere4 → Sphere2`, proving global unimodularity, `rankAt = 0` on
+    `s4CriticalPoint ∈ criticalPoints` (nonempty!), and `rankAt = 2` on
+    `s4RegularPoint ∈ s4PreimageOpen` (nonempty!).
+  - `m2_s2_liftSliceDiffeomorph_witness`: instantiates `liftSliceDiffeomorph` on `Sphere2` under
+    `[HasTuringCompleteAreaPreservingDiskIsotopy]`, verifying area pullback preservation,
+    `MeasurePreserving`, `IsTuringComplete`, and `≠ id`.
 -/
 
 @[expose] public section
 
 open MeasureTheory Metric Module Set TopologicalSpace
-open scoped ContDiff ENNReal Manifold Topology
+open scoped ContDiff ENNReal InnerProductSpace Manifold Topology
 
 namespace S4TuringPoisson.Checks
 
@@ -461,5 +472,233 @@ theorem gate5_s4_nontrivial_volume_witness :
   ⟨s4_volume_ball_half_pos s4BasePoint,
     s4_volume_ball_half_lt_univ s4BasePoint,
     measure_lt_top S4PositiveVolumeForm.μ Set.univ⟩
+
+/-! ## 6. Cross-Track M1+M2 Integration Witnesses (`indefiniteFoldMap`, `s4Fibration`, `Sphere2`) -/
+
+/-- Definitional identity between M1's `criticalSet` and M2's `criticalPoints`. -/
+theorem criticalSet_eq_criticalPoints
+    {E H E' H' M N : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [TopologicalSpace H]
+    [NormedAddCommGroup E'] [NormedSpace ℝ E'] [TopologicalSpace H']
+    [TopologicalSpace M] [ChartedSpace H M]
+    [TopologicalSpace N] [ChartedSpace H' N]
+    (I : ModelWithCorners ℝ E H) (J : ModelWithCorners ℝ E' H') (f : M → N) :
+    criticalSet I J f = criticalPoints I J f :=
+  rfl
+
+/-- M2.1's `indefiniteFoldMap` coincides with Gate 4's `eq2FoldMap`. -/
+theorem indefiniteFoldMap_eq_eq2FoldMap : indefiniteFoldMap = eq2FoldMap := by
+  funext p
+  refine ext_vec2 ?_ ?_ <;> simp [eq2FoldMap, eq2FoldFirst, EuclideanSpace.basisFun_apply]
+
+/-- Congruence of `euclideanJacobianPoisson` under function equality (`ContDiff` is
+proof-irrelevant). -/
+theorem euclideanJacobianPoisson_congr
+    {f g : EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 2)}
+    (hf : ContDiff ℝ ∞ f) (hg : ContDiff ℝ ∞ g) (hfg : f = g) :
+    euclideanJacobianPoisson f hf = euclideanJacobianPoisson g hg := by
+  subst hfg
+  rfl
+
+/-- **Cross-Track Gate 4 Witness on `LocalSingularModels.indefiniteFoldMap`**:
+Directly connects M2.1's `indefiniteFoldMap` and `criticalPoints` with M1.2's
+`euclideanJacobianPoisson`. -/
+theorem m1_m2_indefiniteFoldMap_gate4_witness (t : ℝ) :
+    vec4 0 0 0 t ∈ criticalPoints (𝓡 4) (𝓡 2) indefiniteFoldMap ∧
+      (euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap).rankAt
+        (vec4 0 0 0 t) = 0 ∧
+      vec4 1 0 0 t ∉ criticalPoints (𝓡 4) (𝓡 2) indefiniteFoldMap ∧
+      (euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap).rankAt
+        (vec4 1 0 0 t) = 2 ∧
+      ((euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap).bracket
+          (euclideanCoord 1) (euclideanCoord 2)) (vec4 1 0 0 t) = 2 ∧
+      (euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap).IsUnimodularWithVolume
+        euclidean4VolumeForm := by
+  have hs : vec4 0 0 0 t = eq2SingPoint t := rfl
+  have hr : vec4 1 0 0 t = eq2RegPoint t := rfl
+  have hP : euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap =
+      euclideanJacobianPoisson eq2FoldMap contDiff_eq2FoldMap :=
+    euclideanJacobianPoisson_congr _ _ indefiniteFoldMap_eq_eq2FoldMap
+  refine ⟨indefiniteFold_zero_mem_criticalPoints t, ?_,
+    indefiniteFold_one_notMem_criticalPoints t, ?_, ?_,
+    isUnimodularWithVolume_euclideanJacobianPoisson indefiniteFoldMap contDiff_indefiniteFoldMap⟩
+  · rw [hP, hs]
+    exact eq2_rankAt_singPoint_eq_zero t
+  · rw [hP, hr]
+    exact eq2_rankAt_regPoint_eq_two t
+  · rw [hP, hr]
+    exact eq2_bracket_coord_one_two_regPoint t
+
+section S4CrossTrack
+
+attribute [local instance] TauCeti.finrank_euclideanSpace_fin_succ_fact
+
+/-- Global Jacobian–Poisson structure `π_{s4Fibration}` on `Sphere4` built by combining M1's
+`jacobianPoissonOfPositiveVolume` with M2's `s4Fibration : Sphere4 → Sphere2`. -/
+noncomputable def s4JacobianPoisson : PoissonStructure (𝓡 4) Sphere4 :=
+  jacobianPoissonOfPositiveVolume S4PositiveVolumeForm S2VolumeForm s4Fibration
+    contMDiff_s4Fibration
+
+/-- Concrete regular point `(0, 0, 0, 0, 1) ∈ s4PreimageOpen` of `s4Fibration` over
+`s2NorthPole`. -/
+noncomputable def s4RegularPoint : Sphere4 :=
+  s4PlaneEmbed (⟨0, Metric.mem_ball_self s4BaseDiskRadius_pos⟩, s2NorthPole)
+
+theorem s4RegularPoint_mem_s4PreimageOpen : s4RegularPoint ∈ s4PreimageOpen.1 :=
+  s4PlaneEmbed_mem_preimage (⟨0, Metric.mem_ball_self s4BaseDiskRadius_pos⟩, s2NorthPole)
+
+theorem s4PreimageOpen_nonempty : s4PreimageOpen.1.Nonempty :=
+  ⟨s4RegularPoint, s4RegularPoint_mem_s4PreimageOpen⟩
+
+theorem s4RegularPoint_notMem_criticalPoints :
+    s4RegularPoint ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration :=
+  notMem_criticalPoints_iff.mpr
+    (regular_on_s4BaseRegion s4RegularPoint s4RegularPoint_mem_s4PreimageOpen)
+
+/-- At `s4RegularPoint ∈ s4PreimageOpen`, `s4JacobianPoisson` has rank `2`. -/
+theorem s4JacobianPoisson_rankAt_regularPoint :
+    s4JacobianPoisson.rankAt s4RegularPoint = 2 :=
+  rankAt_jacobianPoisson_of_notMem_criticalSet S4PositiveVolumeForm.Ω S4PositiveVolumeForm.Ω_ne_zero
+    S2VolumeForm s4Fibration contMDiff_s4Fibration s4RegularPoint_notMem_criticalPoints
+    (S2VolumeForm_ne_zero _)
+
+/-- At `s4CriticalPoint ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration`, `s4JacobianPoisson` has
+rank `0`. -/
+theorem s4JacobianPoisson_rankAt_criticalPoint :
+    s4JacobianPoisson.rankAt s4CriticalPoint = 0 := by
+  let x := s4CriticalPoint
+  let e₁ : TangentSpace (𝓡 2) (s4ProjPlane x.1) :=
+    (NormedSpace.fromTangentSpace (s4ProjPlane x.1)).symm (vec2 0 1)
+  let u₀ : TangentSpace (𝓡 2) (s4Fibration x) :=
+    mfderiv (𝓡 2) (𝓡 2) southPoleStereoInv (s4ProjPlane x.1) e₁
+  have hcollinear (v : TangentSpace (𝓡 4) x) :
+      ∃ c : ℝ, mfderiv (𝓡 4) (𝓡 2) s4Fibration x v = c • u₀ := by
+    let V : EuclideanSpace ℝ (Fin 5) :=
+      mvfderiv (𝓡 4) (Subtype.val : Sphere4 → EuclideanSpace ℝ (Fin 5)) x v
+    have hV_mem : V ∈ (ℝ ∙ (x : EuclideanSpace ℝ (Fin 5)))ᗮ := by
+      rw [← range_mvfderiv_subtypeVal (n := 4) x]
+      exact LinearMap.mem_range_self _ v
+    have hinner : ⟪(x : EuclideanSpace ℝ (Fin 5)), V⟫_ℝ = 0 :=
+      Submodule.mem_orthogonal_singleton_iff_inner_right.mp hV_mem
+    rw [PiLp.inner_apply, Fin.sum_univ_five] at hinner
+    have hV0 : V 0 = 0 := by
+      simp only [x, s4CriticalPoint, vec5_zero, vec5_one, vec5_two, vec5_three, vec5_four,
+        RCLike.inner_apply, conj_trivial] at hinner
+      linarith
+    have hcoe : MDifferentiableAt (𝓡 4) 𝓘(ℝ, EuclideanSpace ℝ (Fin 5))
+        (Subtype.val : Sphere4 → EuclideanSpace ℝ (Fin 5)) x :=
+      (contMDiff_coe_sphere (m := ∞) x).mdifferentiableAt (by simp)
+    have hproj : MDifferentiableAt (𝓡 4) (𝓡 2) (s4ProjPlane ∘ Subtype.val) x :=
+      (s4ProjPlane.contDiff.contMDiff.comp (contMDiff_coe_sphere (m := ∞)) x).mdifferentiableAt
+        (by simp)
+    have hst : MDifferentiableAt (𝓡 2) (𝓡 2) southPoleStereoInv (s4ProjPlane x.1) :=
+      (contMDiff_southPoleStereoInv (s4ProjPlane x.1)).mdifferentiableAt (by simp)
+    have hvalE : (mfderiv (𝓡 4) (𝓡 2) (s4ProjPlane ∘ Subtype.val) x v : EuclideanPlane) =
+        V 1 • vec2 0 1 := by
+      rw [← mvfderiv_apply_eq_mfderiv_apply, s4ProjPlane.mvfderiv_comp_apply hcoe v]
+      change s4ProjPlane V = V 1 • vec2 0 1
+      rw [s4ProjPlane_apply, hV0]
+      refine ext_vec2 ?_ ?_ <;> simp
+    have hvalT : mfderiv (𝓡 4) (𝓡 2) (s4ProjPlane ∘ Subtype.val) x v = V 1 • e₁ := by
+      apply (NormedSpace.fromTangentSpace (s4ProjPlane x.1)).injective
+      rw [map_smul, ContinuousLinearEquiv.apply_symm_apply]
+      exact hvalE
+    refine ⟨V 1, ?_⟩
+    have hcomp := congrArg (· v) (mfderiv_comp x hst hproj)
+    change mfderiv (𝓡 4) (𝓡 2) (southPoleStereoInv ∘ ⇑s4ProjPlane ∘ Subtype.val) x v =
+      V 1 • u₀
+    rw [hcomp, ContinuousLinearMap.comp_apply, hvalT, map_smul]
+    rfl
+  have hpul0 : (TauCeti.SmoothForm.mpullback s4Fibration contMDiff_s4Fibration S2VolumeForm).1 x =
+      0 := by
+    ext w
+    rw [TauCeti.SmoothForm.mpullback_apply]
+    obtain ⟨c₀, hc₀⟩ := hcollinear (w 0)
+    obtain ⟨c₁, hc₁⟩ := hcollinear (w 1)
+    let A := S2VolumeForm.1 (s4Fibration x)
+    have hw_eq : (fun i : Fin 2 ↦ mfderiv (𝓡 4) (𝓡 2) s4Fibration x (w i)) =
+        Function.update (Function.update ![u₀, u₀] 0 (c₀ • u₀)) 1 (c₁ • u₀) := by
+      funext i
+      fin_cases i
+      · simpa using hc₀
+      · simpa using hc₁
+    have hupd1 : Function.update (Function.update ![u₀, u₀] 0 (c₀ • u₀)) 1 u₀ =
+        Function.update ![u₀, u₀] 0 (c₀ • u₀) := by
+      funext i; fin_cases i <;> rfl
+    change A (fun i : Fin 2 ↦ mfderiv (𝓡 4) (𝓡 2) s4Fibration x (w i)) = 0
+    rw [hw_eq, A.map_update_smul, hupd1, A.map_update_smul,
+      A.map_eq_zero_of_eq _ (i := 0) (j := 1) rfl (by decide),
+      smul_zero, smul_zero]
+  have hanch0 : s4JacobianPoisson.anchor s4CriticalPoint = 0 := by
+    ext α : 1
+    change jacobianAnchor S4PositiveVolumeForm.Ω S2VolumeForm s4Fibration contMDiff_s4Fibration x
+      α = 0
+    rw [jacobianAnchor_eq_subTopDualVector, hpul0,
+      ContinuousAlternatingMap.pairedWedge_zero_right, neg_zero]
+    simp [subTopDualVector]
+  simp [SmoothBivector.rankAt, hanch0]
+
+/-- **Cross-Track M1+M2 $S^4$ Jacobian–Poisson Witness**:
+On `Sphere4`, `s4JacobianPoisson` (`π_{s4Fibration}`) is globally unimodular with volume
+`S4PositiveVolumeForm.Ω`, vanishes (`rankAt = 0`) on `s4CriticalPoint ∈ criticalPoints` (nonempty),
+and has `rankAt = 2` on `s4RegularPoint ∈ s4PreimageOpen` (nonempty). -/
+theorem m1_m2_s4Fibration_jacobianPoisson_witness :
+    s4JacobianPoisson.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      s4JacobianPoisson.IsUnimodularPoisson ∧
+      (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
+      s4CriticalPoint ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration ∧
+      s4JacobianPoisson.rankAt s4CriticalPoint = 0 ∧
+      s4PreimageOpen.1.Nonempty ∧
+      s4RegularPoint ∈ s4PreimageOpen.1 ∧
+      s4RegularPoint ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration ∧
+      s4JacobianPoisson.rankAt s4RegularPoint = 2 :=
+  ⟨isUnimodularWithVolume_jacobianPoisson S4PositiveVolumeForm.Ω S4PositiveVolumeForm.Ω_ne_zero
+      S2VolumeForm s4Fibration contMDiff_s4Fibration,
+    isUnimodularPoisson_jacobianPoissonOfPositiveVolume S4PositiveVolumeForm S2VolumeForm
+      s4Fibration contMDiff_s4Fibration,
+    criticalPoints_s4Fibration_nonempty,
+    s4CriticalPoint_mem_criticalPoints,
+    s4JacobianPoisson_rankAt_criticalPoint,
+    s4PreimageOpen_nonempty,
+    s4RegularPoint_mem_s4PreimageOpen,
+    s4RegularPoint_notMem_criticalPoints,
+    s4JacobianPoisson_rankAt_regularPoint⟩
+
+end S4CrossTrack
+
+section S2LiftCheck
+
+set_option linter.concreteInstances false
+
+variable [HasTuringCompleteAreaPreservingDiskIsotopy]
+
+/-- Canonical Darboux symplectic disk chart on `Sphere2` induced by `S2PositiveVolumeForm`. -/
+noncomputable def s2DiskChart : SymplecticDiskChart Sphere2 S2PositiveVolumeForm.Ω :=
+  S2PositiveVolumeForm.symplecticDiskChart
+
+/-- Time-`1` area-preserving smooth diffeomorphism on `Sphere2` lifted from the Turing-complete disk
+isotopy. -/
+noncomputable def s2TimeOneDiffeomorph : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 :=
+  s2DiskChart.liftSliceDiffeomorph 1
+
+/-- **Cross-Track M2.3 $S^2$ Isotopy Lift Witness**:
+Under `[HasTuringCompleteAreaPreservingDiskIsotopy]`, `s2TimeOneDiffeomorph` on `Sphere2` is
+isotopic to `Diffeomorph.refl` (`t = 0`), preserves `S2PositiveVolumeForm.Ω` under pullback, is
+`MeasurePreserving` for `S2PositiveVolumeForm.μ`, satisfies `IsTuringComplete`, and differs from
+`id`. -/
+theorem m2_s2_liftSliceDiffeomorph_witness :
+    s2DiskChart.liftSliceDiffeomorph 0 = Diffeomorph.refl (𝓡 2) Sphere2 ∞ ∧
+      TauCeti.SmoothForm.mpullback s2TimeOneDiffeomorph s2TimeOneDiffeomorph.contMDiff
+        S2PositiveVolumeForm.Ω = S2PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑s2TimeOneDiffeomorph S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑s2TimeOneDiffeomorph ∧
+      (⇑s2TimeOneDiffeomorph : Sphere2 → Sphere2) ≠ id :=
+  ⟨s2DiskChart.liftSliceDiffeomorph_zero,
+    s2DiskChart.mpullback_liftSliceDiffeomorph_eq 1,
+    SymplecticDiskChart.measurePreserving_liftSliceDiffeomorph S2PositiveVolumeForm s2DiskChart 1,
+    s2DiskChart.isTuringComplete_liftTimeOne,
+    s2DiskChart.isTuringComplete_liftTimeOne.ne_id⟩
+
+end S2LiftCheck
 
 end S4TuringPoisson.Checks
