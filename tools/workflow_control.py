@@ -44,6 +44,27 @@ CONTRACT_FILES: Dict[str, str] = {
 SORRY_RE = re.compile(r"\b(sorry|admit)\b")
 
 
+def strip_lean_comments(source: str) -> str:
+    """Remove nested Lean block comments `/- ... -/` and line comments `-- ...`."""
+    out: List[str] = []
+    i, n, depth = 0, len(source), 0
+    while i < n:
+        if source[i:i + 2] == "/-":
+            depth += 1
+            i += 2
+        elif depth > 0 and source[i:i + 2] == "-/":
+            depth -= 1
+            i += 2
+        elif depth == 0 and source[i:i + 2] == "--":
+            while i < n and source[i] != "\n":
+                i += 1
+        else:
+            if depth == 0:
+                out.append(source[i])
+            i += 1
+    return "".join(out)
+
+
 def utc_now() -> str:
     """Return current UTC ISO-8601 timestamp."""
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -88,7 +109,7 @@ class WorkflowController:
             if full.is_file():
                 text = full.read_text(encoding="utf-8", errors="replace")
                 lines = text.splitlines()
-                sorry_count = len(SORRY_RE.findall(text))
+                sorry_count = len(SORRY_RE.findall(strip_lean_comments(text)))
                 contracts[cid] = {
                     "path": rel_path,
                     "exists": True,
