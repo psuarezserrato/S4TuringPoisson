@@ -13,13 +13,14 @@ public import S4TuringPoisson.Fibration.LocalSingularModels
 public import S4TuringPoisson.Fibration.S4Fibration
 public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
 public import S4TuringPoisson.Smoothing.DiskSmoothing
+public import S4TuringPoisson.Main
 public import TauCeti.Geometry.Symplectic.Manifold.Sphere
 
 /-!
 # Adversarial Geometry, Poisson, Fibration & Volume Verification Checks (`GeomChecks`)
 
-This file implements the Milestone M0–M3.3 geometric verification gates from Section 6 of
-`MISSION_DIRECTIVE.md` together with cross-track M1+M2+M3.3 integration checks:
+This file implements the Milestone M0–M5 geometric verification gates from Section 6 of
+`MISSION_DIRECTIVE.md` together with cross-track M1–M5 integration checks:
 
 - **M0 Non-Zero Top-Form & Pullback Sanity**:
   - `planeAreaForm_zero_ne_zero` & `planeAreaForm_ne_zero_smoothForm`: confirms `planeAreaForm` on
@@ -63,6 +64,21 @@ This file implements the Milestone M0–M3.3 geometric verification gates from S
     through `s2DiskChart` onto `Sphere2` (zero typeclasses!), verifying smooth isotopy to
     `Diffeomorph.refl`, `S2PositiveVolumeForm.Ω` pullback invariance, `MeasurePreserving`, and
     `≠ id`.
+- **Final M4–M5 Aligned Volume (Gate 5), Equation (1) & Main Theorem Synthesis Checks**:
+  - `gate5_s4_aligned_volume_witness`: verifies Section 6 Gate 5 directly on M4's aligned volume
+    measure `Main.s4AlignedPositiveVolume.μ` on `Sphere4` (`0 < μ_Ω (ball p (1/2)) < μ_Ω univ < ⊤`
+    universally and at `s4BasePoint`, plus strict positive co-orientation with
+    `S4PositiveVolumeForm.Ω`).
+  - `m4_s4_equation1_and_adapted_poisson_witness`: verifies Equation (1)
+    (`mpullback_innerPreimageOpen_alignedVolumeForm Sphere4`) on the nonempty open domain
+    `innerPreimageOpen Sphere4` together with global unimodularity, `rankAt = 0` on
+    `s4CriticalPoint`, and `rankAt = 2` on `s4RegularPoint` for `Main.s4AdaptedPoisson`.
+  - `m4_m5_s4_unconditional_poisson_diffeomorph_witness`: verifies
+    `Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional` and proves
+    `Main.s4UnconditionalPoissonDiffeomorph s4CriticalPoint = s4CriticalPoint` while `≠ id`.
+  - `m5_headline_theorems_S4_and_fourManifold_check` &
+    `m5_cmpp_headline_theorems_S4_and_fourManifold_check`: verifies Theorem 1 and Corollary 2
+    instantiated on `Sphere4` (including Gate 5 non-degeneracy on the existential volume `V`).
 -/
 
 @[expose] public section
@@ -1020,5 +1036,207 @@ theorem m33_unconditional_s2_sectorSwap_witness :
       (canonicalSectorSwapIsotopy_properties m33SupportRadius_mem_Ioo).2.2.2.2.2⟩
 
 end M33SmoothingChecks
+
+/-! ## 8. Final Milestone M4–M5 Gate 5, Equation (1) & Main Theorem Synthesis Checks -/
+
+section M4M5UnconditionalChecks
+
+/-- **Section 6 Gate 5 Witness on M4's Aligned Volume `Main.s4AlignedPositiveVolume`**:
+Verifies `0 < μ_Ω (Metric.ball p (1 / 2)) < μ_Ω Set.univ` for every `p : Sphere4` and specifically
+at `s4BasePoint`, finite total volume `< ⊤`, non-vanishing at `s4BasePoint`, and global strict
+positive co-orientation with `S4PositiveVolumeForm.Ω`. -/
+theorem gate5_s4_aligned_volume_witness :
+    (∀ p : Sphere4,
+      0 < Main.s4AlignedPositiveVolume.μ (Metric.ball p (1 / 2)) ∧
+        Main.s4AlignedPositiveVolume.μ (Metric.ball p (1 / 2)) <
+          Main.s4AlignedPositiveVolume.μ Set.univ) ∧
+      0 < Main.s4AlignedPositiveVolume.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      Main.s4AlignedPositiveVolume.μ (Metric.ball s4BasePoint (1 / 2)) <
+        Main.s4AlignedPositiveVolume.μ Set.univ ∧
+      Main.s4AlignedPositiveVolume.μ Set.univ < ⊤ ∧
+      Main.s4AlignedPositiveVolume.Ω.1 s4BasePoint ≠ 0 ∧
+      ∀ x : Sphere4, ∃ a : ℝ, 0 < a ∧
+        Main.s4AlignedPositiveVolume.Ω.1 x = a • S4PositiveVolumeForm.Ω.1 x :=
+  ⟨Main.s4AlignedPositiveVolume_ball_bounds,
+    (Main.s4AlignedPositiveVolume_ball_bounds s4BasePoint).1,
+    (Main.s4AlignedPositiveVolume_ball_bounds s4BasePoint).2,
+    measure_lt_top Main.s4AlignedPositiveVolume.μ Set.univ,
+    Main.s4AlignedPositiveVolume.Ω_ne_zero s4BasePoint,
+    alignedVolumeForm_pos_cooriented Sphere4⟩
+
+/-- Non-emptiness of the open 4-manifold domain `innerPreimageOpen Sphere4` on which Equation (1)
+holds, ruling out vacuous pullback identities. -/
+theorem innerPreimageOpen_s4_nonempty : (innerPreimageOpen Sphere4).1.Nonempty := by
+  let x₀ : Sphere4 := s4WrinkledFibration.embed (s4WrinkledFibration.baseCenter, s2NorthPole)
+  refine ⟨x₀, ?_⟩
+  change s4Fibration x₀ ∈ (baseInnerOpen Sphere4).1
+  have hf : s4Fibration x₀ = s4WrinkledFibration.baseCenter.1 :=
+    s4WrinkledFibration.apply_embed s4WrinkledFibration.baseCenter s2NorthPole
+  rw [hf]
+  have hcore : s4WrinkledFibration.baseCenter.1 ∈ (baseCoreOpen Sphere4).1 :=
+    baseCenter_mem_baseCoreOpen Sphere4
+  have hclosed := baseOpenSubdisk_subset_baseClosedSubdisk Sphere4 (rCore Sphere4)
+    (rCore_lt_baseRadius Sphere4) hcore
+  exact baseClosedSubdisk_subset_baseOpenSubdisk Sphere4 (rCore_lt_baseRadius Sphere4)
+    (rCore_lt_rInner Sphere4) hclosed
+
+/-- **M4.1 Equation (1) & Adapted $S^4$ Jacobian–Poisson Witness**:
+Verifies that `innerPreimageOpen Sphere4` is nonempty, `alignedVolumeForm Sphere4` satisfies
+Equation (1) (`mpullback_innerPreimageOpen_alignedVolumeForm Sphere4`), and `Main.s4AdaptedPoisson`
+is globally unimodular with `rankAt = 0` at `s4CriticalPoint` and `rankAt = 2` at
+`s4RegularPoint`. -/
+theorem m4_s4_equation1_and_adapted_poisson_witness :
+    (innerPreimageOpen Sphere4).1.Nonempty ∧
+      TauCeti.SmoothForm.mpullback (Subtype.val : innerPreimageOpen Sphere4 → Sphere4)
+          contMDiff_subtype_val (alignedVolumeForm Sphere4) =
+        TauCeti.SmoothForm.mpullback
+          (Opens.inclusion (innerPreimageOpen_le_preimageOpen Sphere4))
+          (contMDiff_inclusion _) (trivializedProductForm Sphere4) ∧
+      Main.s4AdaptedPoisson.IsUnimodularWithVolume Main.s4AlignedPositiveVolume.Ω ∧
+      Main.s4AdaptedPoisson.IsUnimodularPoisson ∧
+      Main.s4AdaptedPoisson.rankAt s4CriticalPoint = 0 ∧
+      Main.s4AdaptedPoisson.rankAt s4RegularPoint = 2 :=
+  ⟨innerPreimageOpen_s4_nonempty,
+    mpullback_innerPreimageOpen_alignedVolumeForm Sphere4,
+    isUnimodularWithVolume_adaptedJacobianPoisson Sphere4,
+    isUnimodularPoisson_adaptedJacobianPoisson Sphere4,
+    rankAt_adaptedJacobianPoisson_of_mem_criticalPoints Sphere4 s4CriticalPoint_mem_criticalPoints,
+    rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints Sphere4
+      s4RegularPoint_notMem_criticalPoints⟩
+
+theorem s4CriticalPoint_notMem_s4PreimageOpen : s4CriticalPoint ∉ s4PreimageOpen.1 := by
+  intro hmem
+  have hb : s4Fibration s4CriticalPoint ∈ s4BaseRegion.1 := hmem
+  have hcrit : s4Fibration s4CriticalPoint ∈
+      s4Fibration '' criticalPoints (𝓡 4) (𝓡 2) s4Fibration :=
+    ⟨s4CriticalPoint, s4CriticalPoint_mem_criticalPoints, rfl⟩
+  exact Set.disjoint_left.mp disjoint_s4BaseRegion_criticalPoints hb hcrit
+
+theorem s4UnconditionalPoissonDiffeomorph_criticalPoint :
+    Main.s4UnconditionalPoissonDiffeomorph s4CriticalPoint = s4CriticalPoint :=
+  leafwiseBumpDiffeomorphOfIsotopy_of_notMem Sphere4 Main.s4SectorSwapDiskIsotopy
+    s4CriticalPoint_notMem_s4PreimageOpen
+
+/-- **M4+M5 Unconditional $S^4$ Volume-Preserving Poisson Diffeomorphism Witness**:
+Verifies `Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional` together
+with singular-locus fixing (`d_bar s4CriticalPoint = s4CriticalPoint`) alongside global
+non-triviality (`d_bar ≠ id`), ruling out 3D suspension shortcuts. -/
+theorem m4_m5_s4_unconditional_poisson_diffeomorph_witness :
+    (s4Fibration ∘ ⇑Main.s4UnconditionalPoissonDiffeomorph = s4Fibration ∧
+      SmoothBivector.IsPoissonMap Main.s4AdaptedPoisson.toSmoothBivector
+        Main.s4AdaptedPoisson.toSmoothBivector Main.s4UnconditionalPoissonDiffeomorph
+        Main.s4UnconditionalPoissonDiffeomorph.contMDiff ∧
+      TauCeti.SmoothForm.mpullback Main.s4UnconditionalPoissonDiffeomorph
+        Main.s4UnconditionalPoissonDiffeomorph.contMDiff Main.s4AlignedPositiveVolume.Ω =
+        Main.s4AlignedPositiveVolume.Ω ∧
+      MeasurePreserving ⇑Main.s4UnconditionalPoissonDiffeomorph
+        Main.s4AlignedPositiveVolume.μ Main.s4AlignedPositiveVolume.μ ∧
+      (⇑Main.s4UnconditionalPoissonDiffeomorph : Sphere4 → Sphere4) ≠ id) ∧
+      Main.s4UnconditionalPoissonDiffeomorph s4CriticalPoint = s4CriticalPoint :=
+  ⟨Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional,
+    s4UnconditionalPoissonDiffeomorph_criticalPoint⟩
+
+/-- Any `PositiveVolumeForm (𝓡 4) Sphere4` automatically satisfies the Section 6 Gate 5 bounds at
+`s4BasePoint`. -/
+theorem positiveVolumeForm_s4_gate5 (V : PositiveVolumeForm (𝓡 4) Sphere4) :
+    0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
+      V.μ Set.univ < ⊤ := by
+  have hpos : 0 < V.μ (Metric.ball s4BasePoint (1 / 2)) :=
+    V.measure_isOpen_pos Metric.isOpen_ball ⟨s4BasePoint, Metric.mem_ball_self (by norm_num)⟩
+  have hlt : V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ := by
+    refine V.measure_lt_univ_of_disjoint_isOpen
+      (u := Metric.ball (s4Antipode s4BasePoint) (1 / 2)) Metric.isOpen_ball
+      ⟨s4Antipode s4BasePoint, Metric.mem_ball_self (by norm_num)⟩ ?_
+    exact Metric.ball_disjoint_ball (by rw [dist_s4Antipode s4BasePoint]; norm_num)
+  exact ⟨hpos, hlt, measure_lt_top V.μ Set.univ⟩
+
+end M4M5UnconditionalChecks
+
+section M5HeadlineChecks
+
+set_option linter.concreteInstances false
+
+/-- **M5 Headline Theorem 1 & Corollary 2 Synthesis Check on `Sphere4`**:
+Under `[HasTuringCompleteAreaPreservingDiskIsotopy]`, verifies that both
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4` (Theorem 1) and
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4` (Corollary 2
+instantiated on `Sphere4`) produce genuine Gate 5 non-degenerate volumes `V`, unimodular
+generically rank-2 Jacobian–Poisson structures with nonempty rank-0 singular locus, and
+leaf-preserving, volume-preserving, measure-preserving, Turing complete Poisson diffeomorphisms. -/
+theorem m5_headline_theorems_S4_and_fourManifold_check
+    [HasTuringCompleteAreaPreservingDiskIsotopy] :
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
+      V.μ Set.univ < ⊤ ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 2) ∧
+      (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
+      (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 0) ∧
+      s4Fibration ∘ ⇑d_bar = s4Fibration ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar ∧
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id) ∧
+    (∃ (V' : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f' : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      0 < V'.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      V'.μ (Metric.ball s4BasePoint (1 / 2)) < V'.μ Set.univ ∧
+      π_f'.IsUnimodularWithVolume V'.Ω ∧
+      s4Fibration ∘ ⇑d_bar' = s4Fibration ∧
+      SmoothBivector.IsPoissonMap π_f'.toSmoothBivector π_f'.toSmoothBivector
+        d_bar' d_bar'.contMDiff ∧
+      MeasurePreserving ⇑d_bar' V'.μ V'.μ ∧
+      IsTuringComplete ⇑d_bar' ∧
+      (⇑d_bar' : Sphere4 → Sphere4) ≠ id) := by
+  constructor
+  · obtain ⟨V, π_f, d_bar, -, hunim, -, hreg, hne, hcrit, hfib, hpoiss, -, hpull, hmp, htc,
+      hne_id⟩ := Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4
+    obtain ⟨hpos, hlt, hfin⟩ := positiveVolumeForm_s4_gate5 V
+    exact ⟨V, π_f, d_bar, hpos, hlt, hfin, hunim, hreg, hne, hcrit, hfib, hpoiss, hpull, hmp, htc,
+      hne_id⟩
+  · obtain ⟨V', π_f', d_bar', -, hunim', -, -, -, hfib', hpoiss', -, -, hmp', htc', hne_id'⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4
+    obtain ⟨hpos', hlt', -⟩ := positiveVolumeForm_s4_gate5 V'
+    exact ⟨V', π_f', d_bar', hpos', hlt', hunim', hfib', hpoiss', hmp', htc', hne_id'⟩
+
+/-- **M3.3 + M5 CMPP Hamiltonian Synthesis Check on `Sphere4`**:
+Verifies automatic synthesis of Theorem 1 and Corollary 2 (instantiated on `Sphere4`) from
+`[HasCMPPCantorCirculationHamiltonians]`. -/
+theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
+    [HasCMPPCantorCirculationHamiltonians] :
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
+      s4Fibration ∘ ⇑d_bar = s4Fibration ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar) ∧
+    ∃ (V' : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f' : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      π_f'.IsUnimodularWithVolume V'.Ω ∧
+      s4Fibration ∘ ⇑d_bar' = s4Fibration ∧
+      SmoothBivector.IsPoissonMap π_f'.toSmoothBivector π_f'.toSmoothBivector
+        d_bar' d_bar'.contMDiff ∧
+      MeasurePreserving ⇑d_bar' V'.μ V'.μ ∧
+      IsTuringComplete ⇑d_bar' := by
+  constructor
+  · obtain ⟨V, d_bar, hfib, hpull, hmp, htc⟩ :=
+      Main.exists_turingComplete_volumePreserving_diffeomorph_S4_of_cmpp
+    obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
+    exact ⟨V, d_bar, hpos, hlt, hfib, hpull, hmp, htc⟩
+  · obtain ⟨V', π_f', d_bar', -, hunim', -, -, -, hfib', hpoiss', -, -, hmp', htc', -⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_of_cmpp Sphere4
+    exact ⟨V', π_f', d_bar', hunim', hfib', hpoiss', hmp', htc'⟩
+
+end M5HeadlineChecks
 
 end S4TuringPoisson.Checks
