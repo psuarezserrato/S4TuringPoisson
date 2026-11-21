@@ -10,5 +10,8 @@ public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
 public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Smoothing.DiskSmoothing
+public import S4TuringPoisson.Extension.AlignedUnimodularVolume
+public import S4TuringPoisson.Extension.BumpIsotopyLift
+public import S4TuringPoisson.Main
 public import S4TuringPoisson.Checks.GeomChecks
 public import S4TuringPoisson.Checks.CompChecks
