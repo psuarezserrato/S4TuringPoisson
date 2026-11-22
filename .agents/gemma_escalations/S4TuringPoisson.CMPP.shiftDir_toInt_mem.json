@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.shiftDir_toInt_mem",
+  "raw_name": "shiftDir_toInt_mem",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T21:12:44Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.ShiftDir.toInt",
+    "S4TuringPoisson.ShiftDir",
+    "S4TuringPoisson.CMPP.restrictToDom3",
+    "S4TuringPoisson.CMPP.blockOffsetX"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1 :=\n  by\n  rcases d with\n  | left => mut_left\n  | stay => mut_middle\n  | right => mut_right\n  where\n    mut_left : -1 = -1 \u2228 -1 = 0 \u2228 -1 = 1 := by\n      left; rfl\n    mut_middle : 0 = -1 \u2228 0 = 0 \u2228 0 = 1 := by\n      right; left; rfl\n    mut_right : 1 = -1 \u2228 1 = 0 \u2228 1 = 1 := by\n      right; right; rfl",
+      "proof_body": "by\n  rcases d with\n  | left => mut_left\n  | stay => mut_middle\n  | right => mut_right\n  where\n    mut_left : -1 = -1 \u2228 -1 = 0 \u2228 -1 = 1 := by\n      left; rfl\n    mut_middle : 0 = -1 \u2228 0 = 0 \u2228 0 = 1 := by\n      right; left; rfl\n    mut_right : 1 = -1 \u2228 1 = 0 \u2228 1 = 1 := by\n      right; right; rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.shiftDir_toInt_mem_1.lean:400:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 34281.39,
+      "lean_ms": 6715.75,
+      "tokens": 182,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1 :=\n  by\n  rcases d with\n  | left => left; rfl\n  | stay => right; left; rfl\n  | right => right; right; rfl",
+      "proof_body": "by\n  rcases d with\n  | left => left; rfl\n  | stay => right; left; rfl\n  | right => right; right; rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.shiftDir_toInt_mem_2.lean:400:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 26706.46,
+      "lean_ms": 6867.78,
+      "tokens": 83,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1 :=\n  by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "proof_body": "by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.shiftDir_toInt_mem_3.lean:400:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 26708.94,
+      "lean_ms": 6866.9,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1 :=\n  by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "proof_body": "by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.shiftDir_toInt_mem_4.lean:400:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 28056.55,
+      "lean_ms": 7423.66,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem shiftDir_toInt_mem (d : ShiftDir) :\n    d.toInt = -1 \u2228 d.toInt = 0 \u2228 d.toInt = 1 :=\n  by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "proof_body": "by\n  rcases d with\n  | .left => left; rfl\n  | .stay => right; left; rfl\n  | .right => right; right; rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.shiftDir_toInt_mem_5.lean:400:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 27858.59,
+      "lean_ms": 6986.67,
+      "tokens": 86,
+      "accepted": false
+    }
+  ]
+}

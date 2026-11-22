@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.blockAffineMap_one",
+  "raw_name": "blockAffineMap_one",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T21:09:45Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.blockAffineMap",
+    "S4TuringPoisson.CMPP.blockOffsetY",
+    "S4TuringPoisson.CMPP.blockOffsetX",
+    "S4TuringPoisson.CMPP.blockStretchMu"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- Note: blockOffsetX is multiplied by (cantorBase N) ^ (-\u03a6.F w)\n  -- The target expression is (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY.\n  -- Let's re-examine the definition:\n  -- blockAffineMap = [ (cantorBase N)^{-\u03a6.F w} * p 0 + blockOffsetX, (cantorBase N)^{\u03a6.F w} * p 1 + blockOffsetY ]\n  -- The components are:\n  -- 0: (cantorBase N)^{-\u03a6.F w} * p 0 + blockOffsetX\n  -- 1: (cantorBase N)^{\u03a6.F w} * p 1 + blockOffsetY\n  -- The target is the result at index 1.\n  have h_inv : (cantorBase N : \u211d) ^ (\u03a6.F w) = (cantorBase N : \u211d) ^ (-( - (\u03a6.F w))) := by\n    rfl",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- Note: blockOffsetX is multiplied by (cantorBase N) ^ (-\u03a6.F w)\n  -- The target expression is (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY.\n  -- Let's re-examine the definition:\n  -- blockAffineMap = [ (cantorBase N)^{-\u03a6.F w} * p 0 + blockOffsetX, (cantorBase N)^{\u03a6.F w} * p 1 + blockOffsetY ]\n  -- The components are:\n  -- 0: (cantorBase N)^{-\u03a6.F w} * p 0 + blockOffsetX\n  -- 1: (cantorBase N)^{\u03a6.F w} * p 1 + blockOffsetY\n  -- The target is the result at index 1.\n  have h_inv : (cantorBase N : \u211d) ^ (\u03a6.F w) = (cantorBase N : \u211d) ^ (-( - (\u03a6.F w))) := by\n    rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_one_1.lean:403:9: error: Tactic `unfold` failed to unfold `WithLp` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX enc \u03a6 hD w,\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w].ofLp\n      1 =\n    \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w",
+      "error_class": "other",
+      "latency_ms": 56398.45,
+      "lean_ms": 7990.52,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  rcases (WithLp.toLp 2 (blockAffineMap enc \u03a6 hD w p)) with \u27e8_, _, h_eq\u27e9\n  have h_eq : (blockAffineMap enc \u03a6 hD w p) 1 = (cantorBase N : \u211d) ^ (\u03a6.F w) * (p 1) + blockOffsetY enc \u03a6 hD w := by\n    simp [blockOffsetX, blockOffsetY]\n    -- The definition of blockAffineMap uses (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX ...\n    -- and (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY ...\n    -- We need to show the second component matches.\n    -- The first component of `p` is `p 0`, and the second is `p 1`.\n    -- WithLp.toLp 2 maps (x, y) to p where p 0 = x and p 1 = y.\n    -- So (blockAffineMap enc \u03a6 hD w p) 1 is the second component of the list.\n    tauto\n  exact h_eq",
+      "proof_body": "by\n  unfold blockAffineMap\n  rcases (WithLp.toLp 2 (blockAffineMap enc \u03a6 hD w p)) with \u27e8_, _, h_eq\u27e9\n  have h_eq : (blockAffineMap enc \u03a6 hD w p) 1 = (cantorBase N : \u211d) ^ (\u03a6.F w) * (p 1) + blockOffsetY enc \u03a6 hD w := by\n    simp [blockOffsetX, blockOffsetY]\n    -- The definition of blockAffineMap uses (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX ...\n    -- and (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY ...\n    -- We need to show the second component matches.\n    -- The first component of `p` is `p 0`, and the second is `p 1`.\n    -- WithLp.toLp 2 maps (x, y) to p where p 0 = x and p 1 = y.\n    -- So (blockAffineMap enc \u03a6 hD w p) 1 is the second component of the list.\n    tauto\n  exact h_eq",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_one_2.lean:403:60: error: Tactic `rcases` failed: `ofLp\u271d : (i : Fin 2) \u2192 (fun x => \u211d) i` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 54239.98,
+      "lean_ms": 8743.66,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The definition of blockAffineMap is:\n  -- WithLp.toLp 2 ![(cantorBase N) ^ (-\u03a6.F w) * p 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY]\n  -- For i = 1, it simplifies to (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY.\n  linarith",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The definition of blockAffineMap is:\n  -- WithLp.toLp 2 ![(cantorBase N) ^ (-\u03a6.F w) * p 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY]\n  -- For i = 1, it simplifies to (cantorBase N) ^ (\u03a6.F w) * p 1 + blockOffsetY.\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_one_3.lean:403:9: error: Tactic `unfold` failed to unfold `WithLp` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX enc \u03a6 hD w,\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w].ofLp\n      1 =\n    \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w",
+      "error_class": "other",
+      "latency_ms": 43202.05,
+      "lean_ms": 6909.97,
+      "tokens": 245,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The expression simplifies to:\n  -- ((cantorBase N) ^ (-\u03a6.F w) * (p.ofLp 0) + blockOffsetX) + ((cantorBase N) ^ (\u03a6.F w) * (p.ofLp 1) + blockOffsetY)\n  -- Wait, the definition of blockAffineMap is a vector-valued function returning a list of 2 elements.\n  -- The index 1 refers to the second component.\n  -- The definition is:\n  -- blockAffineMap = [ (cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY ]\n  -- When we evaluate at 1, it picks the second element.\n  -- The term (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY is exactly what is required.\n  -- The `simp` above produces:\n  -- (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY\n  -- Since p.ofLp 1 is p 1 (by standard definition of EuclideanPlane/Lp mapping), we just need to ensure the types match.\n  rfl",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The expression simplifies to:\n  -- ((cantorBase N) ^ (-\u03a6.F w) * (p.ofLp 0) + blockOffsetX) + ((cantorBase N) ^ (\u03a6.F w) * (p.ofLp 1) + blockOffsetY)\n  -- Wait, the definition of blockAffineMap is a vector-valued function returning a list of 2 elements.\n  -- The index 1 refers to the second component.\n  -- The definition is:\n  -- blockAffineMap = [ (cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY ]\n  -- When we evaluate at 1, it picks the second element.\n  -- The term (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY is exactly what is required.\n  -- The `simp` above produces:\n  -- (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY\n  -- Since p.ofLp 1 is p 1 (by standard definition of EuclideanPlane/Lp mapping), we just need to ensure the types match.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_one_4.lean:403:9: error: Tactic `unfold` failed to unfold `WithLp` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX enc \u03a6 hD w,\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w].ofLp\n      1 =\n    \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w",
+      "error_class": "other",
+      "latency_ms": 56497.37,
+      "lean_ms": 8898.86,
+      "tokens": 439,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_one {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 1 =\n      (cantorBase N : \u211d) ^ (\u03a6.F w) * p 1 + blockOffsetY enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The definition of blockAffineMap is:\n  -- WithLp.toLp 2 ![(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY]\n  -- When applying to index 1:\n  -- (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY\n  -- Note: p 1 is shorthand for p.ofLp 1\n  rfl",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold WithLp\n  simp [blockOffsetX, blockOffsetY]\n  -- The definition of blockAffineMap is:\n  -- WithLp.toLp 2 ![(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX, (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY]\n  -- When applying to index 1:\n  -- (cantorBase N) ^ (\u03a6.F w) * p.ofLp 1 + blockOffsetY\n  -- Note: p 1 is shorthand for p.ofLp 1\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_one_5.lean:403:9: error: Tactic `unfold` failed to unfold `WithLp` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 + blockOffsetX enc \u03a6 hD w,\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w].ofLp\n      1 =\n    \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 + blockOffsetY enc \u03a6 hD w",
+      "error_class": "other",
+      "latency_ms": 43351.51,
+      "lean_ms": 9016.2,
+      "tokens": 275,
+      "accepted": false
+    }
+  ]
+}

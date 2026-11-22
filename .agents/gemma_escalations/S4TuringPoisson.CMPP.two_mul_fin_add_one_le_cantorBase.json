@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase",
+  "raw_name": "two_mul_fin_add_one_le_cantorBase",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:45:43Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.cantorBase",
+    "S4TuringPoisson.cantorCoord_le_prefix_add_one_div",
+    "S4TuringPoisson.CMPP.cantorClosedInterval",
+    "S4TuringPoisson.cantorBase_eq_of_two_le"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N :=\n  by\n  rcases N with |zero |succ n\n  \u00b7 mut d := d\n    simp at *\n    norm_cast\n    linarith\n  \u00b7 by\n    have h_base : cantorBase (n + 1) = 2 * (n + 1) - 1 := cantorBase_eq_of_two_le (n + 1)\n    have h_d : d.1 \u2264 n := Fin.mem_le (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    have h_final : 2 * n + 1 \u2264 2 * (n + 1) - 1 := by\n      simp [cantorBase]\n      linarith\n    mp_le_trans h_le h_final\n    exact h_base.symm",
+      "proof_body": "by\n  rcases N with |zero |succ n\n  \u00b7 mut d := d\n    simp at *\n    norm_cast\n    linarith\n  \u00b7 by\n    have h_base : cantorBase (n + 1) = 2 * (n + 1) - 1 := cantorBase_eq_of_two_le (n + 1)\n    have h_d : d.1 \u2264 n := Fin.mem_le (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    have h_final : 2 * n + 1 \u2264 2 * (n + 1) - 1 := by\n      simp [cantorBase]\n      linarith\n    mp_le_trans h_le h_final\n    exact h_base.symm",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_1.lean:264:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 47929.35,
+      "lean_ms": 7892.87,
+      "tokens": 249,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N :=\n  by\n  rcases N with hN\n  \u00b7 mut d := d\n    simp at *\n    norm_cast\n    linarith\n  \u00b7 by\n    let n := N - 1\n    have h_base : cantorBase N = 2 * N - 1 := cantorBase_eq_of_two_le (n + 1)\n    have h_d : d.1 \u2264 n := Fin.mem_le (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    calc\n      2 * d.1 + 1 \u2264 2 * n + 1 := h_le\n      _ \u2264 2 * (n + 1) - 1 := h_le\n      _ = 2 * N - 1 := h_base\n      _ = cantorBase N := h_base",
+      "proof_body": "by\n  rcases N with hN\n  \u00b7 mut d := d\n    simp at *\n    norm_cast\n    linarith\n  \u00b7 by\n    let n := N - 1\n    have h_base : cantorBase N = 2 * N - 1 := cantorBase_eq_of_two_le (n + 1)\n    have h_d : d.1 \u2264 n := Fin.mem_le (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    calc\n      2 * d.1 + 1 \u2264 2 * n + 1 := h_le\n      _ \u2264 2 * (n + 1) - 1 := h_le\n      _ = 2 * N - 1 := h_base\n      _ = cantorBase N := h_base",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_2.lean:265:2: error: unsolved goals\nN : \u2115\nd : Fin N\n\u22a2 2 * \u2191d + 1 \u2264 cantorBase N\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_2.lean:265:4: error: unexpected token 'mut'; expected command",
+      "error_class": "unsolved goals",
+      "latency_ms": 43700.99,
+      "lean_ms": 7095.72,
+      "tokens": 253,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N :=\n  by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base]\n    linarith",
+      "proof_body": "by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base]\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_3.lean:264:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 40257.13,
+      "lean_ms": 6838.31,
+      "tokens": 192,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N :=\n  by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base] at h_le\n    linarith",
+      "proof_body": "by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base] at h_le\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_4.lean:264:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 40554.99,
+      "lean_ms": 8011.67,
+      "tokens": 196,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem two_mul_fin_add_one_le_cantorBase {N : \u2115} (d : Fin N) :\n    2 * d.1 + 1 \u2264 cantorBase N :=\n  by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base]\n    linarith",
+      "proof_body": "by\n  rcases N with\n  | zero =>\n    simp at *\n    norm_cast\n    linarith\n  | succ n =>\n    let n' := n + 1\n    have h_base : cantorBase n' = 2 * n' - 1 := cantorBase_eq_of_two_le n'\n    have h_mem : d.1 < n' := Fin.mem_lt (n + 1)\n    have h_le : 2 * d.1 + 1 \u2264 2 * n + 1 := by\n      linarith\n    rw [h_base]\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.two_mul_fin_add_one_le_cantorBase_5.lean:264:15: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 38521.17,
+      "lean_ms": 8583.25,
+      "tokens": 192,
+      "accepted": false
+    }
+  ]
+}

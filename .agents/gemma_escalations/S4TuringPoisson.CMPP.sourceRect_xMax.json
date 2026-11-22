@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.sourceRect_xMax",
+  "raw_name": "sourceRect_xMax",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d))",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:52:38Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.sourceRect",
+    "S4TuringPoisson.dom3NegOne",
+    "S4TuringPoisson.CMPP.blockAffineMap",
+    "S4TuringPoisson.CMPP.imageRect"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d)) :=\n  by\n  let R := sourceRect enc w\n  unfold sourceRect\n  -- sourceRect definition is based on cantorClosedInterval and the specific encoding\n  -- and is known to be a rectangle of width 1 / (4 * B) and height 1 / (4 * B^2)\n  -- where B = cantorBase N.\n  -- The x-range is [ (2 * (enc (w dom3NegOne)).1) / (4 * B), (2 * (enc (w dom3NegOne)).1 + 1) / (4 * B) ]\n  -- Thus xMax is (2 * (enc (w dom3NegOne)).1 + 1) / (4 * B)\n  simp_mem [sourceRect]\n  rfl",
+      "proof_body": "by\n  let R := sourceRect enc w\n  unfold sourceRect\n  -- sourceRect definition is based on cantorClosedInterval and the specific encoding\n  -- and is known to be a rectangle of width 1 / (4 * B) and height 1 / (4 * B^2)\n  -- where B = cantorBase N.\n  -- The x-range is [ (2 * (enc (w dom3NegOne)).1) / (4 * B), (2 * (enc (w dom3NegOne)).1 + 1) / (4 * B) ]\n  -- Thus xMax is (2 * (enc (w dom3NegOne)).1 + 1) / (4 * B)\n  simp_mem [sourceRect]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_1.lean:325:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_1.lean:317:2: error: unsolved goals\nA : Type u_1\nN : \u2115\nenc : A \u2243 Fin N\nw : \u21a5shiftDom3 \u2192 A\nR : AxisRect := sourceRect enc w\n\u22a2 { xMin := 2 * \u2191\u2191(enc (w dom3NegOne)) / (4 * \u2191(cantorBase N)),\n        xMax := (2 * \u2191\u2191(enc (w dom3NegOne)) + 1) / (4 * \u2191(cantorBase N)),\n        yMin := (2 * \u2191\u2191(enc (w dom3Zero)) * \u2191(cantorBase N) + 2 * \u2191\u2191(enc (w dom3One))) / (4 * \u2191(cantorBase N) ^ 2),\n        yMax := (2 * \u2191\u2191(enc (w dom3Zero)) * \u2191(cantorBase N) + 2 * \u2191\u2191(enc (w dom3One)) + 1) / (4 * \u2191(cantorBase N) ^ 2),\n        hx := \u22ef, hy := \u22ef }.xMax =",
+      "error_class": "unsolved goals",
+      "latency_ms": 42438.56,
+      "lean_ms": 7030.98,
+      "tokens": 262,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d)) :=\n  by\n  unfold sourceRect\n  let R := sourceRect enc w\n  -- The sourceRect definition ensures that for a given w, the rectangle is defined \n  -- by the Cantor closed interval associated with the digit at index -1.\n  -- The xMax of this rectangle is exactly the upper bound of the interval.\n  -- Based on the geometry of the Cantor set representation in this context,\n  -- the xMax is given by the formula (2 * value + 1) / (4 * B).\n  simp [sourceRect]\n  -- Since the sourceRect is defined to satisfy the xMax property,\n  -- the term simplifies directly to the RHS.\n  rfl",
+      "proof_body": "by\n  unfold sourceRect\n  let R := sourceRect enc w\n  -- The sourceRect definition ensures that for a given w, the rectangle is defined \n  -- by the Cantor closed interval associated with the digit at index -1.\n  -- The xMax of this rectangle is exactly the upper bound of the interval.\n  -- Based on the geometry of the Cantor set representation in this context,\n  -- the xMax is given by the formula (2 * value + 1) / (4 * B).\n  simp [sourceRect]\n  -- Since the sourceRect is defined to satisfy the xMax property,\n  -- the term simplifies directly to the RHS.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_2.lean:328:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_2.lean:325:8: warning: This simp argument is unused:\n  sourceRect\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 46598.04,
+      "lean_ms": 7130.92,
+      "tokens": 241,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d)) :=\n  by\n  let R := sourceRect enc w\n  unfold sourceRect\n  -- The sourceRect is defined such that its x-dimension corresponds to the \n  -- Cantor closed interval associated with the value at dom3NegOne.\n  -- The width of the source cylinder rectangle is 1 / (4 * B) where B = cantorBase N.\n  -- The x-range is determined by the digit (enc (w dom3NegOne)).1.\n  -- The upper bound of the Cantor interval for a digit 'd' is (2*d + 1) / (4*B).\n  simp [sourceRect]\n  -- The xMax is the right endpoint of the interval associated with (enc (w dom3NegOne)).1.\n  -- Based on the definition of sourceRect, the interval is [ (2*d)/ (4*B), (2*d+1)/(4*B) ].\n  rfl",
+      "proof_body": "by\n  let R := sourceRect enc w\n  unfold sourceRect\n  -- The sourceRect is defined such that its x-dimension corresponds to the \n  -- Cantor closed interval associated with the value at dom3NegOne.\n  -- The width of the source cylinder rectangle is 1 / (4 * B) where B = cantorBase N.\n  -- The x-range is determined by the digit (enc (w dom3NegOne)).1.\n  -- The upper bound of the Cantor interval for a digit 'd' is (2*d + 1) / (4*B).\n  simp [sourceRect]\n  -- The xMax is the right endpoint of the interval associated with (enc (w dom3NegOne)).1.\n  -- Based on the definition of sourceRect, the interval is [ (2*d)/ (4*B), (2*d+1)/(4*B) ].\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_3.lean:328:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_3.lean:325:8: warning: This simp argument is unused:\n  sourceRect\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 50912.01,
+      "lean_ms": 7733.24,
+      "tokens": 296,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d)) :=\n  by\n  unfold sourceRect\n  simp\n  -- The sourceRect is defined by an interval whose xMax matches the formula.\n  -- Specifically, for a value v = (enc (w dom3NegOne)).1, \n  -- the interval is [ (2*v)/ (4*B), (2*v+1)/(4*B) ]\n  -- The xMax of this interval is (2*v + 1) / (4*B).\n  rfl",
+      "proof_body": "by\n  unfold sourceRect\n  simp\n  -- The sourceRect is defined by an interval whose xMax matches the formula.\n  -- Specifically, for a value v = (enc (w dom3NegOne)).1, \n  -- the interval is [ (2*v)/ (4*B), (2*v+1)/(4*B) ]\n  -- The xMax of this interval is (2*v + 1) / (4*B).\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_4.lean:324:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 40352.99,
+      "lean_ms": 7385.11,
+      "tokens": 199,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_xMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).xMax =\n      (2 * ((enc (w dom3NegOne)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d)) :=\n  by\n  unfold sourceRect\n  simp\n  -- The sourceRect is defined as a Cantor closed interval in the x-dimension.\n  -- The xMax is the upper bound of that interval, which corresponds to \n  -- the value (2 * v + 1) / (4 * B) where v is the digit at index -1.\n  rfl",
+      "proof_body": "by\n  unfold sourceRect\n  simp\n  -- The sourceRect is defined as a Cantor closed interval in the x-dimension.\n  -- The xMax is the upper bound of that interval, which corresponds to \n  -- the value (2 * v + 1) / (4 * B) where v is the digit at index -1.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_xMax_5.lean:323:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 36288.24,
+      "lean_ms": 7257.11,
+      "tokens": 172,
+      "accepted": false
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.sourceRect_yMax",
+  "raw_name": "sourceRect_yMax",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem sourceRect_yMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMax =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d) ^ 2)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T21:00:53Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.sourceRect",
+    "S4TuringPoisson.CMPP.blockAffineMap",
+    "S4TuringPoisson.dom3Zero",
+    "S4TuringPoisson.dom3One"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Analysis.SpecialFunctions.Log.Basic\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Function Set TopologicalSpace\nnamespace S4TuringPoisson.CMPP\nstructure AxisRect where\n  namespace AxisRect\n  def toSet (R : AxisRect) : Set EuclideanPlane :=\n  def width (R : AxisRect) : \u211d := R.xMax - R.xMin\n  def height (R : AxisRect) : \u211d := R.yMax - R.yMin\n  noncomputable def center (R : AxisRect) : EuclideanPlane :=\n  def translate (R : AxisRect) (dx dy : \u211d) : AxisRect :=\n  def tubeRect (R : AxisRect) (dx dy : \u211d) : AxisRect :=\nend AxisRect\nnoncomputable def quarterSquare : AxisRect :=\nnoncomputable def cantorClosedInterval {N m : \u2115} (p : Fin m \u2192 Fin N) : Set \u211d :=\ndef restrictToDom3 {A : Type*} {D : Finset \u2124} (hD : D = shiftDom3) (w : D \u2192 A) :\nnoncomputable def sourceRect {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) : AxisRect\n  where\n    sourceRect (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) : AxisRect :=\n      let base := (cantorBase N : \u211d)\n      let x0 := (enc (w dom3Zero)).1\n      let x1 := (enc (w dom3One)).1\n      let y0 := (enc (w dom3Zero)).0\n      let y1 :=",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 47998.17,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Analysis.SpecialFunctions.Log.Basic\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Function Set TopologicalSpace\nnamespace S4TuringPoisson.CMPP\nstructure AxisRect where\n  namespace AxisRect\n  def toSet (R : AxisRect) : Set EuclideanPlane :=\n  def width (R : AxisRect) : \u211d := R.xMax - R.xMin\n  def height (R : AxisRect) : \u211d := R.yMax - R.yMin\n  noncomputable def center (R : AxisRect) : EuclideanPlane :=\n  def translate (R : AxisRect) (dx dy : \u211d) : AxisRect :=\n  def tubeRect (R : AxisRect) (dx dy : \u211d) : AxisRect :=\nend AxisRect\nnoncomputable def quarterSquare : AxisRect :=\nnoncomputable def cantorClosedInterval {N m : \u2115} (p : Fin m \u2192 Fin N) : Set \u211d :=\ndef restrictToDom3 {A : Type*} {D : Finset \u2124} (hD : D = shiftDom3) (w : D \u2192 A) :\nnoncomputable def sourceRect {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) : AxisRect\n  where\n    -- Source Cantor cylinder rectangle `R_w \u2286 [0, 1/4]\u00b2` of width `1 / (4 B)` and height `1 / (4 B\u00b2)` associated to a 3-cell b\n    -- This is a property of the construction of sourceRect.\n    -- Since the internal definition of sourceRect is not provided in the snippet, \n    -- but the theorem states a",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 50501.0,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Analysis.SpecialFunctions.Log.Basic\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Function Set TopologicalSpace\nnamespace S4TuringPoisson.CMPP\nstructure AxisRect where\n  namespace AxisRect\n  def toSet (R : AxisRect) : Set EuclideanPlane :=\n  def width (R : AxisRect) : \u211d := R.xMax - R.xMin\n  def height (R : AxisRect) : \u211d := R.yMax - R.yMin\n  noncomputable def center (R : AxisRect) : EuclideanPlane :=\n  def translate (R : AxisRect) (dx dy : \u211d) : AxisRect :=\n  def tubeRect (R : AxisRect) (dx dy : \u211d) : AxisRect :=\nend AxisRect\nnoncomputable def quarterSquare : AxisRect :=\nnoncomputable def cantorClosedInterval {N m : \u2115} (p : Fin m \u2192 Fin N) : Set \u211d :=\ndef restrictToDom3 {A : Type*} {D : Finset \u2124} (hD : D = shiftDom3) (w : D \u2192 A) :\nnoncomputable def sourceRect {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) : AxisRect\n  der := by\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl\n    rfl",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 51226.13,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMax =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  unfold sourceRect\n  simp [sourceRect]\n  rfl",
+      "proof_body": "by\n  unfold sourceRect\n  simp [sourceRect]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMax_4.lean:323:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMax_4.lean:322:8: warning: This simp argument is unused:\n  sourceRect\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 58238.1,
+      "lean_ms": 9680.66,
+      "tokens": 423,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMax {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMax =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d) + 1) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  unfold sourceRect\n  simp only [sourceRect, yMax]\n  rfl",
+      "proof_body": "by\n  unfold sourceRect\n  simp only [sourceRect, yMax]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMax_5.lean:322:25: error(lean.unknownIdentifier): Unknown identifier `yMax`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMax_5.lean:323:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMax_5.lean:322:13: warning: This simp argument is unused:\n  sourceRect\nHint: Omit it from the simp argument list.\n  [apply] simp only [yMax]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 36052.7,
+      "lean_ms": 8861.62,
+      "tokens": 190,
+      "accepted": false
+    }
+  ]
+}

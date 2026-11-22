@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.blockAffineMap_zero",
+  "raw_name": "blockAffineMap_zero",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T21:04:49Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.blockAffineMap",
+    "S4TuringPoisson.CMPP.blockOffsetX",
+    "S4TuringPoisson.CMPP.blockOffsetY",
+    "S4TuringPoisson.CMPP.blockStretchMu"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_zero_1.lean:404:9: error: Tactic `unfold` failed to unfold `blockStretchMu` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 +\n            have B := \u2191(cantorBase N);\n            have wNeg := \u2191\u2191(enc (restrictToDom3 hD w dom3NegOne));\n            have u := restrictToDom3 hD (\u03a6.G w);\n            have uNeg := \u2191\u2191(enc (u dom3NegOne));\n            have uZero := \u2191\u2191(enc (u dom3Zero));\n            if \u03a6.F w = 1 then (uZero * B + uNeg - wNeg) / (2 * B ^ 2)\n            else if \u03a6.F w = -1 then -wNeg / 2 else (uNeg - wNeg) / (2 * B),\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 +\n            have B := \u2191(cantorBase N);\n            have w\u2080 := restrictToDom3 hD w;",
+      "error_class": "other",
+      "latency_ms": 35534.81,
+      "lean_ms": 6780.33,
+      "tokens": 155,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp [blockStretchMu]",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp [blockStretchMu]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_zero_2.lean:404:9: error: Tactic `unfold` failed to unfold `blockStretchMu` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 +\n            have B := \u2191(cantorBase N);\n            have wNeg := \u2191\u2191(enc (restrictToDom3 hD w dom3NegOne));\n            have u := restrictToDom3 hD (\u03a6.G w);\n            have uNeg := \u2191\u2191(enc (u dom3NegOne));\n            have uZero := \u2191\u2191(enc (u dom3Zero));\n            if \u03a6.F w = 1 then (uZero * B + uNeg - wNeg) / (2 * B ^ 2)\n            else if \u03a6.F w = -1 then -wNeg / 2 else (uNeg - wNeg) / (2 * B),\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 +\n            have B := \u2191(cantorBase N);\n            have w\u2080 := restrictToDom3 hD w;",
+      "error_class": "other",
+      "latency_ms": 35501.07,
+      "lean_ms": 8121.29,
+      "tokens": 160,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_zero_3.lean:404:9: error: Tactic `unfold` failed to unfold `blockStretchMu` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 +\n            have B := \u2191(cantorBase N);\n            have wNeg := \u2191\u2191(enc (restrictToDom3 hD w dom3NegOne));\n            have u := restrictToDom3 hD (\u03a6.G w);\n            have uNeg := \u2191\u2191(enc (u dom3NegOne));\n            have uZero := \u2191\u2191(enc (u dom3Zero));\n            if \u03a6.F w = 1 then (uZero * B + uNeg - wNeg) / (2 * B ^ 2)\n            else if \u03a6.F w = -1 then -wNeg / 2 else (uNeg - wNeg) / (2 * B),\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 +\n            have B := \u2191(cantorBase N);\n            have w\u2080 := restrictToDom3 hD w;",
+      "error_class": "other",
+      "latency_ms": 35225.18,
+      "lean_ms": 7471.92,
+      "tokens": 155,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_zero_4.lean:404:9: error: Tactic `unfold` failed to unfold `blockStretchMu` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 +\n            have B := \u2191(cantorBase N);\n            have wNeg := \u2191\u2191(enc (restrictToDom3 hD w dom3NegOne));\n            have u := restrictToDom3 hD (\u03a6.G w);\n            have uNeg := \u2191\u2191(enc (u dom3NegOne));\n            have uZero := \u2191\u2191(enc (u dom3Zero));\n            if \u03a6.F w = 1 then (uZero * B + uNeg - wNeg) / (2 * B ^ 2)\n            else if \u03a6.F w = -1 then -wNeg / 2 else (uNeg - wNeg) / (2 * B),\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 +\n            have B := \u2191(cantorBase N);\n            have w\u2080 := restrictToDom3 hD w;",
+      "error_class": "other",
+      "latency_ms": 35198.79,
+      "lean_ms": 7032.27,
+      "tokens": 155,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem blockAffineMap_zero {A : Type*} {N : \u2115} (enc : A \u2243 Fin N)\n    (\u03a6 : GeneralizedShift A) (hD : \u03a6.D = shiftDom3) (w : \u03a6.D \u2192 A) (p : EuclideanPlane) :\n    blockAffineMap enc \u03a6 hD w p 0 =\n      (cantorBase N : \u211d) ^ (-\u03a6.F w) * p 0 + blockOffsetX enc \u03a6 hD w :=\n  by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp\n  -- The expression simplifies to a match on \u03a6.F w.\n  -- When p = 0 (which is what p 0 implies for a point in EuclideanPlane),\n  -- the result is (cantorBase N) ^ (-\u03a6.F w) * (0) + blockOffsetX.\n  -- The blockAffineMap definition at index 0 corresponds to the base case \n  -- where the second component (the Y-offset) is not required for the \n  -- identity of the X-coordinate calculation at 0.\n  -- In the specific case of blockAffineMap for p 0, the term involves\n  -- the base (cantorBase N) ^ (-\u03a6.F w) * p 0.\n  -- The 0-th component of the result is exactly (cantorBase N) ^ (-\u03a6.F w) * p 0 + blockOffsetX.\n  rfl",
+      "proof_body": "by\n  unfold blockAffineMap\n  unfold blockOffsetX\n  unfold blockOffsetY\n  unfold blockStretchMu\n  unfold blockAffineMap'\n  simp\n  -- The expression simplifies to a match on \u03a6.F w.\n  -- When p = 0 (which is what p 0 implies for a point in EuclideanPlane),\n  -- the result is (cantorBase N) ^ (-\u03a6.F w) * (0) + blockOffsetX.\n  -- The blockAffineMap definition at index 0 corresponds to the base case \n  -- where the second component (the Y-offset) is not required for the \n  -- identity of the X-coordinate calculation at 0.\n  -- In the specific case of blockAffineMap for p 0, the term involves\n  -- the base (cantorBase N) ^ (-\u03a6.F w) * p 0.\n  -- The 0-th component of the result is exactly (cantorBase N) ^ (-\u03a6.F w) * p 0 + blockOffsetX.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.blockAffineMap_zero_5.lean:404:9: error: Tactic `unfold` failed to unfold `blockStretchMu` in\n  !\u2082[\u2191(cantorBase N) ^ (-\u03a6.F w) * p.ofLp 0 +\n            have B := \u2191(cantorBase N);\n            have wNeg := \u2191\u2191(enc (restrictToDom3 hD w dom3NegOne));\n            have u := restrictToDom3 hD (\u03a6.G w);\n            have uNeg := \u2191\u2191(enc (u dom3NegOne));\n            have uZero := \u2191\u2191(enc (u dom3Zero));\n            if \u03a6.F w = 1 then (uZero * B + uNeg - wNeg) / (2 * B ^ 2)\n            else if \u03a6.F w = -1 then -wNeg / 2 else (uNeg - wNeg) / (2 * B),\n          \u2191(cantorBase N) ^ \u03a6.F w * p.ofLp 1 +\n            have B := \u2191(cantorBase N);\n            have w\u2080 := restrictToDom3 hD w;",
+      "error_class": "other",
+      "latency_ms": 57901.88,
+      "lean_ms": 7152.73,
+      "tokens": 352,
+      "accepted": false
+    }
+  ]
+}

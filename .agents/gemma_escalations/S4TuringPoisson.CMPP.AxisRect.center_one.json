@@ -1,0 +1,77 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.center_one",
+  "raw_name": "center_one",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem center_one (R : AxisRect) : R.center 1 = (R.yMin + R.yMax) / 2",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:20:39Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.center",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.height",
+    "S4TuringPoisson.CMPP.AxisRect.translate"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Analysis.SpecialFunctions.Log.Basic\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Function Set TopologicalSpace\nnamespace S4TuringPoisson.CMPP\nstructure AxisRect where\n  namespace AxisRect\n  def toSet (R : AxisRect) : Set EuclideanPlane :=\n  def width (R : AxisRect) : \u211d := R.xMax - R.xMin\n  def height (R : AxisRect) : \u211d := R.yMax - R.yMin\n  noncomputable def center (R : AxisRect) : EuclideanPlane :=\n  def translate (R : AxisRect) (dx dy : \u211d) : AxisRect :=\n  def tubeRect (R : AxisRect) (dx dy : \u211d) : AxisRect :=\n  where\n    hx := by linarith [R.hx]\n    hy := by linarith [R.hy]\n\n  noncomputable def center (R : AxisRect) : EuclideanPlane := WithLp.toLp 2 ![(R.xMin + R.xMax) / 2, (R.yMin + R.yMax) / 2]\n  def translate (R : AxisRect) (dx dy : \u211d) : AxisRect := { xMin := R.xMin + dx, xMax := R.xMax + dx, yMin := R.yMin + dy, yMax := R.yMax + dy, hx := by linarith [R.hx], hy := by linarith [R.hy] }\n  def height (R : AxisRect) : \u211d := R.yMax - R.yMin\nend\n\ntheorem center_one (R : AxisRect) : R.center 1",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 39963.91,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem center_one (R : AxisRect) : R.center 1 = (R.yMin + R.yMax) / 2 :=\n  by\n  unfold center\n  simp [center]\n  -- The definition of center is (R.xMin + R.xMax) / 2, (R.yMin + R.yMax) / 2\n  -- The 1 in center 1 corresponds to the second coordinate (index 1).\n  rfl",
+      "proof_body": "by\n  unfold center\n  simp [center]\n  -- The definition of center is (R.xMin + R.xMax) / 2, (R.yMin + R.yMax) / 2\n  -- The 1 in center 1 corresponds to the second coordinate (index 1).\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_2.lean:123:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_2.lean:120:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 43402.74,
+      "lean_ms": 9620.17,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem center_one (R : AxisRect) : R.center 1 = (R.yMin + R.yMax) / 2 :=\n  by\n  unfold center\n  simp [center]\n  rfl",
+      "proof_body": "by\n  unfold center\n  simp [center]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_3.lean:121:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_3.lean:120:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 35781.06,
+      "lean_ms": 8611.76,
+      "tokens": 263,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem center_one (R : AxisRect) : R.center 1 = (R.yMin + R.yMax) / 2 :=\n  by\n  unfold center\n  simp [center]\n  rfl",
+      "proof_body": "by\n  unfold center\n  simp [center]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_4.lean:121:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_4.lean:120:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 36908.15,
+      "lean_ms": 8418.24,
+      "tokens": 269,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem center_one (R : AxisRect) : R.center 1 = (R.yMin + R.yMax) / 2 :=\n  by\n  unfold center\n  simp [center]\n  rfl",
+      "proof_body": "by\n  unfold center\n  simp [center]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_5.lean:121:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.center_one_5.lean:120:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 42750.39,
+      "lean_ms": 8339.18,
+      "tokens": 350,
+      "accepted": false
+    }
+  ]
+}

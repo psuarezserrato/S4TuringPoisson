@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.height_nonneg",
+  "raw_name": "height_nonneg",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:14:24Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.height",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.width",
+    "S4TuringPoisson.CMPP.AxisRect.tubeRect"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height :=\n  by\n  unfold height\n  simp_in_mem\n  linarith",
+      "proof_body": "by\n  unfold height\n  simp_in_mem\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_1.lean:117:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_1.lean:115:2: error: unsolved goals\nR : AxisRect\n\u22a2 0 \u2264 R.yMax - R.yMin",
+      "error_class": "unsolved goals",
+      "latency_ms": 15178.52,
+      "lean_ms": 6630.42,
+      "tokens": 42,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height :=\n  by\n  unfold height\n  -- AxisRect is defined as [xMin, xMax] \u00d7 [yMin, yMax]\n  -- In a valid AxisRect, yMin \u2264 yMax must hold by the definition of the interval.\n  linarith",
+      "proof_body": "by\n  unfold height\n  -- AxisRect is defined as [xMin, xMax] \u00d7 [yMin, yMax]\n  -- In a valid AxisRect, yMin \u2264 yMax must hold by the definition of the interval.\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_2.lean:119:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.yMax - R.yMin < 0\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 20046.28,
+      "lean_ms": 6684.56,
+      "tokens": 81,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height :=\n  by\n  unfold height\n  -- Since R is an AxisRect, it is based on intervals [xMin, xMax] and [yMin, yMax].\n  -- In the definition of AxisRect, the vertical component is an interval [yMin, yMax],\n  -- which implies yMin \u2264 yMax.\n  simp\n  linarith",
+      "proof_body": "by\n  unfold height\n  -- Since R is an AxisRect, it is based on intervals [xMin, xMax] and [yMin, yMax].\n  -- In the definition of AxisRect, the vertical component is an interval [yMin, yMax],\n  -- which implies yMin \u2264 yMax.\n  simp\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_3.lean:121:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.yMax < R.yMin\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 22340.89,
+      "lean_ms": 6777.1,
+      "tokens": 102,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height :=\n  by\n  unfold height\n  simp\n  linarith",
+      "proof_body": "by\n  unfold height\n  simp\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_4.lean:118:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.yMax < R.yMin\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 17516.73,
+      "lean_ms": 6711.97,
+      "tokens": 38,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem height_nonneg (R : AxisRect) : 0 \u2264 R.height :=\n  by\n  unfold height\n  simp\n  linarith",
+      "proof_body": "by\n  unfold height\n  simp\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.height_nonneg_5.lean:118:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.yMax < R.yMin\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 17977.39,
+      "lean_ms": 6659.05,
+      "tokens": 38,
+      "accepted": false
+    }
+  ]
+}
