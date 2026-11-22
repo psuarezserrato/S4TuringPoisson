@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export PATH="$HOME/.elan/bin:$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
-MAIN_REPO="/Users/pablosuarez/Desktop/S4TuringPoisson"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMON_GIT_DIR="$(git -C "$SCRIPT_DIR/.." rev-parse --git-common-dir 2>/dev/null || true)"
+if [ -n "$COMMON_GIT_DIR" ]; then
+  if [ "${COMMON_GIT_DIR#/}" = "$COMMON_GIT_DIR" ]; then
+    COMMON_GIT_DIR="$SCRIPT_DIR/../$COMMON_GIT_DIR"
+  fi
+  MAIN_REPO="$(cd "$(dirname "$COMMON_GIT_DIR")" && pwd)"
+else
+  MAIN_REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
 WORKER="${1:?Usage: bash tools/bootstrap_worktree.sh <worker-name> [base-ref]}"
 BASE_REF="${2:-main}"
 WT_DIR="$MAIN_REPO/.worktrees/$WORKER"
 BRANCH="work/$WORKER"
 
 mkdir -p "$MAIN_REPO/.worktrees"
+if [ -d "$MAIN_REPO/../Turing-recursive" ]; then
+  ln -sfn ../../Turing-recursive "$MAIN_REPO/.worktrees/Turing-recursive"
+fi
 LOCKDIR="$MAIN_REPO/.git/s4tp_wt.lock"
 for _ in $(seq 1 50); do
   if mkdir "$LOCKDIR" 2>/dev/null; then break; fi
@@ -27,5 +39,10 @@ if [ ! -d "$WT_DIR/.lake/packages/TauCeti" ]; then
   echo "[bootstrap_worktree] Cloning .lake/packages via APFS CoW into $WT_DIR/.lake/packages ..."
   rm -rf "$WT_DIR/.lake/packages"
   cp -Rc "$MAIN_REPO/.lake/packages" "$WT_DIR/.lake/packages"
+fi
+if [ -d "$MAIN_REPO/.lake/build" ] && [ ! -f "$WT_DIR/.lake/build/lib/lean/S4TuringPoisson.olean" ]; then
+  echo "[bootstrap_worktree] Cloning .lake/build via APFS CoW into $WT_DIR/.lake/build ..."
+  rm -rf "$WT_DIR/.lake/build"
+  cp -Rc "$MAIN_REPO/.lake/build" "$WT_DIR/.lake/build"
 fi
 echo "[bootstrap_worktree] Ready: $WT_DIR (branch $BRANCH)"
