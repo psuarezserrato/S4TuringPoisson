@@ -12,5 +12,9 @@ name = "TauCeti"
 git = "https://github.com/TauCetiProject/TauCeti"
 rev = "v4.36.0"
 
+[[require]]
+name = "TuringRecursive"
+path = "../Turing-recursive"
+
 [[lean_lib]]
 name = "S4TuringPoisson"
