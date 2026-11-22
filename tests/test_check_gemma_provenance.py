@@ -126,6 +126,11 @@ class TestCheckGemmaProvenance(unittest.TestCase):
             self.assertTrue(res_sub["ok"])
             self.assertEqual(res_sub["origin"], "gemma_accepted")
 
+    def test_default_enforced_tiers_matches_gm1_routing(self):
+        import inspect
+        sig = inspect.signature(check_gemma_provenance.check_git_diff_provenance)
+        self.assertEqual(sig.parameters["enforced_tiers"].default, ("T0",))
+
 
 if __name__ == "__main__":
     unittest.main()
