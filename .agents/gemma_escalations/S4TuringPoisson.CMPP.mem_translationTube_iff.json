@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.mem_translationTube_iff",
+  "raw_name": "mem_translationTube_iff",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:16:37Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.mem_tubeRect_of_mem_Icc",
+    "S4TuringPoisson.CMPP.AxisRect.mem_toSet_iff",
+    "S4TuringPoisson.CMPP.AxisRect.toSet",
+    "S4TuringPoisson.EuclideanPlane"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v :=\n  by\n    rw [translationTube]\n    constructor\n    \u00b7 intros y' mutt\n      simp at y'\n      exact y'\n    \u00b7",
+      "proof_body": "by\n    rw [translationTube]\n    constructor\n    \u00b7 intros y' mutt\n      simp at y'\n      exact y'\n    \u00b7",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_1.lean:115:6: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\ncase mp\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v} \u2192 \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_1.lean:118:4: error: unsolved goals\ncase mpr\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 (\u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v) \u2192 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v}",
+      "error_class": "unsolved goals",
+      "latency_ms": 55291.2,
+      "lean_ms": 6867.32,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v :=\n  by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    simp at y'\n    exact y'\n  \u00b7 intros h\n    simp at h\n    exact h",
+      "proof_body": "by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    simp at y'\n    exact y'\n  \u00b7 intros h\n    simp at h\n    exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_2.lean:115:4: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\ncase mp\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v} \u2192 \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v",
+      "error_class": "other",
+      "latency_ms": 34095.02,
+      "lean_ms": 6880.62,
+      "tokens": 116,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v :=\n  by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    exact y'\n  \u00b7 intros h\n    exact h",
+      "proof_body": "by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    exact y'\n  \u00b7 intros h\n    exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_3.lean:115:4: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\ncase mp\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v} \u2192 \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v",
+      "error_class": "other",
+      "latency_ms": 31296.72,
+      "lean_ms": 6787.83,
+      "tokens": 105,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v :=\n  by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    simp at y'\n    exact y'\n  \u00b7 intros h\n    simp at h\n    exact h",
+      "proof_body": "by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    simp at y'\n    exact y'\n  \u00b7 intros h\n    simp at h\n    exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_4.lean:115:4: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\ncase mp\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v} \u2192 \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v",
+      "error_class": "other",
+      "latency_ms": 31283.9,
+      "lean_ms": 6769.8,
+      "tokens": 116,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem mem_translationTube_iff (S : Set EuclideanPlane) (v y : EuclideanPlane) :\n    y \u2208 translationTube S v \u2194 \u2203 x \u2208 S, \u2203 t \u2208 Set.Icc (0 : \u211d) 1, y = x + t \u2022 v :=\n  by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    exact y'\n  \u00b7 intros h\n    exact h",
+      "proof_body": "by\n  rw [translationTube]\n  constructor\n  \u00b7 intros y' mutt\n    exact y'\n  \u00b7 intros h\n    exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.mem_translationTube_iff_5.lean:115:4: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\ncase mp\nS : Set EuclideanPlane\nv y : EuclideanPlane\n\u22a2 y \u2208 {y | \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v} \u2192 \u2203 x \u2208 S, \u2203 t \u2208 Icc 0 1, y = x + t \u2022 v",
+      "error_class": "other",
+      "latency_ms": 30752.38,
+      "lean_ms": 6642.67,
+      "tokens": 105,
+      "accepted": false
+    }
+  ]
+}

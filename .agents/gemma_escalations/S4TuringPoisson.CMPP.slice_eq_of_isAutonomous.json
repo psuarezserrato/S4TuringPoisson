@@ -1,0 +1,75 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.slice_eq_of_isAutonomous",
+  "raw_name": "slice_eq_of_isAutonomous",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:04:50Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.slice",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.ofAutonomous",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.contDiff_slice"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0 := by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  rfl",
+      "compiler_error": "error: Declaration statement before ':=' was modified.\nExpected: theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0\nGot:      theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0",
+      "error_class": "other",
+      "latency_ms": 19750.36,
+      "lean_ms": 0.0,
+      "tokens": 85,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0 :=\n  by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "proof_body": "by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.slice_eq_of_isAutonomous_2.lean:111:9: error: Tactic `unfold` failed: expression P.IsAutonomous is not a global or local constant\nr\u2080 : \u211d\nP : CompactlySupportedPlanarHamiltonian r\u2080\nhP : P.IsAutonomous\nt : \u211d\n\u22a2 P.slice t = P.slice 0",
+      "error_class": "other",
+      "latency_ms": 27035.8,
+      "lean_ms": 9621.71,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0 := by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "compiler_error": "error: Declaration statement before ':=' was modified.\nExpected: theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0\nGot:      theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0",
+      "error_class": "other",
+      "latency_ms": 26389.72,
+      "lean_ms": 0.0,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0 := by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "compiler_error": "error: Declaration statement before ':=' was modified.\nExpected: theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0\nGot:      theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} (P : CompactlySupportedPlanarHamiltonian r\u2080)\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0",
+      "error_class": "other",
+      "latency_ms": 25365.29,
+      "lean_ms": 0.0,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem slice_eq_of_isAutonomous {r\u2080 : \u211d} {P : CompactlySupportedPlanarHamiltonian r\u2080}\n    (hP : P.IsAutonomous) (t : \u211d) :\n    P.slice t = P.slice 0 :=\n  by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "proof_body": "by\n  unfold P.IsAutonomous\n  simp [P.slice]\n  exact hP",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.slice_eq_of_isAutonomous_5.lean:111:9: error: Tactic `unfold` failed: expression P.IsAutonomous is not a global or local constant\nr\u2080 : \u211d\nP : CompactlySupportedPlanarHamiltonian r\u2080\nhP : P.IsAutonomous\nt : \u211d\n\u22a2 P.slice t = P.slice 0",
+      "error_class": "other",
+      "latency_ms": 25772.1,
+      "lean_ms": 9668.98,
+      "tokens": 86,
+      "accepted": false
+    }
+  ]
+}

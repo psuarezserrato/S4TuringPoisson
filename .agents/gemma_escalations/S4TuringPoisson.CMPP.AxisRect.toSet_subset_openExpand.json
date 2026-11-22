@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand",
+  "raw_name": "AxisRect.toSet_subset_openExpand",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:35:45Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.toSet",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.subset_tubeRect_self",
+    "S4TuringPoisson.CMPP.AxisRect.translate_subset_tubeRect"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5 :=\n  by\n  let (xMin, xMax) := R.xMin, R.xMax\n  let (yMin, yMax) := R.yMin, R.yMax\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    sub_cost_iff.mp (by rw [R.halfSize_eq_diff])\n  have h_min : yMax - yMin = 2 * hy := by\n    sub_cost_iff.mp (by rw [R.halfSize_eq_diff])\n  have h_center : x0 = (xMin + xMax) / 2 := by\n    simp at h_max; rfl; constructor; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (",
+      "proof_body": "by\n  let (xMin, xMax) := R.xMin, R.xMax\n  let (yMin, yMax) := R.yMin, R.yMax\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    sub_cost_iff.mp (by rw [R.halfSize_eq_diff])\n  have h_min : yMax - yMin = 2 * hy := by\n    sub_cost_iff.mp (by rw [R.halfSize_eq_diff])\n  have h_center : x0 = (xMin + xMax) / 2 := by\n    simp at h_max; rfl; constructor; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (h_max).mp; archaic_split; exact (",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_1.lean:127:6: error: Type mismatch\n  (xMin, xMax)\nhas type\n  ?m.8 \u00d7 ?m.9\nbut is expected to have type\n  \u211d\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_1.lean:127:28: error: unexpected token ','; expected command",
+      "error_class": "type mismatch",
+      "latency_ms": 50844.28,
+      "lean_ms": 7212.09,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5 :=\n  by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  refine (R.toSet).cap r\n  rcases h \u2264 r with h_x h_y\n  have h1 : xMin \u2264 x0 \u2264 xMax := by\n    rw [h_max]; lia\n  have h2 : yMin \u2264 y0 \u2264 yMax := by\n    rw [h_min]; lia\n  have h3 : xMin \u2264 xMax := by\n    rw [h_max]; lia\n  have h4 : yMin \u2264 yMax := by\n    rw [h_min]; lia\n  have h5 : xMax - x0 \u2264 hx := by\n    rw [h_max]; lia\n  have h6 : x0 - xMin \u2264 hx := by\n    rw [h_max]; lia\n  have h7 : yMax - y0 \u2264 hy := by\n    rw [h_",
+      "proof_body": "by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  refine (R.toSet).cap r\n  rcases h \u2264 r with h_x h_y\n  have h1 : xMin \u2264 x0 \u2264 xMax := by\n    rw [h_max]; lia\n  have h2 : yMin \u2264 y0 \u2264 yMax := by\n    rw [h_min]; lia\n  have h3 : xMin \u2264 xMax := by\n    rw [h_max]; lia\n  have h4 : yMin \u2264 yMax := by\n    rw [h_min]; lia\n  have h5 : xMax - x0 \u2264 hx := by\n    rw [h_max]; lia\n  have h6 : x0 - xMin \u2264 hx := by\n    rw [h_max]; lia\n  have h7 : yMax - y0 \u2264 hy := by\n    rw [h_",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_2.lean:129:6: error: Type mismatch\n  (x0, y0)\nhas type\n  ?m.44 \u00d7 ?m.45\nbut is expected to have type\n  EuclideanPlane\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_2.lean:130:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_2.lean:138:24: error: unexpected identifier; expected command",
+      "error_class": "type mismatch",
+      "latency_ms": 51272.75,
+      "lean_ms": 7088.83,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5 :=\n  by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  refine (forall p : EuclideanPlane, \n    p 0 \u2208 Set.Icc xMin xMax \u2227 p 1 \u2208 Set.Icc yMin yMax \u2192\n    p \u2208 R.openExpand \u03b5)\n  intro p hp\n  rcases hp with \u27e8h_x, h_y\u27e9",
+      "proof_body": "by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  refine (forall p : EuclideanPlane, \n    p 0 \u2208 Set.Icc xMin xMax \u2227 p 1 \u2208 Set.Icc yMin yMax \u2192\n    p \u2208 R.openExpand \u03b5)\n  intro p hp\n  rcases hp with \u27e8h_x, h_y\u27e9",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_3.lean:129:6: error: Type mismatch\n  (x0, y0)\nhas type\n  ?m.44 \u00d7 ?m.45\nbut is expected to have type\n  EuclideanPlane\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_3.lean:130:2: error: No goals to be solved",
+      "error_class": "type mismatch",
+      "latency_ms": 58433.71,
+      "lean_ms": 7403.52,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5 :=\n  by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  intros p hp\n  rcases hp with rfl\n  have h_x_min : xMin \u2264 x0 := by\n    have h1 : xMin - x0 \u2264 0 := by\n      rw [h_max]\n      linarith\n    exact (le_of_ne_lt (lt_self (xMin - x0))) (le_of_ne_lt (le_of_le_iff (xMin - x0 \u2264 0))) -- This is a placeholder for the actual comparison logic\n    -- Let's simplify:\n    tauto\n  have h_x_max : xMax \u2265 x0 := by tauto\n  have h_y_min : yMin \u2264 y0 := by tauto\n  have h_y_max : yMax \u2265 y0 := by tauto\n  -- The definitions of R.toSet and R.openExpand show that R.toSet is contained in the closed box.\n  -- openExpand adds an epsilon margin.\n  have h_in_x := by\n    tauto\n  have h_in_y := by\n    tauto\n  -- Since p is in [xMin, xMax] x [yMin, yMax] and xMin < xMax, yMin < yMax\n  -- and openExpand adds \u03b5 to the boundaries, the inclusion follows.\n  apply (mem_set.mem_iff .1).mp (And.mem_iff",
+      "proof_body": "by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  intros p hp\n  rcases hp with rfl\n  have h_x_min : xMin \u2264 x0 := by\n    have h1 : xMin - x0 \u2264 0 := by\n      rw [h_max]\n      linarith\n    exact (le_of_ne_lt (lt_self (xMin - x0))) (le_of_ne_lt (le_of_le_iff (xMin - x0 \u2264 0))) -- This is a placeholder for the actual comparison logic\n    -- Let's simplify:\n    tauto\n  have h_x_max : xMax \u2265 x0 := by tauto\n  have h_y_min : yMin \u2264 y0 := by tauto\n  have h_y_max : yMax \u2265 y0 := by tauto\n  -- The definitions of R.toSet and R.openExpand show that R.toSet is contained in the closed box.\n  -- openExpand adds an epsilon margin.\n  have h_in_x := by\n    tauto\n  have h_in_y := by\n    tauto\n  -- Since p is in [xMin, xMax] x [yMin, yMax] and xMin < xMax, yMin < yMax\n  -- and openExpand adds \u03b5 to the boundaries, the inclusion follows.\n  apply (mem_set.mem_iff .1).mp (And.mem_iff",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_4.lean:157:26: error: unexpected token; expected ')', ',' or ':'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_4.lean:129:6: error: Type mismatch\n  (x0, y0)\nhas type\n  ?m.44 \u00d7 ?m.45\nbut is expected to have type\n  EuclideanPlane",
+      "error_class": "type mismatch",
+      "latency_ms": 69745.98,
+      "lean_ms": 8666.39,
+      "tokens": 512,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem AxisRect.toSet_subset_openExpand (R : AxisRect) {\u03b5 : \u211d} (h\u03b5 : 0 < \u03b5) :\n    R.toSet \u2286 R.openExpand \u03b5 :=\n  by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  rcases R.toSet.mem with r_mem\n  rcases r_mem with \u27e8x_in, y_in, h_x_in, h_y_in\u27e9\n  have h_x_bound : x_in - x0 \u2264 hx := by\n    have h1 : x_in - x0 \u2264 xMax - x0 := h_x_in\n    have h2 : xMax - x0 = hx := by\n      rw [h_max]\n      simp\n    exact h1.trans h2\n  have h_x_bound_lower : x_in - x0 \u2265 -hx := by\n    have h1 : x_in - x0 \u2265 xMin - x0 := h_x_in\n    have h2 : xMin - x0 = -hx := by\n      rw [h_max]\n      simp\n    exact h1.trans h2\n  have h_y_bound : y_in - y0 \u2264 hy := by\n    have h1 : y_in - y0 \u2264 yMax - y0 := h_y_in\n    have h2 : yMax - y0 = hy := by\n      rw [h_min]\n      simp\n    exact h1.trans h2\n  have h_y_bound_lower : y_in - y0 \u2265 -hy := by\n    have h1 : y_in - y0 \u2265",
+      "proof_body": "by\n  let (xMin, xMax) := (R.xMin, R.xMax)\n  let (yMin, yMax) := (R.yMin, R.yMax)\n  let (x0, y0) := R.center\n  let (hx, hy) := R.halfSize\n  have h_max : xMax - xMin = 2 * hx := by\n    rw [R.halfSize_eq_diff]\n    simp\n  have h_min : yMax - yMin = 2 * hy := by\n    rw [R.halfSize_eq_diff]\n    simp\n  rcases R.toSet.mem with r_mem\n  rcases r_mem with \u27e8x_in, y_in, h_x_in, h_y_in\u27e9\n  have h_x_bound : x_in - x0 \u2264 hx := by\n    have h1 : x_in - x0 \u2264 xMax - x0 := h_x_in\n    have h2 : xMax - x0 = hx := by\n      rw [h_max]\n      simp\n    exact h1.trans h2\n  have h_x_bound_lower : x_in - x0 \u2265 -hx := by\n    have h1 : x_in - x0 \u2265 xMin - x0 := h_x_in\n    have h2 : xMin - x0 = -hx := by\n      rw [h_max]\n      simp\n    exact h1.trans h2\n  have h_y_bound : y_in - y0 \u2264 hy := by\n    have h1 : y_in - y0 \u2264 yMax - y0 := h_y_in\n    have h2 : yMax - y0 = hy := by\n      rw [h_min]\n      simp\n    exact h1.trans h2\n  have h_y_bound_lower : y_in - y0 \u2265 -hy := by\n    have h1 : y_in - y0 \u2265",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_5.lean:158:25: error: unexpected token 'end'; expected term\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.toSet_subset_openExpand_5.lean:129:6: error: Type mismatch\n  (x0, y0)\nhas type\n  ?m.44 \u00d7 ?m.45\nbut is expected to have type\n  EuclideanPlane",
+      "error_class": "type mismatch",
+      "latency_ms": 59914.97,
+      "lean_ms": 8715.79,
+      "tokens": 512,
+      "accepted": false
+    }
+  ]
+}
