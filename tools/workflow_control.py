@@ -21,38 +21,54 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-MAIN_REPO = Path("/Users/pablosuarez/Desktop/S4TuringPoisson")
 SENTINEL_FILENAME = ".pause_workflow"
 CHECKPOINTS_REL = ".agents/checkpoints"
 USAGE_LOG_REL = ".agents/gemma_usage.jsonl"
 
 CONTRACT_FILES: Dict[str, str] = {
-    "M0": "S4TuringPoisson/Interfaces.lean",
-    "M1.1": "S4TuringPoisson/Poisson/BivectorAndModular.lean",
-    "M1.2": "S4TuringPoisson/Poisson/JacobianPoisson.lean",
-    "M1.3": "S4TuringPoisson/Poisson/SingularCircleNormalForm.lean",
-    "M2.1": "S4TuringPoisson/Fibration/LocalSingularModels.lean",
-    "M2.2": "S4TuringPoisson/Fibration/S4Fibration.lean",
-    "M2.3": "S4TuringPoisson/Fibration/WrinkledGeneral4Manifold.lean",
-    "M3.1": "S4TuringPoisson/Dynamics/GeneralizedShift.lean",
-    "M3.2": "S4TuringPoisson/Dynamics/UndecidabilityAndTransfer.lean",
-    "M3.3": "S4TuringPoisson/Smoothing/DiskSmoothing.lean",
-    "M4.1": "S4TuringPoisson/Extension/AlignedUnimodularVolume.lean",
-    "M4.2": "S4TuringPoisson/Extension/BumpIsotopyLift.lean",
-    "M5": "S4TuringPoisson/Main.lean",
-    "C.Geom": "S4TuringPoisson/Checks/GeomChecks.lean",
-    "C.Comp": "S4TuringPoisson/Checks/CompChecks.lean",
+    "A1": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+    "A2": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+    "A3": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+    "A4": "S4TuringPoisson/Smoothing/CMPP/Realize.lean",
+    "B1": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+    "B2": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+    "B3": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+    "P": "S4TuringPoisson/Extension/PoissonHamiltonian.lean",
+    "Z": "S4TuringPoisson/Smoothing/CMPPInstance.lean",
 }
 
 SORRY_RE = re.compile(r"\b(sorry|admit)\b")
 
 
 def strip_lean_comments(source: str) -> str:
-    """Remove nested Lean block comments `/- ... -/` and line comments `-- ...`."""
+    """Remove nested Lean block comments `/- ... -/` and line comments `-- ...`, preserving string literals."""
     out: List[str] = []
     i, n, depth = 0, len(source), 0
     while i < n:
-        if source[i:i + 2] == "/-":
+        if depth == 0 and source[i] == "'" and (i == 0 or not (source[i - 1].isalnum() or source[i - 1] in "_'")):
+            if i + 3 < n and source[i + 1] == "\\" and source[i + 3] == "'":
+                out.append(source[i:i + 4])
+                i += 4
+                continue
+            if i + 2 < n and source[i + 1] not in ("\\", "\n", "'") and source[i + 2] == "'":
+                out.append(source[i:i + 3])
+                i += 3
+                continue
+        if depth == 0 and source[i] == '"':
+            out.append('"')
+            i += 1
+            while i < n:
+                ch = source[i]
+                out.append(ch)
+                if ch == "\\" and i + 1 < n:
+                    out.append(source[i + 1])
+                    i += 2
+                elif ch == '"':
+                    i += 1
+                    break
+                else:
+                    i += 1
+        elif source[i:i + 2] == "/-":
             depth += 1
             i += 2
         elif depth > 0 and source[i:i + 2] == "-/":
@@ -77,9 +93,25 @@ def resolve_root(root_arg: Optional[str] = None) -> Path:
     """Resolve the repository root shared across worktrees."""
     if root_arg:
         return Path(root_arg).resolve()
-    if MAIN_REPO.is_dir():
-        return MAIN_REPO
-    return Path(__file__).resolve().parent.parent
+    env_root = os.environ.get("S4TP_ROOT")
+    if env_root:
+        return Path(env_root).resolve()
+    here_root = Path(__file__).resolve().parent.parent
+    try:
+        raw = subprocess.check_output(
+            ["git", "-C", str(here_root), "rev-parse", "--git-common-dir"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=2.0,
+        ).strip()
+        if raw:
+            p = Path(raw)
+            p = (here_root / p).resolve() if not p.is_absolute() else p.resolve()
+            if p.name == ".git":
+                return p.parent
+    except Exception:
+        pass
+    return here_root
 
 
 class WorkflowController:
@@ -263,8 +295,9 @@ def run_self_tests() -> int:
     """Run isolated unit tests in a TemporaryDirectory without modifying live state."""
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
-        (root / "S4TuringPoisson").mkdir()
-        (root / "S4TuringPoisson" / "Interfaces.lean").write_text("theorem ok : True := trivial\n", encoding="utf-8")
+        digits_dir = root / "S4TuringPoisson" / "Smoothing" / "CMPP"
+        digits_dir.mkdir(parents=True)
+        (digits_dir / "Digits.lean").write_text("theorem ok : True := trivial\n", encoding="utf-8")
         ctl = WorkflowController(root)
         assert not ctl.is_paused()
         st0 = ctl.get_status()

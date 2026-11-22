@@ -3,7 +3,10 @@
 /.worktrees/
 /.pause_workflow
 /.agents/gemma_usage.jsonl
+/.agents/gemma_scratch/
 /.agents/checkpoints/
+/.agents/bm25_index.pkl
+/data/s4tp_accepted.jsonl
 **/__pycache__/
 *.pyc
 .DS_Store
