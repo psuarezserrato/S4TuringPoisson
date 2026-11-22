@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.width_nonneg",
+  "raw_name": "width_nonneg",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:12:17Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.width",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.height",
+    "S4TuringPoisson.CMPP.AxisRect.tubeRect"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width :=\n  by\n  unfold width\n  linarith",
+      "proof_body": "by\n  unfold width\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_1.lean:116:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.xMax - R.xMin < 0\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 14557.85,
+      "lean_ms": 6600.61,
+      "tokens": 35,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width :=\n  by\n  unfold width\n  simp_fund\n  linarith",
+      "proof_body": "by\n  unfold width\n  simp_fund\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_2.lean:116:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_2.lean:114:2: error: unsolved goals\nR : AxisRect\n\u22a2 0 \u2264 R.xMax - R.xMin",
+      "error_class": "unsolved goals",
+      "latency_ms": 16543.55,
+      "lean_ms": 6945.45,
+      "tokens": 40,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width :=\n  by\n  unfold width\n  simp only [AxisRect.width]\n  apply bounded_iff.mp\n  exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin)) -- This is not quite it, let's use a standard lemma\n  \u00b7 rw [AxisRect.xMax]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin)) -- wait, AxisRect implies xMin <= xMax\n  \u00b7 rw [AxisRect.xMin]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  -- Let's simplify the logic:\n  revert\n  unfold width\n  simp only [AxisRect.width]\n  apply bounded_iff.mp\n  \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  -- Actually, since AxisRect implies xMin <= xMax, we can use:\n  \u00b7 rw [AxisRect.xMax]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.",
+      "proof_body": "by\n  unfold width\n  simp only [AxisRect.width]\n  apply bounded_iff.mp\n  exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin)) -- This is not quite it, let's use a standard lemma\n  \u00b7 rw [AxisRect.xMax]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin)) -- wait, AxisRect implies xMin <= xMax\n  \u00b7 rw [AxisRect.xMin]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  -- Let's simplify the logic:\n  revert\n  unfold width\n  simp only [AxisRect.width]\n  apply bounded_iff.mp\n  \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n  -- Actually, since AxisRect implies xMin <= xMax, we can use:\n  \u00b7 rw [AxisRect.xMax]\n    apply bounded_iff.mp\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.xMin))\n    \u00b7 exact (bounded_iff.mp).mp (le_of_lt (R.xMax - R.",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_3.lean:127:2: error: expected checkColGt",
+      "error_class": "other",
+      "latency_ms": 41592.73,
+      "lean_ms": 6696.99,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width :=\n  by\n  unfold width\n  linarith",
+      "proof_body": "by\n  unfold width\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_4.lean:116:2: error: linarith failed to find a contradiction\nR : AxisRect\na\u271d : R.xMax - R.xMin < 0\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 17555.46,
+      "lean_ms": 6942.07,
+      "tokens": 35,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem width_nonneg (R : AxisRect) : 0 \u2264 R.width :=\n  by\n  unfold width\n  -- From the definition of AxisRect, xMin \u2264 xMax.\n  -- Specifically, the structure implies R.xMin \u2264 R.xMax.\n  apply le_sub_iff.mp\n  linarith",
+      "proof_body": "by\n  unfold width\n  -- From the definition of AxisRect, xMin \u2264 xMax.\n  -- Specifically, the structure implies R.xMin \u2264 R.xMax.\n  apply le_sub_iff.mp\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_5.lean:118:8: error(lean.unknownIdentifier): Unknown identifier `le_sub_iff.mp`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.width_nonneg_5.lean:119:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 21286.69,
+      "lean_ms": 6946.42,
+      "tokens": 79,
+      "accepted": false
+    }
+  ]
+}

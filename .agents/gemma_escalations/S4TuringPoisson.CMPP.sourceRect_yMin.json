@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.sourceRect_yMin",
+  "raw_name": "sourceRect_yMin",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:56:30Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.sourceRect",
+    "S4TuringPoisson.CMPP.blockAffineMap",
+    "S4TuringPoisson.dom3Zero",
+    "S4TuringPoisson.dom3One"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  let R := sourceRect enc w\n  let B := cantorBase N\n  unfold sourceRect\n  -- The sourceRect is constructed as a Cantor cylinder rectangle.\n  -- For a fixed w, the set is restricted to the range of the values \n  -- associated with the domain of the cylinder.\n  -- Specifically, the y-coordinates for sourceRect are derived from the \n  -- values of the function w on the domain.\n  -- The standard construction for sourceRect gives the bounds:\n  -- xMin = 0, xMax = 1 / (4 * B)\n  -- yMin = (2 * y0 * B + 2 * y1) / (4 * B^2)\n  -- where y0 and y1 are the y-components of the embeddings of w(dom3Zero) and w(dom3One).\n  -- In the current definition of sourceRect, it returns a rectangle \n  -- that encodes the range of the function f.\n  -- For yMin, the formula simplifies to the lower bound of the \n  -- Cantor set construction applied to the specific weights.\n  have h : (sourceRect enc w).yMin = (2 * ((enc (w dom3",
+      "proof_body": "by\n  let R := sourceRect enc w\n  let B := cantorBase N\n  unfold sourceRect\n  -- The sourceRect is constructed as a Cantor cylinder rectangle.\n  -- For a fixed w, the set is restricted to the range of the values \n  -- associated with the domain of the cylinder.\n  -- Specifically, the y-coordinates for sourceRect are derived from the \n  -- values of the function w on the domain.\n  -- The standard construction for sourceRect gives the bounds:\n  -- xMin = 0, xMax = 1 / (4 * B)\n  -- yMin = (2 * y0 * B + 2 * y1) / (4 * B^2)\n  -- where y0 and y1 are the y-components of the embeddings of w(dom3Zero) and w(dom3One).\n  -- In the current definition of sourceRect, it returns a rectangle \n  -- that encodes the range of the function f.\n  -- For yMin, the formula simplifies to the lower bound of the \n  -- Cantor set construction applied to the specific weights.\n  have h : (sourceRect enc w).yMin = (2 * ((enc (w dom3",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_1.lean:336:55: error: unexpected token '/--'; expected ')', ',' or ':'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_1.lean:336:51: error(lean.unknownIdentifier): Unknown identifier `dom3`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_1.lean:336:7: error: Missing cases:\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_1.lean:319:2: error: unsolved goals\nA : Type u_1\nN : \u2115\nenc : A \u2243 Fin N\nw : \u21a5shiftDom3 \u2192 A\nR : AxisRect := sourceRect enc w\nB : \u2115 := cantorBase N\nh : (sourceRect enc w).yMin = 2 * \u2191\u2191(enc (w sorry))\n\u22a2 { xMin := 2 * \u2191\u2191(enc (w dom3NegOne)) / (4 * \u2191(cantorBase N)),",
+      "error_class": "unknown identifier",
+      "latency_ms": 55709.94,
+      "lean_ms": 7135.3,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  unfold sourceRect\n  unfold yMin\n  unfold cantorBase\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "proof_body": "by\n  unfold sourceRect\n  unfold yMin\n  unfold cantorBase\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_2.lean:321:9: error(lean.unknownIdentifier): Unknown identifier `yMin`",
+      "error_class": "unknown identifier",
+      "latency_ms": 36550.29,
+      "lean_ms": 7298.23,
+      "tokens": 158,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold cantorBase\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "proof_body": "by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold cantorBase\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_3.lean:322:9: error(lean.unknownIdentifier): Unknown identifier `yMin`",
+      "error_class": "unknown identifier",
+      "latency_ms": 33390.9,
+      "lean_ms": 8650.88,
+      "tokens": 167,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "proof_body": "by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_4.lean:322:9: error(lean.unknownIdentifier): Unknown identifier `yMin`",
+      "error_class": "unknown identifier",
+      "latency_ms": 32152.56,
+      "lean_ms": 8485.31,
+      "tokens": 161,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem sourceRect_yMin {A : Type*} {N : \u2115} (enc : A \u2243 Fin N) (w : shiftDom3 \u2192 A) :\n    (sourceRect enc w).yMin =\n      (2 * ((enc (w dom3Zero)).1 : \u211d) * (cantorBase N : \u211d) +\n        2 * ((enc (w dom3One)).1 : \u211d)) / (4 * (cantorBase N : \u211d) ^ 2) :=\n  by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "proof_body": "by\n  let R := sourceRect enc w\n  unfold sourceRect\n  unfold yMin\n  unfold dom3Zero\n  unfold dom3One\n  field_simp\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.sourceRect_yMin_5.lean:322:9: error(lean.unknownIdentifier): Unknown identifier `yMin`",
+      "error_class": "unknown identifier",
+      "latency_ms": 32845.43,
+      "lean_ms": 8989.49,
+      "tokens": 161,
+      "accepted": false
+    }
+  ]
+}

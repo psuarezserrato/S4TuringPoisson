@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.ext",
+  "raw_name": "ext",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:08:50Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.translate",
+    "S4TuringPoisson.CMPP.AxisRect.center",
+    "S4TuringPoisson.CMPP.AxisRect.toSet"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082 :=\n  by\n  hxMin; hxMax; hyMin; hyMax",
+      "proof_body": "by\n  hxMin; hxMax; hyMin; hyMax",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_1.lean:106:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_1.lean:105:2: error: unsolved goals\nR\u2081 R\u2082 : AxisRect\nhxMin : R\u2081.xMin = R\u2082.xMin\nhxMax : R\u2081.xMax = R\u2082.xMax\nhyMin : R\u2081.yMin = R\u2082.yMin\nhyMax : R\u2081.yMax = R\u2082.yMax\n\u22a2 R\u2081 = R\u2082",
+      "error_class": "unsolved goals",
+      "latency_ms": 22157.13,
+      "lean_ms": 10306.26,
+      "tokens": 105,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082 :=\n  by\n  rw [hxMin, hxMax, hyMin, hyMax]",
+      "proof_body": "by\n  rw [hxMin, hxMax, hyMin, hyMax]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_2.lean:106:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  R\u2081.xMin\nin the target expression\n  R\u2081 = R\u2082\nR\u2081 R\u2082 : AxisRect\nhxMin : R\u2081.xMin = R\u2082.xMin\nhxMax : R\u2081.xMax = R\u2082.xMax\nhyMin : R\u2081.yMin = R\u2082.yMin\nhyMax : R\u2081.yMax = R\u2082.yMax\n\u22a2 R\u2081 = R\u2082",
+      "error_class": "other",
+      "latency_ms": 24181.01,
+      "lean_ms": 7159.08,
+      "tokens": 108,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082 :=\n  by\n  have h1 : R\u2081.xMin = R\u2082.xMin := hxMin\n  have h2 : R\u2081.xMax = R\u2082.xMax := hxMax\n  have h3 : R\u2081.yMin = R\u2082.yMin := hyMin\n  have h4 : R\u2081.yMax = R\u2082.yMax := hyMax\n  simp [hxMin, hxMax, hyMin, hyMax]",
+      "proof_body": "by\n  have h1 : R\u2081.xMin = R\u2082.xMin := hxMin\n  have h2 : R\u2081.xMax = R\u2082.xMax := hxMax\n  have h3 : R\u2081.yMin = R\u2082.yMin := hyMin\n  have h4 : R\u2081.yMax = R\u2082.yMax := hyMax\n  simp [hxMin, hxMax, hyMin, hyMax]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_3.lean:110:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 28062.79,
+      "lean_ms": 8362.52,
+      "tokens": 186,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082 :=\n  by\n  rw [hxMin, hxMax, hyMin, hyMax]\n  rfl",
+      "proof_body": "by\n  rw [hxMin, hxMax, hyMin, hyMax]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_4.lean:106:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  R\u2081.xMin\nin the target expression\n  R\u2081 = R\u2082\nR\u2081 R\u2082 : AxisRect\nhxMin : R\u2081.xMin = R\u2082.xMin\nhxMax : R\u2081.xMax = R\u2082.xMax\nhyMin : R\u2081.yMin = R\u2082.yMin\nhyMax : R\u2081.yMax = R\u2082.yMax\n\u22a2 R\u2081 = R\u2082",
+      "error_class": "other",
+      "latency_ms": 24072.12,
+      "lean_ms": 6810.58,
+      "tokens": 112,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[ext]\ntheorem ext {R\u2081 R\u2082 : AxisRect} (hxMin : R\u2081.xMin = R\u2082.xMin) (hxMax : R\u2081.xMax = R\u2082.xMax)\n    (hyMin : R\u2081.yMin = R\u2082.yMin) (hyMax : R\u2081.yMax = R\u2082.yMax) : R\u2081 = R\u2082 :=\n  by\n  simp [hxMin, hxMax, hyMin, hyMax]",
+      "proof_body": "by\n  simp [hxMin, hxMax, hyMin, hyMax]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ext_5.lean:106:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 24379.84,
+      "lean_ms": 7638.97,
+      "tokens": 108,
+      "accepted": false
+    }
+  ]
+}

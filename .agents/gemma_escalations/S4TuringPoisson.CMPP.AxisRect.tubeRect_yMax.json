@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax",
+  "raw_name": "tubeRect_yMax",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Digits.lean",
+  "milestone": "A1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T20:39:26Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.tubeRect",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.translate",
+    "S4TuringPoisson.CMPP.AxisRect.height"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy) :=\n  by\n  let R' := translate R dx dy\n  simp [tubeRect, translate",
+      "proof_body": "by\n  let R' := translate R dx dy\n  simp [tubeRect, translate",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_1.lean:212:27: error: unexpected token 'end'; expected ']'",
+      "error_class": "syntax",
+      "latency_ms": 47622.79,
+      "lean_ms": 7705.21,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy) :=\n  by\n  simp [tubeRect, translate]\n  -- tubeRect R dx dy = { xMin := min (R.xMin) (R.xMin + dx) ... yMax := max (R.yMax) (R.yMax + dy) }\n  -- The simplified expression is (max R.yMax (R.yMax + dy))\n  rfl",
+      "proof_body": "by\n  simp [tubeRect, translate]\n  -- tubeRect R dx dy = { xMin := min (R.xMin) (R.xMin + dx) ... yMax := max (R.yMax) (R.yMax + dy) }\n  -- The simplified expression is (max R.yMax (R.yMax + dy))\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_2.lean:214:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_2.lean:211:18: warning: This simp argument is unused:\n  translate\nHint: Omit it from the simp argument list.\n  [apply] simp [tubeRect]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 29455.63,
+      "lean_ms": 6826.64,
+      "tokens": 139,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy) :=\n  by\n  simp [tubeRect, translate]\n  rfl",
+      "proof_body": "by\n  simp [tubeRect, translate]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_3.lean:212:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_3.lean:211:18: warning: This simp argument is unused:\n  translate\nHint: Omit it from the simp argument list.\n  [apply] simp [tubeRect]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 23847.67,
+      "lean_ms": 6898.34,
+      "tokens": 70,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy) :=\n  by\n  simp [tubeRect]\n  rfl",
+      "proof_body": "by\n  simp [tubeRect]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_4.lean:212:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24382.71,
+      "lean_ms": 7345.16,
+      "tokens": 68,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tubeRect_yMax (R : AxisRect) (dx dy : \u211d) :\n    (R.tubeRect dx dy).yMax = max R.yMax (R.yMax + dy) :=\n  by\n  simp [tubeRect]\n  rfl",
+      "proof_body": "by\n  simp [tubeRect]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/digits/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax_5.lean:212:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 23588.36,
+      "lean_ms": 7456.73,
+      "tokens": 68,
+      "accepted": false
+    }
+  ]
+}
