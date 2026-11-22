@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous",
+  "raw_name": "bumpedHyperbolicStretchHamiltonian_isAutonomous",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:08:22Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.bumpedHyperbolicStretchHamiltonian",
+    "S4TuringPoisson.bumpedHyperbolicStretchIsotopy",
+    "S4TuringPoisson.bumpedHyperbolicStretchIsotopy_timeOne_of_mem_closedBall",
+    "S4TuringPoisson.bumpedHyperbolicStretchIsotopy_cantorBase_timeOne"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous :=\n  by\n  apply mut_ham_isAutonomous",
+      "proof_body": "by\n  apply mut_ham_isAutonomous",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_1.lean:112:8: error(lean.unknownIdentifier): Unknown identifier `mut_ham_isAutonomous`",
+      "error_class": "unknown identifier",
+      "latency_ms": 29527.41,
+      "lean_ms": 6853.49,
+      "tokens": 134,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous :=\n  by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  have h_v : (h.grad : \u211d \u2192 EuclideanPlane) = (h.grad) := by\n    simp\n  rfl",
+      "proof_body": "by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  have h_v : (h.grad : \u211d \u2192 EuclideanPlane) = (h.grad) := by\n    simp\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_2.lean:113:16: error(lean.invalidField): Invalid field `grad`: The environment does not contain `S4TuringPoisson.CompactlySupportedPlanarHamiltonian.grad`, so it is not possible to project the field `grad` from an expression\n  h\nof type\n  CompactlySupportedPlanarHamiltonian r\u2080\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_2.lean:113:48: error(lean.invalidField): Invalid field `grad`: The environment does not contain `S4TuringPoisson.CompactlySupportedPlanarHamiltonian.grad`, so it is not possible to project the field `grad` from an expression\n  h\nof type\n  CompactlySupportedPlanarHamiltonian r\u2080\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_2.lean:115:2: error: Tactic `rfl` failed: The left-hand side\n  r\u2080\nis not definitionally equal to the right-hand side\n  bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc",
+      "error_class": "other",
+      "latency_ms": 36678.94,
+      "lean_ms": 7780.01,
+      "tokens": 179,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous :=\n  by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  -- The definition of IsAutonomous involves checking if the Hamiltonian is independent of time.\n  -- Since the Hamiltonian H depends only on position (x, y) and not explicitly on t,\n  -- the time derivative of the Hamiltonian (dH/dt) is zero.\n  -- In this context, the Hamiltonian is defined as a function of (x, y).\n  apply h.IsAutonomous",
+      "proof_body": "by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  -- The definition of IsAutonomous involves checking if the Hamiltonian is independent of time.\n  -- Since the Hamiltonian H depends only on position (x, y) and not explicitly on t,\n  -- the time derivative of the Hamiltonian (dH/dt) is zero.\n  -- In this context, the Hamiltonian is defined as a function of (x, y).\n  apply h.IsAutonomous",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_3.lean:117:2: error: Tactic `apply` failed: could not unify the type of `h.IsAutonomous`\n  Prop\nwith the goal\n  (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nc : EuclideanPlane\nr_out : \u211d\nhr_out : 0 < r_out\nhsub : ball c r_out \u2286 ball 0 r\u2080\n\u03bc : \u211d\nh : CompactlySupportedPlanarHamiltonian r\u2080 := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc",
+      "error_class": "other",
+      "latency_ms": 37939.65,
+      "lean_ms": 8535.73,
+      "tokens": 229,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous :=\n  by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  unfold IsAutonomous\n  simp [h]",
+      "proof_body": "by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  unfold IsAutonomous\n  simp [h]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_4.lean:113:9: error(lean.unknownIdentifier): Unknown identifier `IsAutonomous`",
+      "error_class": "unknown identifier",
+      "latency_ms": 31931.85,
+      "lean_ms": 8608.89,
+      "tokens": 157,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem bumpedHyperbolicStretchHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_out : \u211d} (hr_out : 0 < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03bc : \u211d) :\n    (bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc).IsAutonomous :=\n  by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  unfold IsAutonomous\n  -- The Hamiltonian is defined as a function of position q, and the definition of\n  -- IsAutonomous checks if the partial derivative with respect to time is zero.\n  -- Since the expression for the Hamiltonian depends only on the configuration variables,\n  -- the time derivative is identically zero.\n  simp [h]",
+      "proof_body": "by\n  let h := bumpedHyperbolicStretchHamiltonian hr\u2080 c hr_out hsub \u03bc\n  unfold IsAutonomous\n  -- The Hamiltonian is defined as a function of position q, and the definition of\n  -- IsAutonomous checks if the partial derivative with respect to time is zero.\n  -- Since the expression for the Hamiltonian depends only on the configuration variables,\n  -- the time derivative is identically zero.\n  simp [h]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedHyperbolicStretchHamiltonian_isAutonomous_5.lean:113:9: error(lean.unknownIdentifier): Unknown identifier `IsAutonomous`",
+      "error_class": "unknown identifier",
+      "latency_ms": 35523.01,
+      "lean_ms": 8429.52,
+      "tokens": 218,
+      "accepted": false
+    }
+  ]
+}

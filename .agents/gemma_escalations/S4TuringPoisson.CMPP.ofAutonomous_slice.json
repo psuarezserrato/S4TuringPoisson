@@ -1,0 +1,77 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.ofAutonomous_slice",
+  "raw_name": "ofAutonomous_slice",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:02:25Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.ofAutonomous",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.slice",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian",
+    "S4TuringPoisson.bumpedHyperbolicStretchHamiltonian"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  have h_aut : \u2200 t, P.H t = h := by\n    -- The definition of ofAutonomous implies that the Hamiltonian is independent of time.\n    -- Specifically, the function H(t, y) is equal to h(y) for all t.\n    -- By the definition of ofAutonomous, the mapping (t, y) maps to h(y).\n    -- In the definition of CompactlySupportedPlanarHamiltonian, H is a function (\u211d \u00d7 EuclideanPlane \u2192 \u211d).\n    -- For ofAutonomous, H (t, y) = h(y).\n    simp [CompactlySupportedPlanarHamiltonian.ofAutonomous]",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  have h_aut : \u2200 t, P.H t = h := by\n    -- The definition of ofAutonomous implies that the Hamiltonian is independent of time.\n    -- Specifically, the function H(t, y) is equal to h(y) for all t.\n    -- By the definition of ofAutonomous, the mapping (t, y) maps to h(y).\n    -- In the definition of CompactlySupportedPlanarHamiltonian, H is a function (\u211d \u00d7 EuclideanPlane \u2192 \u211d).\n    -- For ofAutonomous, H (t, y) = h(y).\n    simp [CompactlySupportedPlanarHamiltonian.ofAutonomous]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_1.lean:113:28: error: Type mismatch\n  h\nhas type\n  EuclideanPlane \u2192 \u211d\nbut is expected to have type\n  \u211d\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_1.lean:113:33: error: unsolved goals\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nh : EuclideanPlane \u2192 \u211d\nhh : ContDiff \u211d \u221e h\nhsupp : \u2200 y \u2209 ball 0 r\u2080, h y = 0",
+      "error_class": "type mismatch",
+      "latency_ms": 45966.95,
+      "lean_ms": 7525.68,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanplanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h := by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  rfl",
+      "compiler_error": "error: Declaration statement before ':=' was modified.\nExpected: @[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h\nGot:      @[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanplanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h",
+      "error_class": "other",
+      "latency_ms": 27583.1,
+      "lean_ms": 0.0,
+      "tokens": 151,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  -- The definition of CompactlySupportedPlanarHamiltonian.ofAutonomous \n  -- ensures that P.H (t, y) = h y for all t and y.\n  rfl",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  -- The definition of CompactlySupportedPlanarHamiltonian.ofAutonomous \n  -- ensures that P.H (t, y) = h y for all t and y.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_3.lean:113:8: error(lean.unknownIdentifier): Unknown identifier `slice`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_3.lean:113:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 30735.56,
+      "lean_ms": 9594.43,
+      "tokens": 196,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  rfl",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_4.lean:113:8: error(lean.unknownIdentifier): Unknown identifier `slice`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_4.lean:113:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 27771.89,
+      "lean_ms": 7051.66,
+      "tokens": 157,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem ofAutonomous_slice {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0)\n    (t : \u211d) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).slice t = h :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  rfl",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  simp [slice]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_5.lean:113:8: error(lean.unknownIdentifier): Unknown identifier `slice`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_slice_5.lean:113:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 27624.34,
+      "lean_ms": 8691.02,
+      "tokens": 157,
+      "accepted": false
+    }
+  ]
+}

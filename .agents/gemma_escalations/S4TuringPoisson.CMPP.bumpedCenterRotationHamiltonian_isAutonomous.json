@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous",
+  "raw_name": "bumpedCenterRotationHamiltonian_isAutonomous",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:13:00Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.bumpedCenterRotationHamiltonian",
+    "S4TuringPoisson.bumpedCenterRotationIsotopy",
+    "S4TuringPoisson.bumpedCenterRotationIsotopy_eq_self_of_notMem_ball",
+    "S4TuringPoisson.bumpedCenterRotationIsotopy_apply_of_mem_closedBall"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous :=\n  by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  -- The definition of IsAutonomous for a CompactlySupportedPlanarHamiltonian\n  -- typically relates to the Hamiltonian being time-independent.\n  -- In the context of S4TuringPoisson, the Hamiltonian is constructed \n  -- such that it depends only on the spatial variables.\n  have_adjoint_time_independent : (h : EuclideanPlane \u2192 \u211d) = (h : EuclideanPlane \u2192 \u211d) := rfl\n  -- The property of being autonomous is satisfied by any Hamiltonian \n  -- that does not explicitly depend on the time parameter t.\n  constructor\n  -- Verification that the Hamiltonian is independent of t.\n  -- Since the construction of bumpedCenterRotationHamiltonian\n  -- involves a rotation and a bump function that are not time-dependent,\n  -- the resulting Hamiltonian is autonomous.\n  apply h.IsAutonomous",
+      "proof_body": "by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  -- The definition of IsAutonomous for a CompactlySupportedPlanarHamiltonian\n  -- typically relates to the Hamiltonian being time-independent.\n  -- In the context of S4TuringPoisson, the Hamiltonian is constructed \n  -- such that it depends only on the spatial variables.\n  have_adjoint_time_independent : (h : EuclideanPlane \u2192 \u211d) = (h : EuclideanPlane \u2192 \u211d) := rfl\n  -- The property of being autonomous is satisfied by any Hamiltonian \n  -- that does not explicitly depend on the time parameter t.\n  constructor\n  -- Verification that the Hamiltonian is independent of t.\n  -- Since the construction of bumpedCenterRotationHamiltonian\n  -- involves a rotation and a bump function that are not time-dependent,\n  -- the resulting Hamiltonian is autonomous.\n  apply h.IsAutonomous",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_1.lean:119:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_1.lean:113:2: error: unsolved goals\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nc : EuclideanPlane\nr_in r_out : \u211d\nhr_in : 0 < r_in\nhr_lt : r_in < r_out\nhsub : ball c r_out \u2286 ball 0 r\u2080\n\u03b8 : \u211d\nh : CompactlySupportedPlanarHamiltonian r\u2080 := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n\u22a2 (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous",
+      "error_class": "unsolved goals",
+      "latency_ms": 50643.14,
+      "lean_ms": 9029.26,
+      "tokens": 345,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous :=\n  by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  have h_ham : h.Hamiltonian = (\u03bb (x : EuclideanPlane) => (S4TuringPoisson.bumpedCenterRotationIsotopy hr\u2080 c hr_in hr_lt hsub \u03b8).d (1, x))",
+      "proof_body": "by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  have h_ham : h.Hamiltonian = (\u03bb (x : EuclideanPlane) => (S4TuringPoisson.bumpedCenterRotationIsotopy hr\u2080 c hr_in hr_lt hsub \u03b8).d (1, x))",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_2.lean:115:138: error: unexpected token 'end'; expected ':=' or '|'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_2.lean:115:17: error(lean.invalidField): Invalid field `Hamiltonian`: The environment does not contain `S4TuringPoisson.CompactlySupportedPlanarHamiltonian.Hamiltonian`, so it is not possible to project the field `Hamiltonian` from an expression\n  h\nof type\n  CompactlySupportedPlanarHamiltonian r\u2080\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_2.lean:115:7: error: Missing cases:\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_2.lean:113:2: error: unsolved goals\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nc : EuclideanPlane\nr_in r_out : \u211d\nhr_in : 0 < r_in",
+      "error_class": "unsolved goals",
+      "latency_ms": 50529.15,
+      "lean_ms": 8369.09,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous :=\n  by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  -- An autonomous Hamiltonian is one where the Hamiltonian function does not depend on time.\n  -- The construction of bumpedCenterRotationHamiltonian ensures that the associated \n  -- vector field (and thus the Hamiltonian) is time-independent.\n  exists (\u03bb _ => h.Hamiltonian)",
+      "proof_body": "by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  -- An autonomous Hamiltonian is one where the Hamiltonian function does not depend on time.\n  -- The construction of bumpedCenterRotationHamiltonian ensures that the associated \n  -- vector field (and thus the Hamiltonian) is time-independent.\n  exists (\u03bb _ => h.Hamiltonian)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_3.lean:118:2: error: Invalid `\u27e8...\u27e9` notation: The expected type\n  \u2200 (t : \u211d) (y : EuclideanPlane),\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).H (t, y) =\n      (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).H (0, y)\nis not an inductive type\nNote: This notation can only be used when the expected type is an inductive type with a single constructor",
+      "error_class": "other",
+      "latency_ms": 36717.72,
+      "lean_ms": 8817.89,
+      "tokens": 228,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous :=\n  by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  unfold IsAutonomous at *\n  simp [bumpedCenterRotationHamiltonian]\n  -- The Hamiltonian H of the bumpedCenterRotationHamiltonian is defined by\n  -- the derivative of the action functional (or generating function)\n  -- associated with the bumpedCenterRotationIsotopy. \n  -- For the bumpedCenterRotationIsotopy, the velocity is given by \n  -- a rotation around c with angular velocity \u03b8 (or some function of r)\n  -- which is independent of time t.\n  -- Since the Hamiltonian function H(t, x) = H(0, x) is time-independent,\n  -- it satisfies the definition of an autonomous Hamiltonian.\n  have h_time_independent : \u2200 (t : \u211d) (y : EuclideanPlane), \n    h.H (t, y) = h.H (0, y) := by\n    rfl\n  exact h_time_independent",
+      "proof_body": "by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  unfold IsAutonomous at *\n  simp [bumpedCenterRotationHamiltonian]\n  -- The Hamiltonian H of the bumpedCenterRotationHamiltonian is defined by\n  -- the derivative of the action functional (or generating function)\n  -- associated with the bumpedCenterRotationIsotopy. \n  -- For the bumpedCenterRotationIsotopy, the velocity is given by \n  -- a rotation around c with angular velocity \u03b8 (or some function of r)\n  -- which is independent of time t.\n  -- Since the Hamiltonian function H(t, x) = H(0, x) is time-independent,\n  -- it satisfies the definition of an autonomous Hamiltonian.\n  have h_time_independent : \u2200 (t : \u211d) (y : EuclideanPlane), \n    h.H (t, y) = h.H (0, y) := by\n    rfl\n  exact h_time_independent",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_4.lean:115:9: error(lean.unknownIdentifier): Unknown identifier `IsAutonomous`",
+      "error_class": "unknown identifier",
+      "latency_ms": 53037.65,
+      "lean_ms": 9208.83,
+      "tokens": 366,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem bumpedCenterRotationHamiltonian_isAutonomous {r\u2080 : \u211d}\n    (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1) (c : EuclideanPlane) {r_in r_out : \u211d}\n    (hr_in : 0 < r_in) (hr_lt : r_in < r_out)\n    (hsub : Metric.ball c r_out \u2286 Metric.ball (0 : EuclideanPlane) r\u2080) (\u03b8 : \u211d) :\n    (bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8).IsAutonomous :=\n  by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  unfold IsAutonomous\n  -- The Hamiltonian is autonomous if it does not depend on the time parameter t.\n  -- Since the formula for the Hamiltonian H(x) in this construction (and for\n  -- all centered rotation/stretch isotopies in this library) is independent\n  -- of t, the condition follows directly from the definition of the \n  -- Hamiltonian associated with the isotopy.\n  simp [h]",
+      "proof_body": "by\n  let h := bumpedCenterRotationHamiltonian hr\u2080 c hr_in hr_lt hsub \u03b8\n  unfold IsAutonomous\n  -- The Hamiltonian is autonomous if it does not depend on the time parameter t.\n  -- Since the formula for the Hamiltonian H(x) in this construction (and for\n  -- all centered rotation/stretch isotopies in this library) is independent\n  -- of t, the condition follows directly from the definition of the \n  -- Hamiltonian associated with the isotopy.\n  simp [h]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.bumpedCenterRotationHamiltonian_isAutonomous_5.lean:115:9: error(lean.unknownIdentifier): Unknown identifier `IsAutonomous`",
+      "error_class": "unknown identifier",
+      "latency_ms": 42698.4,
+      "lean_ms": 8657.23,
+      "tokens": 257,
+      "accepted": false
+    }
+  ]
+}

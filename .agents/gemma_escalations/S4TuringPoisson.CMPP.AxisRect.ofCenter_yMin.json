@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin",
+  "raw_name": "AxisRect.ofCenter_yMin",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:39:20Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.AxisRect.center",
+    "S4TuringPoisson.CMPP.AxisRect",
+    "S4TuringPoisson.CMPP.AxisRect.toSet",
+    "S4TuringPoisson.CMPP.AxisRect.center_one"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081 :=\n  by\n  simp only [AxisRect.ofCenter]\n  linarith",
+      "proof_body": "by\n  simp only [AxisRect.ofCenter]\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin_1.lean:151:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 22502.77,
+      "lean_ms": 6810.4,
+      "tokens": 99,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081 :=\n  by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "proof_body": "by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin_2.lean:151:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24444.18,
+      "lean_ms": 6824.71,
+      "tokens": 98,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081 :=\n  by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "proof_body": "by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin_3.lean:151:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24064.28,
+      "lean_ms": 6696.48,
+      "tokens": 98,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081 :=\n  by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "proof_body": "by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin_4.lean:151:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24490.38,
+      "lean_ms": 6898.59,
+      "tokens": 98,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem AxisRect.ofCenter_yMin (c : EuclideanPlane) {\u03b4\u2080 \u03b4\u2081 : \u211d} (h\u03b4\u2080 : 0 \u2264 \u03b4\u2080)\n    (h\u03b4\u2081 : 0 \u2264 \u03b4\u2081) :\n    (AxisRect.ofCenter c h\u03b4\u2080 h\u03b4\u2081).yMin = c 1 - \u03b4\u2081 :=\n  by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "proof_body": "by\n  simp [AxisRect.ofCenter]\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.AxisRect.ofCenter_yMin_5.lean:151:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24918.51,
+      "lean_ms": 7114.21,
+      "tokens": 98,
+      "accepted": false
+    }
+  ]
+}

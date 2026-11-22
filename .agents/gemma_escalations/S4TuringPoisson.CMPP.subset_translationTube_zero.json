@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.subset_translationTube_zero",
+  "raw_name": "subset_translationTube_zero",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T22:22:30Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.EuclideanPlane",
+    "S4TuringPoisson.CMPP.AxisRect.toSet",
+    "S4TuringPoisson.CMPP.AxisRect.mem_tubeRect_of_mem_Icc",
+    "S4TuringPoisson.CMPP.blockAffineMap_zero"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v :=\n  by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "proof_body": "by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_1.lean:114:31: error(lean.invalidField): Invalid field `mem_iff`: The environment does not contain `Set.mem_iff`, so it is not possible to project the field `mem_iff` from an expression\n  translationTube S v\nof type `Set EuclideanPlane`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_1.lean:114:2: error: Tactic `rcases` failed: `x\u271d : ?m.8` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 55052.41,
+      "lean_ms": 7082.84,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v :=\n  by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "proof_body": "by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_2.lean:114:31: error(lean.invalidField): Invalid field `mem_iff`: The environment does not contain `Set.mem_iff`, so it is not possible to project the field `mem_iff` from an expression\n  translationTube S v\nof type `Set EuclideanPlane`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_2.lean:114:2: error: Tactic `rcases` failed: `x\u271d : ?m.8` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 58683.4,
+      "lean_ms": 6920.17,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v :=\n  by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "proof_body": "by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_3.lean:114:31: error(lean.invalidField): Invalid field `mem_iff`: The environment does not contain `Set.mem_iff`, so it is not possible to project the field `mem_iff` from an expression\n  translationTube S v\nof type `Set EuclideanPlane`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_3.lean:114:2: error: Tactic `rcases` failed: `x\u271d : ?m.8` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 59101.08,
+      "lean_ms": 6954.6,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v :=\n  by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "proof_body": "by\n  intro p hp\n  rcases (translationTube S v).mem_iff.mp hp as h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_4.lean:114:31: error(lean.invalidField): Invalid field `mem_iff`: The environment does not contain `Set.mem_iff`, so it is not possible to project the field `mem_iff` from an expression\n  translationTube S v\nof type `Set EuclideanPlane`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_4.lean:114:2: error: Tactic `rcases` failed: `x\u271d : ?m.8` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 72348.74,
+      "lean_ms": 6963.66,
+      "tokens": 512,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem subset_translationTube_zero (S : Set EuclideanPlane) (v : EuclideanPlane) :\n    S \u2286 translationTube S v :=\n  by\n  intro p hp\n  rcases (translationTube S v).mem of h1 := hp",
+      "proof_body": "by\n  intro p hp\n  rcases (translationTube S v).mem of h1 := hp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_5.lean:114:31: error(lean.invalidField): Invalid field `mem`: The environment does not contain `Set.mem`, so it is not possible to project the field `mem` from an expression\n  translationTube S v\nof type `Set EuclideanPlane`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_5.lean:114:2: error: Tactic `rcases` failed: `x\u271d : ?m.8` is not an inductive datatype\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.subset_translationTube_zero_5.lean:114:41: error: unexpected token ':='; expected command",
+      "error_class": "syntax",
+      "latency_ms": 72273.13,
+      "lean_ms": 6814.01,
+      "tokens": 512,
+      "accepted": false
+    }
+  ]
+}

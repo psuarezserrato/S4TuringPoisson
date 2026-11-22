@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.ofAutonomous_isAutonomous",
+  "raw_name": "ofAutonomous_isAutonomous",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Primitives.lean",
+  "milestone": "A2",
+  "tier": "T0",
+  "statement": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-22T21:59:12Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.ofAutonomous",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian",
+    "S4TuringPoisson.bumpedHyperbolicStretchHamiltonian",
+    "S4TuringPoisson.bumpedCenterRotationHamiltonian"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let h_const : EuclideanPlane \u2192 \u211d := fun _ \u21a6 h\n  let h_const_diff : ContDiff \u211d \u221e (fun _ \u21a6 h) := by\n    apply contMDiff_const\n    exact hh\n  let h_const_supp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0 :=\n    fun y hy := hsupp y hy\n  have h_const_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  have h_const_supp_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  have h_const_diff_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  let h_static : EuclideanPlane \u2192 \u211d := fun _ \u21a6 h\n  let h_static_diff : ContDiff \u211d \u221e (fun _ \u21a6 h) := by\n    apply contMDiff_const\n    exact hh\n  have h_static_eq : (fun _ \u21a6 h) = (",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let h_const : EuclideanPlane \u2192 \u211d := fun _ \u21a6 h\n  let h_const_diff : ContDiff \u211d \u221e (fun _ \u21a6 h) := by\n    apply contMDiff_const\n    exact hh\n  let h_const_supp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0 :=\n    fun y hy := hsupp y hy\n  have h_const_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  have h_const_supp_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  have h_const_diff_eq : (fun _ \u21a6 h) = (fun _ \u21a6 h) := rfl\n  let h_static : EuclideanPlane \u2192 \u211d := fun _ \u21a6 h\n  let h_static_diff : ContDiff \u211d \u221e (fun _ \u21a6 h) := by\n    apply contMDiff_const\n    exact hh\n  have h_static_eq : (fun _ \u21a6 h) = (",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_1.lean:116:12: error: unexpected token ':='; expected '\u21a6', '=>'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_1.lean:111:46: error: Type mismatch\n  h\nhas type\n  EuclideanPlane \u2192 \u211d\nbut is expected to have type\n  \u211d\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_1.lean:112:21: error(lean.synthInstanceFailed): failed to synthesize instance of type class\n  NormedAddCommGroup (EuclideanPlane \u2192 \u211d)\nHint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_1.lean:109:2: error: unsolved goals\nr\u2080 : \u211d",
+      "error_class": "type mismatch",
+      "latency_ms": 46406.11,
+      "lean_ms": 10610.39,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let VF := P.vectorField\n  let t := 0\n  let y := (0 : EuclideanPlane)\n  -- The property IsAutonomous states that the vector field is independent of t.\n  -- For an autonomous Hamiltonian, the vector field V = J \u2207H depends only on y.\n  -- Since the Hamiltonian is defined as h, and the vector field is constructed\n  -- from the gradient of h, if h does not depend on t, then the vector field\n  -- will not depend on t.\n  have h_grad : ContDiff \u211d \u221e (fun y => (h y : \u211d)) := hh\n  -- By definition of ofAutonomous, the vector field is J * grad(h).\n  -- Since h is independent of t, the gradient and the resulting vector field are independent of t.\n  simp [CompactlySupportedPlanarHamiltonian.ofAutonomous]\n  exact P.isAutonomous",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let VF := P.vectorField\n  let t := 0\n  let y := (0 : EuclideanPlane)\n  -- The property IsAutonomous states that the vector field is independent of t.\n  -- For an autonomous Hamiltonian, the vector field V = J \u2207H depends only on y.\n  -- Since the Hamiltonian is defined as h, and the vector field is constructed\n  -- from the gradient of h, if h does not depend on t, then the vector field\n  -- will not depend on t.\n  have h_grad : ContDiff \u211d \u221e (fun y => (h y : \u211d)) := hh\n  -- By definition of ofAutonomous, the vector field is J * grad(h).\n  -- Since h is independent of t, the gradient and the resulting vector field are independent of t.\n  simp [CompactlySupportedPlanarHamiltonian.ofAutonomous]\n  exact P.isAutonomous",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_2.lean:123:10: error(lean.invalidField): Invalid field `isAutonomous`: The environment does not contain `S4TuringPoisson.CompactlySupportedPlanarHamiltonian.isAutonomous`, so it is not possible to project the field `isAutonomous` from an expression\n  P\nof type\n  CompactlySupportedPlanarHamiltonian r\u2080",
+      "error_class": "other",
+      "latency_ms": 41768.96,
+      "lean_ms": 7390.82,
+      "tokens": 334,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let VF := P.vectorField\n  let t := 0\n  let y := (0 : EuclideanPlane)\n  -- The property IsAutonomous is defined as \u2200 t, y, VF t y = VF 0 y.\n  -- We show that for any t, the vector field is independent of t.\n  have h_independent : \u2200 t : \u211d, \u2200 y : EuclideanPlane, VF t y = VF 0 y := by\n    intro t y\n    -- For an autonomous Hamiltonian, the vector field is J * grad(h).\n    -- Since h is independent of t, the gradient and thus the vector field is independent of t.\n    rfl\n  exact h_independent",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  let VF := P.vectorField\n  let t := 0\n  let y := (0 : EuclideanPlane)\n  -- The property IsAutonomous is defined as \u2200 t, y, VF t y = VF 0 y.\n  -- We show that for any t, the vector field is independent of t.\n  have h_independent : \u2200 t : \u211d, \u2200 y : EuclideanPlane, VF t y = VF 0 y := by\n    intro t y\n    -- For an autonomous Hamiltonian, the vector field is J * grad(h).\n    -- Since h is independent of t, the gradient and thus the vector field is independent of t.\n    rfl\n  exact h_independent",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_3.lean:121:2: error: Type mismatch\n  h_independent\nhas type\n  \u2200 (t : \u211d) (y : EuclideanPlane), VF t y = VF 0 y\nbut is expected to have type\n  (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous\nNote: The following definitions were not unfolded because their definition is not exposed:\n  TauCeti.SmoothTwoForm.hamiltonianVectorField \u21a6 7",
+      "error_class": "type mismatch",
+      "latency_ms": 38011.58,
+      "lean_ms": 7294.14,
+      "tokens": 287,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  unfold P.IsAutonomous\n  simp [P.vectorField]\n  -- The vector field of an autonomous Hamiltonian is derived from the gradient of a time-independent Hamiltonian.\n  -- Specifically, P.vectorField t y = J \u2207h(y).\n  -- Since h does not depend on t, the gradient \u2207h does not depend on t,\n  -- and thus the Hamiltonian vector field V = J \u2207h does not depend on t.\n  intro t y\n  rfl",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  unfold P.IsAutonomous\n  simp [P.vectorField]\n  -- The vector field of an autonomous Hamiltonian is derived from the gradient of a time-independent Hamiltonian.\n  -- Specifically, P.vectorField t y = J \u2207h(y).\n  -- Since h does not depend on t, the gradient \u2207h does not depend on t,\n  -- and thus the Hamiltonian vector field V = J \u2207h does not depend on t.\n  intro t y\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_4.lean:111:9: error: Tactic `unfold` failed: expression P.IsAutonomous is not a global or local constant\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nh : EuclideanPlane \u2192 \u211d\nhh : ContDiff \u211d \u221e h\nhsupp : \u2200 y \u2209 ball 0 r\u2080, h y = 0\nP : CompactlySupportedPlanarHamiltonian r\u2080 := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n\u22a2 (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous",
+      "error_class": "other",
+      "latency_ms": 33665.85,
+      "lean_ms": 8892.61,
+      "tokens": 245,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem ofAutonomous_isAutonomous {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (h : EuclideanPlane \u2192 \u211d) (hh : ContDiff \u211d \u221e h)\n    (hsupp : \u2200 y : EuclideanPlane, y \u2209 Metric.ball (0 : EuclideanPlane) r\u2080 \u2192 h y = 0) :\n    (CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp).IsAutonomous :=\n  by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  unfold P.IsAutonomous\n  simp [P.vectorField]\n  -- P.vectorField is defined as J \u2207h where the gradient is independent of t.\n  -- The property IsAutonomous is \u2200 t, y, P.vectorField t y = P.vectorField 0 y.\n  -- Since the Hamiltonian h is independent of t (via hh), the gradient is independent of t.\n  -- Thus the vector field is independent of t.\n  have h_grad : \u2200 t, \u2207h t = \u2207h 0 := by\n    unfold \u2207\n    simp [hh]\n  have h_vec : \u2200 t, P.vectorField t = P.vectorField 0 := by\n    intro t\n    simp [P.vectorField]\n    _ := by rw [h_grad]\n  refine (forall_univ t)\n  \u00b7 exact h_vec t\n  \u00b7 exact (forall_univ y), h_vec 0 y",
+      "proof_body": "by\n  let P := CompactlySupportedPlanarHamiltonian.ofAutonomous hr\u2080 h hh hsupp\n  unfold P.IsAutonomous\n  simp [P.vectorField]\n  -- P.vectorField is defined as J \u2207h where the gradient is independent of t.\n  -- The property IsAutonomous is \u2200 t, y, P.vectorField t y = P.vectorField 0 y.\n  -- Since the Hamiltonian h is independent of t (via hh), the gradient is independent of t.\n  -- Thus the vector field is independent of t.\n  have h_grad : \u2200 t, \u2207h t = \u2207h 0 := by\n    unfold \u2207\n    simp [hh]\n  have h_vec : \u2200 t, P.vectorField t = P.vectorField 0 := by\n    intro t\n    simp [P.vectorField]\n    _ := by rw [h_grad]\n  refine (forall_univ t)\n  \u00b7 exact h_vec t\n  \u00b7 exact (forall_univ y), h_vec 0 y",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/flows/.agents/gemma_scratch/S4TuringPoisson.CMPP.ofAutonomous_isAutonomous_5.lean:117:21: error: expected token",
+      "error_class": "syntax",
+      "latency_ms": 43846.71,
+      "lean_ms": 6866.46,
+      "tokens": 352,
+      "accepted": false
+    }
+  ]
+}
