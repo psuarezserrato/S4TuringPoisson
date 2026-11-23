@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.natCast_mem_Icc_of_le",
+  "raw_name": "natCast_mem_Icc_of_le",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:31:39Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.exp_mul_le_max_of_mem_Icc",
+    "S4TuringPoisson.CMPP.mem_translationTube_of_mem_Icc",
+    "S4TuringPoisson.CMPP.AxisRect.mem_toSet_iff",
+    "S4TuringPoisson.CMPP.AxisRect.mem_tubeRect_of_mem_Icc"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  rcases hi with rfi | rff\n  \u00b7 mut _ := rfi\n    have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n      apply Nat.cast_le\n      exact rfi\n    have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      apply Nat.cast_le.mp\n      exact rff\n    exact mem_Icc.mpr (h_ge, h_le)\n  \u00b7 mut _ := rff\n    have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n      apply Nat.cast_le\n      exact rfi\n    have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      apply Nat.cast_le.mp\n      exact rff\n    exact mem_Icc.mpr (h_ge, h_le)",
+      "proof_body": "by\n  rcases hi with rfi | rff\n  \u00b7 mut _ := rfi\n    have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n      apply Nat.cast_le\n      exact rfi\n    have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      apply Nat.cast_le.mp\n      exact rff\n    exact mem_Icc.mpr (h_ge, h_le)\n  \u00b7 mut _ := rff\n    have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n      apply Nat.cast_le\n      exact rfi\n    have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      apply Nat.cast_le.mp\n      exact rff\n    exact mem_Icc.mpr (h_ge, h_le)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_1.lean:118:2: error: unsolved goals\ncase refl\ni : \u2115\n\u22a2 \u2191i \u2208 Icc (-\u2191i) \u2191i\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_1.lean:116:2: error: unsolved goals\ncase step\ni m\u271d : \u2115\nrff : i.le m\u271d\n\u22a2 \u2191i \u2208 Icc (-\u2191m\u271d.succ) \u2191m\u271d.succ\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_1.lean:118:4: error: unexpected token 'mut'; expected command",
+      "error_class": "unsolved goals",
+      "latency_ms": 40241.19,
+      "lean_ms": 9832.07,
+      "tokens": 272,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n    unfold Icc\n    exact Nat.cast_le.mp hi\n  have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    unfold Icc\n    have h_le_K : (K : \u2124) \u2264 (K : \u2124) := by rw [le_refl]\n    have h_le_i : (i : \u2124) \u2264 (K : \u2124) := by\n      unfold Icc\n      exact Nat.cast_le.mp hi\n    have h_neg : (-(K : \u2124)) \u2264 (K : \u2124) := by\n      unfold Icc\n      simp\n    have h_lt_i : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      unfold Icc\n      have h1 : (i : \u2124) \u2264 (K : \u2124) := h_le\n      have h2 : (-(K : \u2124)) \u2264 (K : \u2124) := h_neg\n      exact le_trans h2 h1\n    exact h_lt_i\n  exact mem_Icc.mpr (h_ge, h_le)",
+      "proof_body": "by\n  have h_le : (i : \u2124) \u2264 (K : \u2124) := by\n    unfold Icc\n    exact Nat.cast_le.mp hi\n  have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    unfold Icc\n    have h_le_K : (K : \u2124) \u2264 (K : \u2124) := by rw [le_refl]\n    have h_le_i : (i : \u2124) \u2264 (K : \u2124) := by\n      unfold Icc\n      exact Nat.cast_le.mp hi\n    have h_neg : (-(K : \u2124)) \u2264 (K : \u2124) := by\n      unfold Icc\n      simp\n    have h_lt_i : (-(K : \u2124)) \u2264 (i : \u2124) := by\n      unfold Icc\n      have h1 : (i : \u2124) \u2264 (K : \u2124) := h_le\n      have h2 : (-(K : \u2124)) \u2264 (K : \u2124) := h_neg\n      exact le_trans h2 h1\n    exact h_lt_i\n  exact mem_Icc.mpr (h_ge, h_le)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_2.lean:118:11: error: Tactic `unfold` failed to unfold `Icc` in\n  \u2191i \u2264 \u2191K\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_2.lean:121:11: error: Tactic `unfold` failed to unfold `Icc` in\n  -\u2191K \u2264 \u2191i\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_2.lean:135:20: error: Application type mismatch: The argument\n  (?m.32, ?m.33)\nhas type\n  ?m.30 \u00d7 ?m.31\nof sort `Type (max ?u.26 ?u.25)` but is expected to have type\n  -\u2191K \u2264 \u2191i \u2227 \u2191i \u2264 \u2191K\nof sort `Prop` in the application\n  mem_Icc.mpr (?m.32, ?m.33)",
+      "error_class": "type mismatch",
+      "latency_ms": 47297.03,
+      "lean_ms": 9651.21,
+      "tokens": 348,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  unfold Icc\n  have h1 : (i : \u2124) \u2264 (K : \u2124) := Nat.cast_le.mp hi\n  have h2 : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    have h_le : (K : \u2124) \u2264 (K : \u2124) := le_refl\n    have h_ge : (-(K : \u2124)) \u2264 (0 : \u2124) := Nat.cast_le.mp (le_nonneg K)\n    simpa h_ge, h_le\n  exact mem_Icc.mpr (h2, h1)",
+      "proof_body": "by\n  unfold Icc\n  have h1 : (i : \u2124) \u2264 (K : \u2124) := Nat.cast_le.mp hi\n  have h2 : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    have h_le : (K : \u2124) \u2264 (K : \u2124) := le_refl\n    have h_ge : (-(K : \u2124)) \u2264 (0 : \u2124) := Nat.cast_le.mp (le_nonneg K)\n    simpa h_ge, h_le\n  exact mem_Icc.mpr (h2, h1)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_3.lean:118:33: error: Type mismatch\n  Nat.cast_le.mp hi\nhas type\n  i \u2264 K\nbut is expected to have type\n  \u2191i \u2264 \u2191K\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_3.lean:120:37: error: Type mismatch\n  le_refl\nhas type\n  \u2200 (a : ?m.35), a \u2264 a\nbut is expected to have type\n  \u2191K \u2264 \u2191K",
+      "error_class": "unknown identifier",
+      "latency_ms": 42986.81,
+      "lean_ms": 9992.98,
+      "tokens": 206,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  unfold Icc\n  have h_le : (i : \u2124) \u2264 (K : \u2124) := Nat.cast_le.mp hi\n  have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    have h_le_K : (K : \u2124) \u2264 (K : \u2124) := le_refl\n    have h_ge_0 : (-(K : \u2124)) \u2264 (0 : \u2124) := Nat.cast_le.mp (le_nonneg K)\n    exact le_trans h_ge_0 h_le_K\n  exact mem_Icc.mpr (h_ge, h_le)",
+      "proof_body": "by\n  unfold Icc\n  have h_le : (i : \u2124) \u2264 (K : \u2124) := Nat.cast_le.mp hi\n  have h_ge : (-(K : \u2124)) \u2264 (i : \u2124) := by\n    have h_le_K : (K : \u2124) \u2264 (K : \u2124) := le_refl\n    have h_ge_0 : (-(K : \u2124)) \u2264 (0 : \u2124) := Nat.cast_le.mp (le_nonneg K)\n    exact le_trans h_ge_0 h_le_K\n  exact mem_Icc.mpr (h_ge, h_le)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_4.lean:118:35: error: Type mismatch\n  Nat.cast_le.mp hi\nhas type\n  i \u2264 K\nbut is expected to have type\n  \u2191i \u2264 \u2191K\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_4.lean:120:39: error: Type mismatch\n  le_refl\nhas type\n  \u2200 (a : ?m.35), a \u2264 a\nbut is expected to have type\n  \u2191K \u2264 \u2191K",
+      "error_class": "unknown identifier",
+      "latency_ms": 41928.36,
+      "lean_ms": 9864.4,
+      "tokens": 219,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem natCast_mem_Icc_of_le {i K : \u2115} (hi : i \u2264 K) :\n    (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  unfold Icc\n  let x := (i : \u2124)\n  let y := (K : \u2124)\n  let z := -(K : \u2124)\n  have h1 : x \u2264 y := Nat.cast_le.mp hi\n  have h2 : z \u2264 x := by\n    have h2_1 : z \u2264 0 := Nat.cast_le.mp (le_nonneg K)\n    have h2_2 : 0 \u2264 y := Nat.cast_le.mp (le_nonneg K)\n    exact le_trans h2_1 h2_2\n  exact mem_Icc.mpr (h2, h1)",
+      "proof_body": "by\n  unfold Icc\n  let x := (i : \u2124)\n  let y := (K : \u2124)\n  let z := -(K : \u2124)\n  have h1 : x \u2264 y := Nat.cast_le.mp hi\n  have h2 : z \u2264 x := by\n    have h2_1 : z \u2264 0 := Nat.cast_le.mp (le_nonneg K)\n    have h2_2 : 0 \u2264 y := Nat.cast_le.mp (le_nonneg K)\n    exact le_trans h2_1 h2_2\n  exact mem_Icc.mpr (h2, h1)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_5.lean:121:21: error: Type mismatch\n  Nat.cast_le.mp hi\nhas type\n  i \u2264 K\nbut is expected to have type\n  x \u2264 y\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_5.lean:123:41: error(lean.unknownIdentifier): Unknown identifier `le_nonneg`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.natCast_mem_Icc_of_le_5.lean:126:20: error: Application type mismatch: The argument\n  (?m.68, ?m.69)\nhas type\n  ?m.66 \u00d7 ?m.67\nof sort `Type (max ?u.33 ?u.32)` but is expected to have type",
+      "error_class": "unknown identifier",
+      "latency_ms": 41649.66,
+      "lean_ms": 10132.93,
+      "tokens": 214,
+      "accepted": false
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.list_getI_zero",
+  "raw_name": "list_getI_zero",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:38:55Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.Reversible.tape_mk\u2081_nth_nat",
+    "S4TuringPoisson.tape_write_head",
+    "S4TuringPoisson.Reversible.bennettInitTape_mk\u2082_nth_zero",
+    "S4TuringPoisson.tape_move_left_head"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI :=\n  by\n  simp",
+      "proof_body": "by\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_getI_zero_1.lean:127:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 18355.5,
+      "lean_ms": 9577.29,
+      "tokens": 49,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI :=\n  by\n  simp [List.getI]",
+      "proof_body": "by\n  simp [List.getI]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_getI_zero_2.lean:126:2: error: unsolved goals\n\u0393 : Type u_1\ninst\u271d : Inhabited \u0393\nl : List \u0393\n\u22a2 l[0]?.getD default = l.headI",
+      "error_class": "unsolved goals",
+      "latency_ms": 19200.37,
+      "lean_ms": 8691.18,
+      "tokens": 55,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI :=\n  by\n  simp [List.getI]",
+      "proof_body": "by\n  simp [List.getI]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_getI_zero_3.lean:126:2: error: unsolved goals\n\u0393 : Type u_1\ninst\u271d : Inhabited \u0393\nl : List \u0393\n\u22a2 l[0]?.getD default = l.headI",
+      "error_class": "unsolved goals",
+      "latency_ms": 19172.77,
+      "lean_ms": 9163.94,
+      "tokens": 55,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI :=\n  by\n  simp [List.getI]",
+      "proof_body": "by\n  simp [List.getI]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_getI_zero_4.lean:126:2: error: unsolved goals\n\u0393 : Type u_1\ninst\u271d : Inhabited \u0393\nl : List \u0393\n\u22a2 l[0]?.getD default = l.headI",
+      "error_class": "unsolved goals",
+      "latency_ms": 20160.1,
+      "lean_ms": 8032.27,
+      "tokens": 55,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem list_getI_zero {\u0393 : Type*} [Inhabited \u0393] (l : List \u0393) :\n    l.getI 0 = l.headI :=\n  by\n  rfl",
+      "proof_body": "by\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_getI_zero_5.lean:127:2: error: Tactic `rfl` failed: The left-hand side\n  l.getI 0\nis not definitionally equal to the right-hand side\n  l.headI\n\u0393 : Type u_1\ninst\u271d : Inhabited \u0393\nl : List \u0393\n\u22a2 l.getI 0 = l.headI",
+      "error_class": "other",
+      "latency_ms": 19599.99,
+      "lean_ms": 10212.69,
+      "tokens": 50,
+      "accepted": false
+    }
+  ]
+}

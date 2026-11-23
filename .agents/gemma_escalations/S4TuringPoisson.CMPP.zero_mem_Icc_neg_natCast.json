@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast",
+  "raw_name": "zero_mem_Icc_neg_natCast",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:27:15Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.mem_translationTube_of_mem_Icc",
+    "S4TuringPoisson.CMPP.exp_mul_le_max_of_mem_Icc",
+    "S4TuringPoisson.CMPP.AxisRect.mem_toSet_iff",
+    "S4TuringPoisson.CMPP.AxisRect.mem_tubeRect_of_mem_Icc"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  norm_cast\n  tauto",
+      "proof_body": "by\n  norm_cast\n  tauto",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_1.lean:116:2: error: Tactic `tauto` failed\nK : \u2115\n\u22a2 0 \u2208 Icc (-\u2191K) \u2191K",
+      "error_class": "other",
+      "latency_ms": 21181.09,
+      "lean_ms": 10497.36,
+      "tokens": 60,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  norm_cast\n  itauto",
+      "proof_body": "by\n  norm_cast\n  itauto",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_2.lean:116:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_2.lean:114:2: error: unsolved goals\nK : \u2115\n\u22a2 0 \u2208 Icc (-\u2191K) \u2191K",
+      "error_class": "unsolved goals",
+      "latency_ms": 22680.14,
+      "lean_ms": 9942.15,
+      "tokens": 60,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  norm_cast\n  tauto",
+      "proof_body": "by\n  norm_cast\n  tauto",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_3.lean:116:2: error: Tactic `tauto` failed\nK : \u2115\n\u22a2 0 \u2208 Icc (-\u2191K) \u2191K",
+      "error_class": "other",
+      "latency_ms": 22386.24,
+      "lean_ms": 9995.98,
+      "tokens": 60,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  norm_cast\n  apply mem_Icc.mk\n  split here with h1 h2\n  \u00b7 exact (le_zero_of_nonneg (Nat.cast_le_zero K)).gr_cast\n  \u00b7 exact (ge_zero_of_nonneg (Nat.cast_ge_zero K)).gr_cast",
+      "proof_body": "by\n  norm_cast\n  apply mem_Icc.mk\n  split here with h1 h2\n  \u00b7 exact (le_zero_of_nonneg (Nat.cast_le_zero K)).gr_cast\n  \u00b7 exact (ge_zero_of_nonneg (Nat.cast_ge_zero K)).gr_cast",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_4.lean:116:16: error(lean.invalidField): Invalid field `mk`: The environment does not contain `Iff.mk`, so it is not possible to project the field `mk` from an expression\n  mem_Icc\nof type\n  ?m.16 \u2208 Icc ?m.14 ?m.15 \u2194 ?m.14 \u2264 ?m.16 \u2227 ?m.16 \u2264 ?m.15\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_4.lean:117:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_4.lean:117:13: error: unexpected token 'with'; expected command",
+      "error_class": "syntax",
+      "latency_ms": 29476.14,
+      "lean_ms": 10055.05,
+      "tokens": 126,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem zero_mem_Icc_neg_natCast (K : \u2115) : (0 : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124) :=\n  by\n  norm_cast\n  apply mem_Icc.mp\n  \u00b7 exact (le_zero_of_nonneg (Nat.cast_le_zero K)).gr_cast\n  \u00b7 exact (ge_zero_of_nonneg (Nat.cast_ge_zero K)).gr_cast",
+      "proof_body": "by\n  norm_cast\n  apply mem_Icc.mp\n  \u00b7 exact (le_zero_of_nonneg (Nat.cast_le_zero K)).gr_cast\n  \u00b7 exact (ge_zero_of_nonneg (Nat.cast_ge_zero K)).gr_cast",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_5.lean:117:11: error(lean.unknownIdentifier): Unknown identifier `le_zero_of_nonneg`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.zero_mem_Icc_neg_natCast_5.lean:118:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 28597.5,
+      "lean_ms": 9998.9,
+      "tokens": 117,
+      "accepted": false
+    }
+  ]
+}

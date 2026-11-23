@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.universalInitRevCfg_q",
+  "raw_name": "universalInitRevCfg_q",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:16:55Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.universalInitRevCfg",
+    "S4TuringPoisson.Reversible.bennettInitCfg",
+    "S4TuringPoisson.Reversible.bennettInitCfg_q",
+    "S4TuringPoisson.FinTM0.initCfg"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq :=\n  by\n  simp only [universalInitRevCfg]\n  exact bennettInitCfg_q M t",
+      "proof_body": "by\n  simp only [universalInitRevCfg]\n  exact bennettInitCfg_q M t",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_1.lean:106:8: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q`",
+      "error_class": "unknown identifier",
+      "latency_ms": 21050.07,
+      "lean_ms": 11141.64,
+      "tokens": 73,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq :=\n  by\n  simp only [universalInitRevCfg]\n  exact bennettInitCfg_q M t",
+      "proof_body": "by\n  simp only [universalInitRevCfg]\n  exact bennettInitCfg_q M t",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_2.lean:106:8: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22787.94,
+      "lean_ms": 10452.71,
+      "tokens": 73,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq :=\n  by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_3.lean:106:13: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_3.lean:107:8: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q`",
+      "error_class": "unknown identifier",
+      "latency_ms": 21852.28,
+      "lean_ms": 10962.09,
+      "tokens": 81,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq :=\n  by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_4.lean:106:13: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_4.lean:107:8: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q`",
+      "error_class": "unknown identifier",
+      "latency_ms": 23327.89,
+      "lean_ms": 9279.55,
+      "tokens": 81,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalInitRevCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (universalInitRevCfg M t).q = .exec default .eq :=\n  by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  simp only [bennettInitCfg]\n  exact bennettInitCfg_q M t",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_5.lean:106:13: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_5.lean:107:8: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22779.95,
+      "lean_ms": 10672.42,
+      "tokens": 81,
+      "accepted": false
+    }
+  ]
+}

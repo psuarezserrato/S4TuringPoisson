@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.list_map_symm_map",
+  "raw_name": "list_map_symm_map",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:41:41Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.restrictToDom3",
+    "S4TuringPoisson.CMPP.blockOffsetX",
+    "S4TuringPoisson.CMPP.blockOffsetY",
+    "S4TuringPoisson.CMPP.listToDiskIsotopy_nil_d"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l :=\n  by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map]\n  simp [inv_comp]",
+      "proof_body": "by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map]\n  simp [inv_comp]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_map_symm_map_1.lean:130:15: error: unexpected identifier; expected '['",
+      "error_class": "syntax",
+      "latency_ms": 23202.9,
+      "lean_ms": 9454.26,
+      "tokens": 88,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l :=\n  by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "proof_body": "by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_map_symm_map_2.lean:130:15: error: unexpected identifier; expected '['",
+      "error_class": "syntax",
+      "latency_ms": 22528.7,
+      "lean_ms": 9412.4,
+      "tokens": 84,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l :=\n  by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "proof_body": "by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_map_symm_map_3.lean:130:15: error: unexpected identifier; expected '['",
+      "error_class": "syntax",
+      "latency_ms": 24307.69,
+      "lean_ms": 9940.26,
+      "tokens": 84,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l :=\n  by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "proof_body": "by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_map_symm_map_4.lean:130:15: error: unexpected identifier; expected '['",
+      "error_class": "syntax",
+      "latency_ms": 23300.99,
+      "lean_ms": 9060.74,
+      "tokens": 84,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem list_map_symm_map {\u03b1 \u03b2 : Type*} (e : \u03b1 \u2243 \u03b2) (l : List \u03b1) :\n    (l.map e).map e.symm = l :=\n  by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "proof_body": "by\n  ext x\n  simp [List.map]\n  nth_rewrite 1\n  simp [List.map, inv_comp]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.list_map_symm_map_5.lean:130:15: error: unexpected identifier; expected '['",
+      "error_class": "syntax",
+      "latency_ms": 23841.16,
+      "lean_ms": 9888.84,
+      "tokens": 84,
+      "accepted": false
+    }
+  ]
+}

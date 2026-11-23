@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.le_of_natCast_mem_Icc",
+  "raw_name": "le_of_natCast_mem_Icc",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:36:04Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.exp_mul_le_max_of_mem_Icc",
+    "S4TuringPoisson.CMPP.mem_translationTube_of_mem_Icc",
+    "S4TuringPoisson.CMPP.AxisRect.mem_toSet_iff",
+    "S4TuringPoisson.CMPP.AxisRect.mem_tubeRect_of_mem_Icc"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K :=\n  by\n  ita_iff.mp hi",
+      "proof_body": "by\n  ita_iff.mp hi",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_1.lean:118:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_1.lean:117:2: error: unsolved goals\ni K : \u2115\nhi : \u2191i \u2208 Icc (-\u2191K) \u2191K\n\u22a2 i \u2264 K",
+      "error_class": "unsolved goals",
+      "latency_ms": 23441.57,
+      "lean_ms": 10012.67,
+      "tokens": 68,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K :=\n  by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "proof_body": "by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_2.lean:118:17: error: Tactic `cases` failed with a nested error:\nDependent elimination failed: Failed to solve equation\n  (match \u2191i, - -\u2191K with\n    | Int.ofNat m, Int.ofNat n => Int.ofNat (m + n)\n    | Int.ofNat m, Int.negSucc n => Int.subNatNat m n.succ\n    | Int.negSucc m, Int.ofNat n => Int.subNatNat n m.succ\n    | Int.negSucc m, Int.negSucc n => Int.negSucc (m + n).succ) =\n    Int.ofNat n\u271d\nat case `Int.NonNeg.mk`",
+      "error_class": "other",
+      "latency_ms": 34801.45,
+      "lean_ms": 9887.6,
+      "tokens": 157,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K :=\n  by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "proof_body": "by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_3.lean:118:17: error: Tactic `cases` failed with a nested error:\nDependent elimination failed: Failed to solve equation\n  (match \u2191i, - -\u2191K with\n    | Int.ofNat m, Int.ofNat n => Int.ofNat (m + n)\n    | Int.ofNat m, Int.negSucc n => Int.subNatNat m n.succ\n    | Int.negSucc m, Int.ofNat n => Int.subNatNat n m.succ\n    | Int.negSucc m, Int.negSucc n => Int.negSucc (m + n).succ) =\n    Int.ofNat n\u271d\nat case `Int.NonNeg.mk`",
+      "error_class": "other",
+      "latency_ms": 55252.97,
+      "lean_ms": 10088.43,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K :=\n  by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "proof_body": "by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_4.lean:118:17: error: Tactic `cases` failed with a nested error:\nDependent elimination failed: Failed to solve equation\n  (match \u2191i, - -\u2191K with\n    | Int.ofNat m, Int.ofNat n => Int.ofNat (m + n)\n    | Int.ofNat m, Int.negSucc n => Int.subNatNat m n.succ\n    | Int.negSucc m, Int.ofNat n => Int.subNatNat n m.succ\n    | Int.negSucc m, Int.negSucc n => Int.negSucc (m + n).succ) =\n    Int.ofNat n\u271d\nat case `Int.NonNeg.mk`",
+      "error_class": "other",
+      "latency_ms": 34806.91,
+      "lean_ms": 10002.71,
+      "tokens": 157,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem le_of_natCast_mem_Icc {i K : \u2115} (hi : (i : \u2124) \u2208 Set.Icc (-(K : \u2124)) (K : \u2124)) :\n    i \u2264 K :=\n  by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "proof_body": "by\n  rcases hi with rfl | rfl\n  \u00b7 exact Nat.le_of_lt_or_eq (Nat.cast_lt_or_eq_of_lt_or_eq (i : \u2124) (K : \u2124))\n  \u00b7 exact Nat.le_of_le_of_eq (Nat.cast_le_of_le_of_eq (i : \u2124) (K : \u2124))",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.le_of_natCast_mem_Icc_5.lean:118:17: error: Tactic `cases` failed with a nested error:\nDependent elimination failed: Failed to solve equation\n  (match \u2191i, - -\u2191K with\n    | Int.ofNat m, Int.ofNat n => Int.ofNat (m + n)\n    | Int.ofNat m, Int.negSucc n => Int.subNatNat m n.succ\n    | Int.negSucc m, Int.ofNat n => Int.subNatNat n m.succ\n    | Int.negSucc m, Int.negSucc n => Int.negSucc (m + n).succ) =\n    Int.ofNat n\u271d\nat case `Int.NonNeg.mk`",
+      "error_class": "other",
+      "latency_ms": 65570.89,
+      "lean_ms": 10024.68,
+      "tokens": 512,
+      "accepted": false
+    }
+  ]
+}
