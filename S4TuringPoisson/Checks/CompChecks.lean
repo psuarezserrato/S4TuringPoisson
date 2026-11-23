@@ -9,6 +9,7 @@ public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Interfaces
 public import S4TuringPoisson.Main
+public import S4TuringPoisson.Smoothing.CMPP.Realize
 public import S4TuringPoisson.Smoothing.DiskSmoothing
 
 /-!
@@ -662,5 +663,61 @@ theorem gate6_fourManifold_corollary2_on_S4 [HasCMPPCantorCirculationHamiltonian
   exact ⟨d_bar, p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hne_id⟩
 
 end FinalGate6Sphere4Audit
+
+/-! ## 8. Milestone A4 `CMPP21` Autonomous Hamiltonian Realization Sanity (`Gate G5`) -/
+
+section CMPPRealizationSanity
+
+/-- Explicit computable numbering `R_flipRight.ShiftAlphabet ≃ Fin 6` (`N = 6`,
+`cantorBase 6 = 11`). -/
+@[nolint defsWithUnderscore]
+def encR_flipRight : R_flipRight.ShiftAlphabet ≃ Fin 6 where
+  toFun x :=
+    match x with
+    | (false, none) => 0
+    | (false, some false) => 1
+    | (false, some true) => 2
+    | (true, none) => 3
+    | (true, some false) => 4
+    | (true, some true) => 5
+  invFun i :=
+    match i with
+    | ⟨0, _⟩ => (false, none)
+    | ⟨1, _⟩ => (false, some false)
+    | ⟨2, _⟩ => (false, some true)
+    | ⟨3, _⟩ => (true, none)
+    | ⟨4, _⟩ => (true, some false)
+    | ⟨5, _⟩ => (true, some true)
+  left_inv x := by rcases x with ⟨_ | _, _ | _ | _⟩ <;> rfl
+  right_inv i := by fin_cases i <;> rfl
+
+/-- **Gate G5 Witness (`R_flipRight`)**: the concrete 2-state reversible Turing machine
+`R_flipRight` is realized on `cantorDiskEmbed encR_flipRight` at `t = 1` by a non-empty finite
+list `Ps` of **autonomous** planar Hamiltonians supported inside `Metric.ball 0 CMPP.cmppR0`
+(`CMPP.cmppR0 = 17 / 20`) with `diskTimeOneMap ≠ id`. -/
+-- tier: T2
+theorem R_flipRight_realized_by_autonomous_hamiltonians :
+    ∃ Ps : List (CompactlySupportedPlanarHamiltonian CMPP.cmppR0),
+      Ps ≠ [] ∧
+      (∀ H ∈ Ps, H.IsAutonomous) ∧
+      RealizesGeneralizedShiftByHamiltonians encR_flipRight R_flipRight.toGeneralizedShift
+        CMPP.cmppR0_mem_Ioo Ps ∧
+      (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy CMPP.cmppR0_mem_Ioo
+        Ps).diskTimeOneMap ≠ id := by
+  obtain ⟨Ps, hauto, hreal⟩ :=
+    CMPP.exists_autonomous_hamiltonians_realizing_reversibleTM R_flipRight encR_flipRight
+  let c₀ : R_flipRight.Cfg := ⟨false, default⟩
+  have hne_eval :
+      R_flipRight.toGeneralizedShift.eval (R_flipRight.encodeCfg c₀) ≠
+        R_flipRight.encodeCfg c₀ := by
+    rw [R_flipRight.eval_encodeCfg]
+    intro heq
+    have h0 := congrArg Prod.snd (congrFun heq 0)
+    cases h0
+  obtain ⟨hPs_ne, hne_id⟩ :=
+    CMPP.ne_nil_and_diskTimeOneMap_ne_id_of_realizes encR_flipRight hreal hne_eval
+  exact ⟨Ps, hPs_ne, hauto, hreal, hne_id⟩
+
+end CMPPRealizationSanity
 
 end S4TuringPoisson.Checks
