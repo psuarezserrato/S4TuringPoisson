@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply",
+  "raw_name": "poissonHamiltonianTimeOneDiffeomorph_symm_apply",
+  "spec_file": "S4TuringPoisson/Extension/PoissonHamiltonian.lean",
+  "milestone": "P",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T07:03:35Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph",
+    "S4TuringPoisson.isComplete_hamiltonianVectorField_adaptedJacobianPoisson",
+    "S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration",
+    "S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x :=\n  by\n  let flow := poissonHamiltonianTimeOneDiffeomorph M H\n  let vecField := (adaptedJacobianPoisson M).hamiltonianVectorField H\n  let timeDependentField := TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 vecField)\n  have h_flow : flow = TauCeti.timeDependentFlowDiffeomorph\n    (isComplete_hamiltonianVectorField_adaptedJacobianPoisson M H)\n    (n := (\u22a4 : \u2115\u221e))\n    le_top (((adaptedJacobianPoisson M).contMDiff_hamiltonianVectorField H).comp contMDiff_snd)\n    0 1 := by\n    simp [poissonHamiltonianTimeOneDiffeomorph]\n    rfl\n  let flow_val : M \u2243\u2098",
+      "proof_body": "by\n  let flow := poissonHamiltonianTimeOneDiffeomorph M H\n  let vecField := (adaptedJacobianPoisson M).hamiltonianVectorField H\n  let timeDependentField := TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 vecField)\n  have h_flow : flow = TauCeti.timeDependentFlowDiffeomorph\n    (isComplete_hamiltonianVectorField_adaptedJacobianPoisson M H)\n    (n := (\u22a4 : \u2115\u221e))\n    le_top (((adaptedJacobianPoisson M).contMDiff_hamiltonianVectorField H).comp contMDiff_snd)\n    0 1 := by\n    simp [poissonHamiltonianTimeOneDiffeomorph]\n    rfl\n  let flow_val : M \u2243\u2098",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_1.lean:317:21: error: unexpected token 'end'; expected ':=' or '|'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_1.lean:315:4: error: `simp` made no progress\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_1.lean:317:20: error: elaboration function for `Mathlib.Tactic.subscriptTerm` has not been implemented\n  \u2098\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_1.lean:317:6: error: Missing cases:\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_1.lean:306:2: error: unsolved goals\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M",
+      "error_class": "unsolved goals",
+      "latency_ms": 47722.22,
+      "lean_ms": 11942.16,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x :=\n  by\n  rfl",
+      "proof_body": "by\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_2.lean:307:2: error: Tactic `rfl` failed: The left-hand side\n  (poissonHamiltonianTimeOneDiffeomorph M H).symm x\nis not definitionally equal to the right-hand side\n  TauCeti.timeDependentFlowOf (fun x => (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M",
+      "error_class": "other",
+      "latency_ms": 34420.83,
+      "lean_ms": 11966.24,
+      "tokens": 208,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x :=\n  by\n  convert TauCeti.timeDependentFlowOf (TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H)) 1 0 x\n  rfl",
+      "proof_body": "by\n  convert TauCeti.timeDependentFlowOf (TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H)) 1 0 x\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_3.lean:307:2: error: Type mismatch\n  TauCeti.timeDependentFlowOf ?m.171 1 0 x\nhas type\n  M\nof sort `Type u_1` but is expected to have type\n  ?m.134\nof sort `Prop`",
+      "error_class": "type mismatch",
+      "latency_ms": 33929.54,
+      "lean_ms": 12207.32,
+      "tokens": 256,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x :=\n  by\n  rfl",
+      "proof_body": "by\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_4.lean:307:2: error: Tactic `rfl` failed: The left-hand side\n  (poissonHamiltonianTimeOneDiffeomorph M H).symm x\nis not definitionally equal to the right-hand side\n  TauCeti.timeDependentFlowOf (fun x => (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M",
+      "error_class": "other",
+      "latency_ms": 34661.42,
+      "lean_ms": 11889.35,
+      "tokens": 208,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem poissonHamiltonianTimeOneDiffeomorph_symm_apply\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (x : M) :\n    (poissonHamiltonianTimeOneDiffeomorph M H).symm x =\n      TauCeti.timeDependentFlowOf\n        (fun _ : \u211d \u21a6 (adaptedJacobianPoisson M).hamiltonianVectorField H) 1 0 x :=\n  by\n  let X := (adaptedJacobianPoisson M).hamiltonianVectorField H\n  let field := TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 X)\n  have h_flow : (poissonHamiltonianTimeOneDiffeomorph M H) =\n    TauCeti.timeDependentFlowDiffeomorph (isComplete_hamiltonianVectorField_adaptedJacobianPoisson H)\n    := by rw [poissonHamiltonianTimeOneDiffeomorph_def]\n  -- The definition of poissonHamiltonianTimeOneDiffeomorph involves the flow of the Hamiltonian vector field.\n  -- Due to the way the symmetry is defined in the library, it corresponds to the flow at time 1.\n  rfl",
+      "proof_body": "by\n  let X := (adaptedJacobianPoisson M).hamiltonianVectorField H\n  let field := TauCeti.timeDependentSuspensionField (fun _ : \u211d \u21a6 X)\n  have h_flow : (poissonHamiltonianTimeOneDiffeomorph M H) =\n    TauCeti.timeDependentFlowDiffeomorph (isComplete_hamiltonianVectorField_adaptedJacobianPoisson H)\n    := by rw [poissonHamiltonianTimeOneDiffeomorph_def]\n  -- The definition of poissonHamiltonianTimeOneDiffeomorph involves the flow of the Hamiltonian vector field.\n  -- Due to the way the symmetry is defined in the library, it corresponds to the flow at time 1.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_5.lean:310:99: error: Application type mismatch: The argument\n  H\nhas type\n  C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef\nof sort `Type u_1` but is expected to have type\n  Type ?u.111\nof sort `Type (?u.111 + 1)` in the application\n  @isComplete_hamiltonianVectorField_adaptedJacobianPoisson H\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_5.lean:311:14: error(lean.unknownIdentifier): Unknown identifier `poissonHamiltonianTimeOneDiffeomorph_def`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_symm_apply_5.lean:314:2: error: Tactic `rfl` failed: The left-hand side\n  (poissonHamiltonianTimeOneDiffeomorph M H).symm x\nis not definitionally equal to the right-hand side",
+      "error_class": "unknown identifier",
+      "latency_ms": 46941.28,
+      "lean_ms": 13034.27,
+      "tokens": 366,
+      "accepted": false
+    }
+  ]
+}

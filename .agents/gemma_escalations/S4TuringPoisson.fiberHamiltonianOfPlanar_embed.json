@@ -1,0 +1,77 @@
+{
+  "declaration": "S4TuringPoisson.fiberHamiltonianOfPlanar_embed",
+  "raw_name": "fiberHamiltonianOfPlanar_embed",
+  "spec_file": "S4TuringPoisson/Extension/PoissonHamiltonian.lean",
+  "milestone": "P",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T06:55:21Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.fiberHamiltonianOfPlanar",
+    "S4TuringPoisson.SymplecticDiskChart.areaScale",
+    "S4TuringPoisson.contMDiff_fiberHamiltonianOfPlanar",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1) :=\n  by\n  rcases (C.embed y) with (z, hz)\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed, C.sourceOpen.1]\n  -- The definition of fiberHamiltonianOfPlanar uses `z \u2208 C.sourceOpen.1`.\n  -- By definition, C.embed y is in C.sourceOpen.1.\n  have h_mem : z \u2208 C.sourceOpen.1 := by\n    -- C.embed is defined such that it maps into the source of the chart.\n    -- Based on the definition of SymplecticDiskChart, C.embed y is in C.sourceOpen.1.\n    -- This is guaranteed by the definition of the embedding.\n    exact C.embed",
+      "proof_body": "by\n  rcases (C.embed y) with (z, hz)\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed, C.sourceOpen.1]\n  -- The definition of fiberHamiltonianOfPlanar uses `z \u2208 C.sourceOpen.1`.\n  -- By definition, C.embed y is in C.sourceOpen.1.\n  have h_mem : z \u2208 C.sourceOpen.1 := by\n    -- C.embed is defined such that it maps into the source of the chart.\n    -- Based on the definition of SymplecticDiskChart, C.embed y is in C.sourceOpen.1.\n    -- This is guaranteed by the definition of the embedding.\n    exact C.embed",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_1.lean:271:28: error: unexpected token ','; expected ')'",
+      "error_class": "syntax",
+      "latency_ms": 47734.85,
+      "lean_ms": 12297.39,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCetin.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1) := by\n  let z := C.embed y\n  have h_in : z \u2208 C.sourceOpen.1 := C.embed_mem\n  have h_raw : C.rawChart (C.embed y) = y.1 := C.embed_apply\n  unfold fiberHamiltonianOfPlanar\n  simp [h_in, h_raw]",
+      "compiler_error": "error: Declaration statement before ':=' was modified.\nExpected: @[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1)\nGot:      @[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCetin.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1)",
+      "error_class": "other",
+      "latency_ms": 41162.35,
+      "lean_ms": 0.0,
+      "tokens": 238,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed, C.sourceOpen.1]\n  -- The definition of fiberHamiltonianOfPlanar is:\n  -- (fun z => (C.areaScale * P.H (0, C.rawChart z.1)) (C.rawChart z))\n  -- Specifically, it's applied to the point z = C.embed y.\n  -- Since C.embed y is in C.sourceOpen.1, the expression simplifies.\n  -- C.rawChart (C.embed y) = (y.1, 0) is not the standard way, \n  -- but C.embed y = (C.rawChart\u207b\u00b9 (y.1, 0)) is.\n  -- The definition of fiberHamiltonianOfPlanar involves the pull-back \n  -- of the Hamiltonian to the chart.\n  refine (fun z => (C.areaScale * P.H (0, C.raw",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed, C.sourceOpen.1]\n  -- The definition of fiberHamiltonianOfPlanar is:\n  -- (fun z => (C.areaScale * P.H (0, C.rawChart z.1)) (C.rawChart z))\n  -- Specifically, it's applied to the point z = C.embed y.\n  -- Since C.embed y is in C.sourceOpen.1, the expression simplifies.\n  -- C.rawChart (C.embed y) = (y.1, 0) is not the standard way, \n  -- but C.embed y = (C.rawChart\u207b\u00b9 (y.1, 0)) is.\n  -- The definition of fiberHamiltonianOfPlanar involves the pull-back \n  -- of the Hamiltonian to the chart.\n  refine (fun z => (C.areaScale * P.H (0, C.raw",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_3.lean:281:47: error: unexpected token 'end'; expected ')'",
+      "error_class": "syntax",
+      "latency_ms": 57293.4,
+      "lean_ms": 11878.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed]",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  simp only [fiberHamiltonianOfPlanar, C.embed]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_4.lean:272:39: error: Invalid simp theorem: Expected a proposition, but found\n  \u21a5diskOpen \u2192 F\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_4.lean:272:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 53710.77,
+      "lean_ms": 12458.91,
+      "tokens": 512,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem fiberHamiltonianOfPlanar_embed\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (y : diskOpen) :\n    fiberHamiltonianOfPlanar C P (C.embed y) = C.areaScale * P.H (0, y.1) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  simp only [C.embed, C.sourceOpen.1]",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  simp only [C.embed, C.sourceOpen.1]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_5.lean:272:13: error: Invalid simp theorem: Expected a proposition, but found\n  \u21a5diskOpen \u2192 F\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_5.lean:272:22: error: Invalid simp theorem: Expected a proposition, but found\n  Set F\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_embed_5.lean:272:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 57798.19,
+      "lean_ms": 12107.61,
+      "tokens": 512,
+      "accepted": false
+    }
+  ]
+}

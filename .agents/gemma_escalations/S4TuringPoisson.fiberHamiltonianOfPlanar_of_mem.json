@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem",
+  "raw_name": "fiberHamiltonianOfPlanar_of_mem",
+  "spec_file": "S4TuringPoisson/Extension/PoissonHamiltonian.lean",
+  "milestone": "P",
+  "tier": "T0",
+  "statement": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T06:45:59Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.fiberHamiltonianOfPlanar",
+    "S4TuringPoisson.SymplecticDiskChart.areaScale",
+    "S4TuringPoisson.SymplecticDiskChart.sourceOpen",
+    "S4TuringPoisson.SymplecticDiskChart"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  rcases Classical.dec hz.1\n  \u00b7 contradiction\n  \u00b7 by_cases h_in : z \u2208 C.sourceOpen.1\n    \u00b7 contradiction\n    \u00b7 exact (Classical.dec hz.1).inpos\n  simp [hz]",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  rcases Classical.dec hz.1\n  \u00b7 contradiction\n  \u00b7 by_cases h_in : z \u2208 C.sourceOpen.1\n    \u00b7 contradiction\n    \u00b7 exact (Classical.dec hz.1).inpos\n  simp [hz]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_1.lean:267:23: error: Application type mismatch: The argument\n  hz.left\nhas type\n  z \u2208 C.rawChart.source\nof sort `Prop` but is expected to have type\n  Prop\nof sort `Type` in the application\n  Classical.dec \u22ef\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_1.lean:268:4: error: Tactic `contradiction` failed\nF : Type u_1\ninst\u271d\u00b2 : TopologicalSpace F\ninst\u271d\u00b9 : ChartedSpace (EuclideanSpace \u211d (Fin 2)) F",
+      "error_class": "type mismatch",
+      "latency_ms": 38094.41,
+      "lean_ms": 13060.9,
+      "tokens": 237,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z) :=\n  by\n  rcases hz with \u27e8hz.1, hz.2\u27e9\n  have h_in_source : z \u2208 C.rawChart.source := by\n    exact (hz.1).2\n  have h_in_radius : C.rawChart z \u2208 Metric.ball (0 : EuclideanPlane) C.radius := by\n    exact (hz.2).2\n  unfold fiberHamiltonianOfPlanar\n  unfold C.areaScale\n  unfold C.sourceOpen\n  unfold C.rawChart.toOpenPartialHomeomorph\n  have h_inv : C.rawChart \u207b\u00b9 (C.rawChart z) = z := by\n    have h_apply : C.rawChart \u207b\u00b9 (C.rawChart z) = z := by\n      simp [C.rawChart.toOpenPartialHomeomorph]\n    exact h_apply.symm\n  unfold C.rawChart.toOpenPartialHomeomorph_source\n  have",
+      "proof_body": "by\n  rcases hz with \u27e8hz.1, hz.2\u27e9\n  have h_in_source : z \u2208 C.rawChart.source := by\n    exact (hz.1).2\n  have h_in_radius : C.rawChart z \u2208 Metric.ball (0 : EuclideanPlane) C.radius := by\n    exact (hz.2).2\n  unfold fiberHamiltonianOfPlanar\n  unfold C.areaScale\n  unfold C.sourceOpen\n  unfold C.rawChart.toOpenPartialHomeomorph\n  have h_inv : C.rawChart \u207b\u00b9 (C.rawChart z) = z := by\n    have h_apply : C.rawChart \u207b\u00b9 (C.rawChart z) = z := by\n      simp [C.rawChart.toOpenPartialHomeomorph]\n    exact h_apply.symm\n  unfold C.rawChart.toOpenPartialHomeomorph_source\n  have",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_2.lean:266:20: error: unexpected token '.'; expected '\u27e9'",
+      "error_class": "syntax",
+      "latency_ms": 46907.38,
+      "lean_ms": 12614.12,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  rcases hz with \u27e8h_in, h_ball\u27e9\n  have h_source : z \u2208 C.rawChart.source := h_in.2\n  have h_radius : C.rawChart z \u2208 Metric.ball (0 : EuclideanPlane) C.radius := h_ball.2\n  simp [C.sourceOpen] from hz\n  simp [C.areaScale]\n  simp [C.rawChart]\n  simp [hz]",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  rcases hz with \u27e8h_in, h_ball\u27e9\n  have h_source : z \u2208 C.rawChart.source := h_in.2\n  have h_radius : C.rawChart z \u2208 Metric.ball (0 : EuclideanPlane) C.radius := h_ball.2\n  simp [C.sourceOpen] from hz\n  simp [C.areaScale]\n  simp [C.rawChart]\n  simp [hz]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_3.lean:268:43: error: Invalid projection: Projection operates on types of the form `C ...` where C is a constant. The expression\n  h_in\nhas type `C.rawChart.source.1 z` which does not have the necessary form.\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_3.lean:269:78: error: Invalid projection: Projection operates on types of the form `C ...` where C is a constant. The expression\n  h_ball\nhas type\n  Real.instLT.1 (dist (\u2191C.rawChart.toPartialEquiv z) 0) C.radius\nwhich does not have the necessary form.\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_3.lean:270:8: error: Invalid simp theorem: Expected a proposition, but found\n  Opens F\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_3.lean:265:2: error: unsolved goals\nF : Type u_1",
+      "error_class": "unsolved goals",
+      "latency_ms": 40619.35,
+      "lean_ms": 12463.03,
+      "tokens": 284,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  unfold C.areaScale\n  unfold C.rawChart\n  unfold C.sourceOpen\n  simp [hz]",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  unfold C.areaScale\n  unfold C.rawChart\n  unfold C.sourceOpen\n  simp [hz]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_4.lean:267:9: error: Tactic `unfold` failed: expression C.areaScale is not a global or local constant\nF : Type u_1\ninst\u271d\u00b2 : TopologicalSpace F\ninst\u271d\u00b9 : ChartedSpace (EuclideanSpace \u211d (Fin 2)) F\ninst\u271d : IsManifold (\ud835\udce1 2) \u221e F\n\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F\nC : SymplecticDiskChart F \u03b7\nr\u2080 : \u211d\nP : CompactlySupportedPlanarHamiltonian r\u2080\nz : F\nhz : z \u2208 C.sourceOpen.carrier\n\u22a2 (if z \u2208 C.sourceOpen.carrier then C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 \u2191C.rawChart.toPartialEquiv z) else 0) =",
+      "error_class": "other",
+      "latency_ms": 34172.98,
+      "lean_ms": 12165.7,
+      "tokens": 211,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem fiberHamiltonianOfPlanar_of_mem\n    {F : Type*} [TopologicalSpace F] [ChartedSpace (EuclideanSpace \u211d (Fin 2)) F]\n    [IsManifold (\ud835\udce1 2) \u221e F] {\u03b7 : TauCeti.SmoothTwoForm (\ud835\udce1 2) F}\n    (C : SymplecticDiskChart F \u03b7) {r\u2080 : \u211d}\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) {z : F} (hz : z \u2208 C.sourceOpen.1) :\n    fiberHamiltonianOfPlanar C P z = C.areaScale * P.H (0, C.radius\u207b\u00b9 \u2022 C.rawChart z) :=\n  by\n  unfold fiberHamiltonianOfPlanar\n  simp [hz]\n  simp [C.rawChart]\n  simp [C.areaScale]\n  simp [C.sourceOpen]\n  simp [C.rawChart]\n  simp [hz]\n  simp [C.rawChart]\n  rfl",
+      "proof_body": "by\n  unfold fiberHamiltonianOfPlanar\n  simp [hz]\n  simp [C.rawChart]\n  simp [C.areaScale]\n  simp [C.sourceOpen]\n  simp [C.rawChart]\n  simp [hz]\n  simp [C.rawChart]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_5.lean:268:8: error: Invalid simp theorem: Expected a proposition, but found\n  PartialDiffeomorph (\ud835\udce1 2) (\ud835\udce1 2) F EuclideanPlane \u221e\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_5.lean:268:2: error: `simp` made no progress\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.fiberHamiltonianOfPlanar_of_mem_5.lean:267:8: warning: This simp argument is unused:\n  hz\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 35836.29,
+      "lean_ms": 12011.13,
+      "tokens": 242,
+      "accepted": false
+    }
+  ]
+}
