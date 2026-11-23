@@ -7,6 +7,7 @@ module
 
 public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
+public import S4TuringPoisson.Extension.PoissonHamiltonian
 public import S4TuringPoisson.Interfaces
 public import S4TuringPoisson.Main
 public import S4TuringPoisson.Smoothing.CMPP.Realize
@@ -578,7 +579,8 @@ and applies `gate6_foliation_and_halting_separation` to the concrete 2-state `Fi
 - global unimodularity, Poisson automorphism (`IsPoissonMap`), volume-form pullback invariance
   `d_bar^* V.Ω = V.Ω`, `MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ`, and
 - non-triviality `(⇑d_bar : Sphere4 → Sphere4) ≠ id`. -/
-theorem gate6_sphere4_witness [HasTuringCompleteAreaPreservingDiskIsotopy] :
+-- tier: T2
+theorem gate6_sphere4_witness :
     ∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
       (π_f : PoissonStructure (𝓡 4) Sphere4)
       (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
@@ -662,6 +664,74 @@ theorem gate6_fourManifold_corollary2_on_S4 [HasCMPPCantorCirculationHamiltonian
       (⇑d_bar) hf_comp htc
   exact ⟨d_bar, p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hne_id⟩
 
+/-- Unconditional Corollary 2 Gate 6 check on `Sphere4`: instantiates the unconditional
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold` on `Sphere4` (with
+**zero** external typeclass hypotheses) and verifies 2-state halting/looping orbit separation and
+fibration leaf preservation. -/
+-- tier: T2
+theorem gate6_fourManifold_corollary2_on_S4_unconditional :
+    ∃ (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
+      (p_h p_l : Sphere4)
+      (U_h U_l : Opens Sphere4),
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
+      ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∘ ⇑d_bar =
+        ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∧
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
+  obtain ⟨_, _, d_bar, _, _, _, _, _, hf_comp, _, _, _, _, htc, _⟩ :=
+    Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4
+  obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, _, hne_id⟩ :=
+    gate6_foliation_and_halting_separation
+      (⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)))
+      (⇑d_bar) hf_comp htc
+  exact ⟨d_bar, p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hne_id⟩
+
+/-- **Unconditional Deliverable R5 Gate 6 Check (`PoissonHamiltonian` on `Sphere4`)**:
+Applies `gate6_foliation_and_halting_separation` directly to
+`exists_poisson_hamiltonian_realization_S4` and verifies that the unconditional headline
+diffeomorphism `Main.s4TuringDiffeomorph` coincides with the composed time-`1`
+Poisson–Hamiltonian flow of the lifted autonomous `CMPP21` generators
+`universalReversibleSimulator_cmpp.generators.map (liftPlanarHamiltonianTo4Manifold Sphere4)`. -/
+-- tier: T2
+theorem gate6_poisson_hamiltonian_realization_S4 :
+    Main.s4TuringDiffeomorph =
+      composePoissonHamiltonianTimeOneFlows Sphere4
+        (universalReversibleSimulator_cmpp.generators.map
+          (liftPlanarHamiltonianTo4Manifold Sphere4)) ∧
+    ∃ (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
+      (p_h p_l : Sphere4)
+      (U_h U_l : Opens Sphere4),
+      d_bar = composePoissonHamiltonianTimeOneFlows Sphere4 Hs ∧
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      0 < Main.s4AlignedPositiveVolume.μ U_h.1 ∧
+      0 < Main.s4AlignedPositiveVolume.μ U_l.1 ∧
+      (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
+      s4Fibration ∘ ⇑d_bar = s4Fibration ∧
+      (∀ (n : ℕ) (x : Sphere4), s4Fibration ((⇑d_bar)^[n] x) = s4Fibration x) ∧
+      SmoothBivector.IsPoissonMap Main.s4AdaptedPoisson.toSmoothBivector
+        Main.s4AdaptedPoisson.toSmoothBivector d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff Main.s4AlignedPositiveVolume.Ω =
+        Main.s4AlignedPositiveVolume.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_bar
+        Main.s4AlignedPositiveVolume.μ Main.s4AlignedPositiveVolume.μ ∧
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
+  refine ⟨(composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq Sphere4
+      universalReversibleSimulator_cmpp.r₀_mem_Ioo
+      universalReversibleSimulator_cmpp_isAutonomous).symm, ?_⟩
+  obtain ⟨Hs, d_bar, hflow, hf_comp, hpoiss, hvol, hmp, htc, _⟩ :=
+    exists_poisson_hamiltonian_realization_S4
+  obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hiter_f, hne_id⟩ :=
+    gate6_foliation_and_halting_separation s4Fibration (⇑d_bar) hf_comp htc
+  exact ⟨Hs, d_bar, p_h, p_l, U_h, U_l, hflow, hUh, hUl,
+    Main.s4AlignedPositiveVolume.measure_pos_of_nonempty U_h hUh,
+    Main.s4AlignedPositiveVolume.measure_pos_of_nonempty U_l hUl,
+    hreach, hloop, hf_eq, hiter_f, hpoiss, hvol, hmp, hne_id⟩
+
 end FinalGate6Sphere4Audit
 
 /-! ## 8. Milestone A4 `CMPP21` Autonomous Hamiltonian Realization Sanity (`Gate G5`) -/
@@ -721,3 +791,77 @@ theorem R_flipRight_realized_by_autonomous_hamiltonians :
 end CMPPRealizationSanity
 
 end S4TuringPoisson.Checks
+
+namespace S4TuringPoisson
+
+/-! ## 9. Milestone B3 Universal Reversible Simulator Sanity (`Gate G5`) -/
+
+/-- **Gate G5 End-to-End Sanity Witness (`UNCONDITIONAL`, Milestone B3)**:
+Verifies on `universalReversibleSimulator` and `universalReversibleSimulator_cmpp` (with **zero**
+typeclass hypotheses):
+1. Non-emptiness of `acceptBlocks` for both `Checks.M_halt` and `Checks.M_loop`,
+2. Step-`0` exclusion and positive-step (`n ≥ 1`) cylinder reachability for `Checks.M_halt` with
+   `Checks.w_halt`,
+3. All-time (`∀ n : ℕ`) cylinder non-reachability for `Checks.M_loop` with `Checks.w_loop`, and
+4. Full Gate 6 instantiation `@Checks.gate6_sphere4_witness_of_cmpp` directly on `Sphere4` (`S⁴`),
+   yielding an unconditional leaf-preserving, unimodular, volume-preserving, Turing-complete Poisson
+   diffeomorphism `d_bar ≠ id`. -/
+-- tier: T2
+theorem universalReversibleSimulator_sanity :
+    (universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt).Nonempty ∧
+    (universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop).Nonempty ∧
+    (∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+      universalReversibleSimulator.R.encodeCfg
+        (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
+          cylinderIcc b.1 b.2) ∧
+    (∃ n ≥ 1, ∃ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+      universalReversibleSimulator.R.encodeCfg
+        (universalReversibleSimulator.R.step^[n]
+          (universalReversibleSimulator.initRevCfg Checks.M_halt default)) ∈
+        cylinderIcc b.1 b.2) ∧
+    (∀ (n : ℕ), ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop,
+      universalReversibleSimulator.R.encodeCfg
+        (universalReversibleSimulator.R.step^[n]
+          (universalReversibleSimulator.initRevCfg Checks.M_loop default)) ∉
+        cylinderIcc b.1 b.2) ∧
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+        (π_f : PoissonStructure (𝓡 4) Sphere4)
+        (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
+        (p_h p_l : Sphere4)
+        (U_h U_l : Opens Sphere4),
+      U_h.1.Nonempty ∧
+      U_l.1.Nonempty ∧
+      0 < V.μ U_h.1 ∧
+      0 < V.μ U_l.1 ∧
+      (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
+      (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
+      s4Fibration ∘ ⇑d_bar = s4Fibration ∧
+      (∀ (n : ℕ) (x : Sphere4), s4Fibration ((⇑d_bar)^[n] x) = s4Fibration x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id) := by
+  have hnot0 :
+      ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+        universalReversibleSimulator.R.encodeCfg
+          (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
+            cylinderIcc b.1 b.2 :=
+    universalReversibleSimulator.encodeCfg_init_notMem_of_step_ne_none Checks.M_halt default 1
+      Checks.w_halt Checks.step_initCfg_M_halt_ne_none
+  refine ⟨universalReversibleSimulator.acceptBlocks_nonempty Checks.M_halt 1 Checks.w_halt,
+    universalReversibleSimulator.acceptBlocks_nonempty Checks.M_loop 1 Checks.w_loop,
+    hnot0, ?_, ?_, @Checks.gate6_sphere4_witness_of_cmpp universalReversibleSimulator_cmpp⟩
+  · obtain ⟨n, b, hb, hcyl⟩ :=
+      (universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_halt default 1
+        Checks.w_halt).mpr Checks.haltsWithWindow_M_halt
+    rcases n with _ | n
+    · exact False.elim (hnot0 b hb hcyl)
+    · exact ⟨n + 1, Nat.succ_pos n, b, hb, hcyl⟩
+  · intro n b hb hcyl
+    exact Checks.not_haltsWithWindow_M_loop_default
+      ((universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_loop default 1
+        Checks.w_loop).mp ⟨n, b, hb, hcyl⟩)
+
+end S4TuringPoisson
