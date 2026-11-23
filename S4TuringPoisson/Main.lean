@@ -12,6 +12,7 @@ module
 public import S4TuringPoisson.Extension.AlignedUnimodularVolume
 public import S4TuringPoisson.Extension.BumpIsotopyLift
 public import S4TuringPoisson.Smoothing.CMPPInstance
+public import S4TuringPoisson.Fibration.ClosedManifoldLocal
 
 /-!
 # Main Theorems: Turing Complete Volume-Preserving Poisson Diffeomorphisms on $S^4$ and 4-Manifolds
@@ -489,6 +490,160 @@ theorem undecidable_orbit_reachability_S4 :
           ∀ c : Nat.Partrec.Code,
             dec c = true ↔ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U :=
   undecidable_orbit_reachability_S4_of_isotopy
+
+section UnconditionalClosedFourManifold
+
+/-- **Corollary 2 (Unconditional on General Closed Oriented 4-Manifolds, `L-R3`)**:
+Every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a positive volume 4-form
+`V_M : PositiveVolumeForm (𝓡 4) M` (with zero `[AdmitsWrinkledOrBrokenLefschetzFibration M]` or
+disk-isotopy assumptions) carries an aligned positive volume 4-form `V` strictly positively
+co-oriented with `V_M`, a smooth map `f : M → Sphere2`, a compatible generically rank-`2`
+unimodular Jacobian–Poisson structure `π_f`, and a $C^\infty$ diffeomorphism
+`d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M` preserving `f`, `π_f`, regular `S²` leaf areas, `V.Ω`, and `V.μ` that
+is Turing complete (`IsTuringComplete ⇑d_bar`, `≠ id`). -/
+-- tier: T2
+theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+    [CompactSpace M] [T2Space M] [Nonempty M]
+    (V_M : PositiveVolumeForm (𝓡 4) M) :
+    ∃ (V : PositiveVolumeForm (𝓡 4) M)
+      (π_f : PoissonStructure (𝓡 4) M)
+      (f : M → Sphere2)
+      (hf : ContMDiff (𝓡 4) (𝓡 2) ∞ f)
+      (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      π_f = jacobianPoissonOfPositiveVolume V S2VolumeForm f hf ∧
+      (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsUnimodularPoisson ∧
+      (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) f, π_f.rankAt x = 2) ∧
+      (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) f, π_f.rankAt x = 0) ∧
+      f ∘ ⇑d_bar = f ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      (∀ b : s4BaseRegion,
+        ∃ (embed : Sphere2 → M) (d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2),
+          (∀ z : Sphere2, f (embed z) = b.1 ∧ d_bar (embed z) = embed (d_b z)) ∧
+          TauCeti.SmoothForm.mpullback d_b d_b.contMDiff S2VolumeForm = S2VolumeForm ∧
+          MeasurePreserving ⇑d_b S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ) ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar ∧
+      (⇑d_bar : M → M) ≠ id := by
+  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
+    AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  let _ := A.instMeasurableSpaceFiber
+  let _ := A.instBorelSpaceFiber
+  let C : SymplecticDiskChart Sphere2 S2VolumeForm :=
+    AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  refine ⟨alignedPositiveVolume M, adaptedJacobianPoisson M,
+    ⇑A.fibration, A.fibration.contMDiff_toFun, leafwiseBumpDiffeomorph M,
+    rfl,
+    fun x ↦ alignedVolumeForm_pos_cooriented M x,
+    isUnimodularWithVolume_adaptedJacobianPoisson M,
+    isUnimodularPoisson_adaptedJacobianPoisson M,
+    fun x hx ↦ rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints M hx,
+    fun x hx ↦ rankAt_adaptedJacobianPoisson_of_mem_criticalPoints M hx,
+    fibration_comp_leafwiseBumpDiffeomorph M,
+    isPoissonMap_leafwiseBumpDiffeomorph M,
+    fun b ↦ ?_,
+    mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M,
+    measurePreserving_leafwiseBumpDiffeomorph M,
+    isTuringComplete_leafwiseBumpDiffeomorph M,
+    leafwiseBumpDiffeomorph_ne_id M⟩
+  let d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 :=
+    C.liftSliceDiffeomorph (bumpProfile M b.1)
+  exact ⟨fun z ↦ A.fibration.embed (b, z), d_b,
+    fun z ↦ ⟨A.fibration.apply_embed b z, leafwiseBumpDiffeomorph_embed M b z⟩,
+    C.mpullback_liftSliceDiffeomorph_eq (bumpProfile M b.1),
+    SymplecticDiskChart.measurePreserving_liftSliceDiffeomorph S2PositiveVolumeForm C
+      (bumpProfile M b.1)⟩
+
+/-- Concise unconditional Corollary 2 on every nonempty compact Hausdorff oriented smooth
+4-manifold `(M, V_M)` (`L-R3`). -/
+-- tier: T2
+theorem exists_turingComplete_volumePreserving_diffeomorph_closedFourManifold
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+    [CompactSpace M] [T2Space M] [Nonempty M]
+    (V_M : PositiveVolumeForm (𝓡 4) M) :
+    ∃ (V : PositiveVolumeForm (𝓡 4) M)
+      (f : M → Sphere2)
+      (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
+      f ∘ ⇑d_bar = f ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar := by
+  obtain ⟨V, _, f, _, d_bar, _, hpos, _, _, _, _, hf_comp, _, _, hV, hμ, htc, _⟩ :=
+    exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold M V_M
+  exact ⟨V, f, d_bar, hpos, hf_comp, hV, hμ, htc⟩
+
+/-- Unconditional algorithmic undecidability of forward-orbit reachability on any nonempty compact
+Hausdorff oriented smooth 4-manifold `(M, V_M)`. -/
+-- tier: T2
+theorem undecidable_orbit_reachability_closedFourManifold
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+    [CompactSpace M] [T2Space M] [Nonempty M]
+    (V_M : PositiveVolumeForm (𝓡 4) M) :
+    ∃ (V : PositiveVolumeForm (𝓡 4) M)
+      (π_f : PoissonStructure (𝓡 4) M)
+      (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M)
+      (U : Opens M)
+      (chart : UnitDisk2 → M)
+      (coord : Nat.Partrec.Code → UnitDisk2)
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      U.1.Nonempty ∧
+      Continuous chart ∧
+      Function.Injective chart ∧
+      Computable approx ∧
+      (∀ (c : Nat.Partrec.Code) (m : ℕ),
+        ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
+      REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
+          ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ∃ dec : Nat.Partrec.Code → Bool,
+          Computable dec ∧
+          ∀ c : Nat.Partrec.Code,
+            dec c = true ↔ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U := by
+  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
+    AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  let _ := A.instMeasurableSpaceFiber
+  let _ := A.instBorelSpaceFiber
+  obtain ⟨U, chart, coord, approx, hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩ :=
+    undecidable_orbit_reachability_leafwiseBumpDiffeomorph M
+  exact ⟨alignedPositiveVolume M, adaptedJacobianPoisson M, leafwiseBumpDiffeomorph M, U, chart,
+    coord, approx,
+    fun x ↦ alignedVolumeForm_pos_cooriented M x,
+    isUnimodularWithVolume_adaptedJacobianPoisson M,
+    isPoissonMap_leafwiseBumpDiffeomorph M,
+    mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M,
+    measurePreserving_leafwiseBumpDiffeomorph M,
+    hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩
+
+end UnconditionalClosedFourManifold
 
 end HeadlineTheorems
 
