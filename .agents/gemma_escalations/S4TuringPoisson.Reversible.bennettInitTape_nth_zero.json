@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettInitTape_nth_zero",
+  "raw_name": "bennettInitTape_nth_zero",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:22:23Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinSupportedTape",
+    "S4TuringPoisson.HaltsWithWindow",
+    "S4TuringPoisson.FinTM0.step_initCfg_cleanHalt_ne_none",
+    "S4TuringPoisson.FinTM0.initCfg"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9 :=\n  by\n  dsimp [bennettInitTape]\n  simp",
+      "proof_body": "by\n  dsimp [bennettInitTape]\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitTape_nth_zero_1.lean:739:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 23324.0,
+      "lean_ms": 7808.89,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9 :=\n  by\n  dsimp [bennettInitTape]\n  simp",
+      "proof_body": "by\n  dsimp [bennettInitTape]\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitTape_nth_zero_2.lean:739:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25777.75,
+      "lean_ms": 8310.21,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9 :=\n  by\n  dsimp [bennettInitTape]\n  simp",
+      "proof_body": "by\n  dsimp [bennettInitTape]\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitTape_nth_zero_3.lean:739:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 26709.74,
+      "lean_ms": 12731.67,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9 :=\n  by\n  dsimp [bennettInitTape]\n  simp",
+      "proof_body": "by\n  dsimp [bennettInitTape]\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitTape_nth_zero_4.lean:739:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 29002.21,
+      "lean_ms": 9038.02,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitTape_nth_zero (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitTape M t).nth 0 = \u27e8t.head, true, none, true, false\u27e9 :=\n  by\n  dsimp [bennettInitTape]\n  simp\n  rfl",
+      "proof_body": "by\n  dsimp [bennettInitTape]\n  simp\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitTape_nth_zero_5.lean:739:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 27535.13,
+      "lean_ms": 8900.4,
+      "tokens": 82,
+      "accepted": false
+    }
+  ]
+}

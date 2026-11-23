@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft",
+  "raw_name": "bennettDirIn_stepHistLeft",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:10:53Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.ReversibleTM.step",
+    "S4TuringPoisson.FinTM0.stepOpt_none",
+    "S4TuringPoisson.FinTM0.iterate_stepOpt_none"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left :=\n  by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_1.lean:312:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_1.lean:311:22: warning: This simp argument is unused:\n  BennettState.stepHistLeft\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 39524.35,
+      "lean_ms": 7995.67,
+      "tokens": 312,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left :=\n  by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_2.lean:312:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_2.lean:311:22: warning: This simp argument is unused:\n  BennettState.stepHistLeft\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 23536.22,
+      "lean_ms": 8232.66,
+      "tokens": 89,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left :=\n  by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_3.lean:312:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_3.lean:311:22: warning: This simp argument is unused:\n  BennettState.stepHistLeft\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 22074.8,
+      "lean_ms": 7959.63,
+      "tokens": 89,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left :=\n  by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_4.lean:312:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_4.lean:311:22: warning: This simp argument is unused:\n  BennettState.stepHistLeft\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 23073.67,
+      "lean_ms": 8044.0,
+      "tokens": 89,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_stepHistLeft {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.stepHistLeft (M := M) e rel) = .left :=\n  by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.stepHistLeft]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_5.lean:312:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_stepHistLeft_5.lean:311:22: warning: This simp argument is unused:\n  BennettState.stepHistLeft\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 23266.07,
+      "lean_ms": 7745.19,
+      "tokens": 89,
+      "accepted": false
+    }
+  ]
+}

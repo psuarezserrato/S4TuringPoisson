@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettDirIn_afterExec",
+  "raw_name": "bennettDirIn_afterExec",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:01:40Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.UniversalReversibleSimulator",
+    "S4TuringPoisson.ReversibleTM",
+    "S4TuringPoisson.Checks.M_loop"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay :=\n  by\n  simp [bennettDirIn, BennettState.afterExec]\n  simp [rel]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.afterExec]\n  simp [rel]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_1.lean:292:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_1.lean:291:22: warning: This simp argument is unused:\n  BennettState.afterExec\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 18759.47,
+      "lean_ms": 7959.84,
+      "tokens": 88,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay :=\n  by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_2.lean:292:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_2.lean:291:22: warning: This simp argument is unused:\n  BennettState.afterExec\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 22192.22,
+      "lean_ms": 7932.85,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay :=\n  by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_3.lean:292:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_3.lean:291:22: warning: This simp argument is unused:\n  BennettState.afterExec\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 20837.24,
+      "lean_ms": 7813.63,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay :=\n  by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.afterExec]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_4.lean:292:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_4.lean:291:22: warning: This simp argument is unused:\n  BennettState.afterExec\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 20578.75,
+      "lean_ms": 7989.66,
+      "tokens": 86,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_afterExec {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.afterExec (M := M) e rel) = .stay :=\n  by\n  simp [bennettDirIn]\n  simp [BennettState.afterExec]",
+      "proof_body": "by\n  simp [bennettDirIn]\n  simp [BennettState.afterExec]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_afterExec_5.lean:292:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 21075.11,
+      "lean_ms": 7837.36,
+      "tokens": 86,
+      "accepted": false
+    }
+  ]
+}

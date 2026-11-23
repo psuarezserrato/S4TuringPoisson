@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettDirIn_atHist",
+  "raw_name": "bennettDirIn_atHist",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:08:01Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.UniversalReversibleSimulator",
+    "S4TuringPoisson.ReversibleTM",
+    "S4TuringPoisson.FinTM0.ShiftAlphabet"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay :=\n  by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => bennettDirIn (BennettState.stay (M := M)) = .stay\n  | .move (d) => bennettDirIn (BennettState.move (M := M) d) = .move d",
+      "proof_body": "by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => bennettDirIn (BennettState.stay (M := M)) = .stay\n  | .move (d) => bennettDirIn (BennettState.move (M := M) d) = .move d",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_atHist_1.lean:310:48: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 44714.53,
+      "lean_ms": 8163.94,
+      "tokens": 366,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay :=\n  by\n  let s := BennettState.atHist (M := M) e rel\n  obtain \u27e8d, h\u27e9 := (bennettDirIn s)\n  simp [bennettDirIn] at h\n  contradiction",
+      "proof_body": "by\n  let s := BennettState.atHist (M := M) e rel\n  obtain \u27e8d, h\u27e9 := (bennettDirIn s)\n  simp [bennettDirIn] at h\n  contradiction",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_atHist_2.lean:312:25: error(lean.unknownIdentifier): Unknown identifier `h`",
+      "error_class": "unknown identifier",
+      "latency_ms": 25865.42,
+      "lean_ms": 8055.33,
+      "tokens": 116,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay :=\n  by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => simp [bennettDirIn]",
+      "proof_body": "by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => simp [bennettDirIn]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_atHist_3.lean:310:48: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 23256.8,
+      "lean_ms": 7855.1,
+      "tokens": 106,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay :=\n  by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => rw [bennettDirIn]\n    simp at *\n    contradiction",
+      "proof_body": "by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => rw [bennettDirIn]\n    simp at *\n    contradiction",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_atHist_4.lean:310:48: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 24839.63,
+      "lean_ms": 8120.35,
+      "tokens": 115,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_atHist {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.atHist (M := M) e rel) = .stay :=\n  by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => \n    simp [bennettDirIn]\n    contradiction",
+      "proof_body": "by\n  rcases BennettState.atHist (M := M) e rel with\n  | .stay => rfl\n  | .move d => \n    simp [bennettDirIn]\n    contradiction",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_atHist_5.lean:310:48: error: unexpected token '|'; expected rcasesPat",
+      "error_class": "syntax",
+      "latency_ms": 24221.72,
+      "lean_ms": 7957.4,
+      "tokens": 113,
+      "accepted": false
+    }
+  ]
+}

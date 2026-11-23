@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.BennettCell.default_histHead",
+  "raw_name": "BennettCell.default_histHead",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T02:45:52Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.Checks.M_halt",
+    "S4TuringPoisson.FinTM0.cleanHalt",
+    "S4TuringPoisson.FinTM0.ShiftAlphabet"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false :=\n  by\n  simp [BennettCell.default]",
+      "proof_body": "by\n  simp [BennettCell.default]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_1.lean:181:8: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.Reversible.BennettCell.default`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_1.lean:181:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 16976.99,
+      "lean_ms": 7851.8,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false :=\n  by\n  simp [BennettCell.default]",
+      "proof_body": "by\n  simp [BennettCell.default]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_2.lean:181:8: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.Reversible.BennettCell.default`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_2.lean:181:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 19112.71,
+      "lean_ms": 7816.92,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false :=\n  by\n  rcases (default : BennettCell M).histHead with h\n  simp [BennettCell.default] at h\n  exact h",
+      "proof_body": "by\n  rcases (default : BennettCell M).histHead with h\n  simp [BennettCell.default] at h\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_3.lean:182:8: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.Reversible.BennettCell.default`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_3.lean:182:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 20832.34,
+      "lean_ms": 8501.83,
+      "tokens": 71,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false :=\n  by\n  simp [BennettCell.default]",
+      "proof_body": "by\n  simp [BennettCell.default]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_4.lean:181:8: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.Reversible.BennettCell.default`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_4.lean:181:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 19036.55,
+      "lean_ms": 7696.27,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem BennettCell.default_histHead (M : FinTM0) :\n    (default : BennettCell M).histHead = false :=\n  by\n  simp [BennettCell.default]",
+      "proof_body": "by\n  simp [BennettCell.default]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_5.lean:181:8: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.Reversible.BennettCell.default`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.BennettCell.default_histHead_5.lean:181:2: error: `simp` made no progress",
+      "error_class": "unknown identifier",
+      "latency_ms": 19233.63,
+      "lean_ms": 7960.07,
+      "tokens": 50,
+      "accepted": false
+    }
+  ]
+}

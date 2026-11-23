@@ -1,0 +1,76 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettInitCfg_q",
+  "raw_name": "bennettInitCfg_q",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettInitCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).q = .exec default .eq",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:26:04Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinSupportedTape",
+    "S4TuringPoisson.FinTM0.initCfg",
+    "S4TuringPoisson.FinTM0.encodeInit",
+    "S4TuringPoisson.FinTM0.step_initCfg_cleanHalt_ne_none"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Data.Finset.Card\nimport Mathlib.Data.Fintype.Card\nimport Mathlib.Data.Fintype.EquivFin\nimport Mathlib.Data.Fintype.Option\nimport Mathlib.Data.Fintype.Prod\nimport Mathlib.Data.Fintype.Sum\nimport Mathlib.Logic.Equiv.Sum\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Turing\n\nnamespace S4TuringPoisson.Reversible\n\nsection PartialPerm\n\nnoncomputable def extendPartialInjPerm {X : Type*} [Fintype X] [DecidableEq X]\n\nstructure BennettCell (M : FinTM0) : Type where\n  def bennettCellEquiv (M : FinTM0) :\n    inductive BennettState (M : FinTM0) : Type\n  def bennettStateEquiv (M : FinTM0) :\n    def bennettDirIn {M : FinTM0} : BennettState M \u2192 ShiftDir\n  def bennettRule (M : FinTM0) :\n    def bennettRuleInv (M : FinTM0) :\n    noncomputable def bennettReversibleTM (M : FinTM0) : ReversibleTM.{0, 0} where\n    def bennettInactiveCell (M : FinTM0) : PointedMap M.\u0393 (BennettCell M) where\n    def bennettInitTape (M : FinTM0) (t : FinSupportedTape M) : Tape (BennettCell M) where\n    def bennettInitCfg (M : FinTM0) (t : FinSupportedTape M) : (bennettReversibleTM M).Cfg :=\n      FinTM0.initCfg M t\n\ntheorem ben",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 54298.67,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "```lean4\nimport Mathlib.Data.Finset.Card\nimport Mathlib.Data.Fintype.Card\nimport Mathlib.Data.Fintype.EquivFin\nimport Mathlib.Data.Fintype.Option\nimport Mathlib.Data.Fintype.Prod\nimport Mathlib.Data.Fintype.Sum\nimport Mathlib.Logic.Equiv.Sum\nimport S4TuringPoisson.Dynamics.GeneralizedShift\n\nopen Turing\n\nnamespace S4TuringPoisson.Reversible\n\nsection PartialPerm\n\nnoncomputable def extendPartialInjPerm {X : Type*} [Fintype X] [DecidableEq X]\nstructure BennettCell (M : FinTM0) : Type where\ndef bennettCellEquiv (M : FinTM0) :\n  inductive BennettState (M : FinTM0) : Type\ndef bennettStateEquiv (M : FinTM0) :\ndef bennettDirIn {M : FinTM0} : BennettState M \u2192 ShiftDir\ndef bennettRule (M : FinTM0) :\ndef bennettRuleInv (M : FinTM0) :\nnoncomputable def bennettReversibleTM (M : FinTM0) : ReversibleTM.{0, 0} where\ndef bennettInactiveCell (M : FinTM0) : PointedMap M.\u0393 (BennettCell M) where\ndef bennettInitTape (M : FinTM0) (t : FinSupportedTape M) : Tape (BennettCell M) where\ndef bennettInitCfg (M : FinTM0) (t : FinSupportedTape M) : (bennettReversibleTM M).Cfg :=\n    (M.initCfg t).map (fun _ => (bennettReversibleTM M).",
+      "compiler_error": "error: Candidate declaration is missing top-level ':='.",
+      "error_class": "other",
+      "latency_ms": 55817.28,
+      "lean_ms": 0.0,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).q = .exec default .eq :=\n  by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "proof_body": "by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_3.lean:740:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 32653.94,
+      "lean_ms": 11006.08,
+      "tokens": 172,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).q = .exec default .eq :=\n  by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "proof_body": "by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_4.lean:740:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24767.53,
+      "lean_ms": 8394.62,
+      "tokens": 77,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_q (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).q = .exec default .eq :=\n  by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "proof_body": "by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_5.lean:740:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25148.21,
+      "lean_ms": 8022.41,
+      "tokens": 77,
+      "accepted": false
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettInitCfg_tape",
+  "raw_name": "bennettInitCfg_tape",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:28:50Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinSupportedTape",
+    "S4TuringPoisson.FinTM0.initCfg",
+    "S4TuringPoisson.FinTM0.encodeInit",
+    "S4TuringPoisson.FinTM0.step_initCfg_cleanHalt_ne_none"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t :=\n  by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg, bennettInitTape]",
+      "proof_body": "by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg, bennettInitTape]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_tape_1.lean:741:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 23976.74,
+      "lean_ms": 8216.32,
+      "tokens": 79,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t :=\n  by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg, bennettInitTape]",
+      "proof_body": "by\n  dsimp [bennettInitCfg]\n  simp [FinTM0.initCfg, bennettInitTape]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_tape_2.lean:741:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25760.54,
+      "lean_ms": 8305.78,
+      "tokens": 79,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t :=\n  by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "proof_body": "by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_tape_3.lean:742:9: error: Tactic `unfold` failed to unfold `FinTM0.initCfg` in\n  { q := BennettState.exec default Ordering.eq,\n        Tape :=\n          { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n            left := ListBlank.map (bennettInactiveCell M) t.left,\n            right := ListBlank.map (bennettInactiveCell M) t.right } }.Tape =\n    { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n      left := ListBlank.map (bennettInactiveCell M) t.left, right := ListBlank.map (bennettInactiveCell M) t.right }",
+      "error_class": "other",
+      "latency_ms": 25069.15,
+      "lean_ms": 8151.12,
+      "tokens": 82,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t :=\n  by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "proof_body": "by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_tape_4.lean:742:9: error: Tactic `unfold` failed to unfold `FinTM0.initCfg` in\n  { q := BennettState.exec default Ordering.eq,\n        Tape :=\n          { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n            left := ListBlank.map (bennettInactiveCell M) t.left,\n            right := ListBlank.map (bennettInactiveCell M) t.right } }.Tape =\n    { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n      left := ListBlank.map (bennettInactiveCell M) t.left, right := ListBlank.map (bennettInactiveCell M) t.right }",
+      "error_class": "other",
+      "latency_ms": 24948.66,
+      "lean_ms": 7901.85,
+      "tokens": 82,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettInitCfg_tape (M : FinTM0) (t : FinSupportedTape M) :\n    (bennettInitCfg M t).Tape = bennettInitTape M t :=\n  by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "proof_body": "by\n  unfold bennettInitCfg\n  unfold bennettInitTape\n  unfold FinTM0.initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_tape_5.lean:742:9: error: Tactic `unfold` failed to unfold `FinTM0.initCfg` in\n  { q := BennettState.exec default Ordering.eq,\n        Tape :=\n          { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n            left := ListBlank.map (bennettInactiveCell M) t.left,\n            right := ListBlank.map (bennettInactiveCell M) t.right } }.Tape =\n    { head := { sym := t.head, workHead := true, hist := none, histHead := true, haltMark := false },\n      left := ListBlank.map (bennettInactiveCell M) t.left, right := ListBlank.map (bennettInactiveCell M) t.right }",
+      "error_class": "other",
+      "latency_ms": 25509.95,
+      "lean_ms": 7980.94,
+      "tokens": 82,
+      "accepted": false
+    }
+  ]
+}
