@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettDirIn_haltRun",
+  "raw_name": "bennettDirIn_haltRun",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T02:54:12Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.Checks.M_halt",
+    "S4TuringPoisson.FinTM0.mkCleanCfg",
+    "S4TuringPoisson.FinTM0.cleanHalt"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right :=\n  by\n  rcases (BennettState.haltRun (M := M) q rel) with \u27e8_ , _\u27e9\n  simp",
+      "proof_body": "by\n  rcases (BennettState.haltRun (M := M) q rel) with \u27e8_ , _\u27e9\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_haltRun_1.lean:289:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 20290.7,
+      "lean_ms": 7937.85,
+      "tokens": 91,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_haltRun_2.lean:288:22: warning: This simp argument is unused:\n  BennettState.haltRun\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 21609.85,
+      "lean_ms": 7794.59,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_haltRun_3.lean:288:22: warning: This simp argument is unused:\n  BennettState.haltRun\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 21658.77,
+      "lean_ms": 7802.07,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_haltRun_4.lean:288:22: warning: This simp argument is unused:\n  BennettState.haltRun\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 21831.17,
+      "lean_ms": 7826.98,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_haltRun {M : FinTM0} (q : M.\u039b) (rel : Ordering) :\n    bennettDirIn (BennettState.haltRun (M := M) q rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.haltRun]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_haltRun_5.lean:288:22: warning: This simp argument is unused:\n  BennettState.haltRun\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 22254.62,
+      "lean_ms": 8059.86,
+      "tokens": 78,
+      "accepted": false
+    }
+  ]
+}

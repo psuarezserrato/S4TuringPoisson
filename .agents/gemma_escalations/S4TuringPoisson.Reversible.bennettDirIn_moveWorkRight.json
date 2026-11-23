@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight",
+  "raw_name": "bennettDirIn_moveWorkRight",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T02:59:17Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0",
+    "S4TuringPoisson.ReversibleTM.step",
+    "S4TuringPoisson.UniversalReversibleSimulator",
+    "S4TuringPoisson.Checks.M_loop"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right :=\n  by\n  simp",
+      "proof_body": "by\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight_1.lean:290:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 18274.74,
+      "lean_ms": 7982.23,
+      "tokens": 72,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight_2.lean:290:22: warning: This simp argument is unused:\n  BennettState.moveWorkRight\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 20775.03,
+      "lean_ms": 7848.81,
+      "tokens": 85,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight_3.lean:290:22: warning: This simp argument is unused:\n  BennettState.moveWorkRight\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 20533.18,
+      "lean_ms": 8008.39,
+      "tokens": 85,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight_4.lean:290:22: warning: This simp argument is unused:\n  BennettState.moveWorkRight\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 22301.38,
+      "lean_ms": 7961.1,
+      "tokens": 85,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem bennettDirIn_moveWorkRight {M : FinTM0} (e : M.\u039b \u00d7 M.\u0393) (rel : Ordering) :\n    bennettDirIn (BennettState.moveWorkRight (M := M) e rel) = .right :=\n  by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "proof_body": "by\n  simp [bennettDirIn, BennettState.moveWorkRight]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettDirIn_moveWorkRight_5.lean:290:22: warning: This simp argument is unused:\n  BennettState.moveWorkRight\nHint: Omit it from the simp argument list.\n  [apply] simp [bennettDirIn]\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 24404.64,
+      "lean_ms": 7966.65,
+      "tokens": 85,
+      "accepted": false
+    }
+  ]
+}

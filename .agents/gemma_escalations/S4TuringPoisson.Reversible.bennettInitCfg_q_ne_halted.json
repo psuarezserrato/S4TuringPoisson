@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted",
+  "raw_name": "bennettInitCfg_q_ne_halted",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Bennett.lean",
+  "milestone": "B1",
+  "tier": "T0",
+  "statement": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T03:32:22Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinSupportedTape",
+    "S4TuringPoisson.FinTM0.initCfg",
+    "S4TuringPoisson.FinTM0.encodeInit",
+    "S4TuringPoisson.FinTM0.step_initCfg_cleanHalt_ne_none"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel :=\n  by\n  simp [bennettInitCfg]\n  -- The initial configuration of the TM is { q := default, Tape := t }.\n  -- The default state of the TM is not the halting state of the TM.\n  -- By the definition of M.initCfg, the initial state is M.default.\n  -- We need to show that M.default \u2260 .halted q rel.\n  -- Since M is a valid TM, the default state is a non-halting state.\n  -- The halting state is determined by the current state and the relation.\n  -- Since M.default is a non-halting state, it cannot be the halting state.\n  have h : M.default \u2260 .halted q rel := by\n    -- The definition of M.default ensures it is not in the halting set.\n    -- In TM0, the halting set is the set of states that cause the machine to halt.\n    -- M.default is explicitly a non-halting state.\n    simp\n  exact h",
+      "proof_body": "by\n  simp [bennettInitCfg]\n  -- The initial configuration of the TM is { q := default, Tape := t }.\n  -- The default state of the TM is not the halting state of the TM.\n  -- By the definition of M.initCfg, the initial state is M.default.\n  -- We need to show that M.default \u2260 .halted q rel.\n  -- Since M is a valid TM, the default state is a non-halting state.\n  -- The halting state is determined by the current state and the relation.\n  -- Since M.default is a non-halting state, it cannot be the halting state.\n  have h : M.default \u2260 .halted q rel := by\n    -- The definition of M.default ensures it is not in the halting set.\n    -- In TM0, the halting set is the set of states that cause the machine to halt.\n    -- M.default is explicitly a non-halting state.\n    simp\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_1.lean:749:13: error(lean.invalidField): Invalid field `default`: The environment does not contain `S4TuringPoisson.FinTM0.default`, so it is not possible to project the field `default` from an expression\n  M\nof type `FinTM0`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_1.lean:749:23: error(lean.invalidDottedIdent): Invalid dotted identifier notation: The expected type of `.halted` could not be determined\nHint: Using `BennettState.halted would be unambiguous:\n  [apply] `BennettState.halted`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_1.lean:740:2: error: unsolved goals\nM : FinTM0\nt : FinSupportedTape M\nq : M.\u039b\nrel : Ordering\n\u22a2 BennettState.exec default Ordering.eq \u2260 BennettState.halted q rel",
+      "error_class": "unsolved goals",
+      "latency_ms": 44517.88,
+      "lean_ms": 8163.13,
+      "tokens": 288,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel :=\n  by\n  simp [bennettInitCfg]\n  -- The state of the initial configuration is M.default.\n  -- By definition, M.default is not a halting state for any q.\n  -- We use the fact that default is not halted by any state.\n  apply (M.default.ne_halted)",
+      "proof_body": "by\n  simp [bennettInitCfg]\n  -- The state of the initial configuration is M.default.\n  -- By definition, M.default is not a halting state for any q.\n  -- We use the fact that default is not halted by any state.\n  apply (M.default.ne_halted)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_2.lean:745:11: error(lean.invalidField): Invalid field `default`: The environment does not contain `S4TuringPoisson.FinTM0.default`, so it is not possible to project the field `default` from an expression\n  M\nof type `FinTM0`",
+      "error_class": "other",
+      "latency_ms": 31841.92,
+      "lean_ms": 8637.81,
+      "tokens": 137,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The initial configuration of the TM is { q := M.default, Tape := t }.\n  -- We need to show that M.default is not a halting state.\n  -- The property that M.default is not a halting state is provided by M.default.ne_halted.\n  apply M.default.ne_halted",
+      "proof_body": "by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The initial configuration of the TM is { q := M.default, Tape := t }.\n  -- We need to show that M.default is not a halting state.\n  -- The property that M.default is not a halting state is provided by M.default.ne_halted.\n  apply M.default.ne_halted",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_3.lean:746:10: error(lean.invalidField): Invalid field `default`: The environment does not contain `S4TuringPoisson.FinTM0.default`, so it is not possible to project the field `default` from an expression\n  M\nof type `FinTM0`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_3.lean:742:13: warning: This simp argument is unused:\n  FinTM0.initCfg\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 32410.05,
+      "lean_ms": 8233.56,
+      "tokens": 162,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The state of the initial configuration is M.default.\n  -- M.default is defined such that it is not a halting state.\n  apply M.default.ne_halted",
+      "proof_body": "by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The state of the initial configuration is M.default.\n  -- M.default is defined such that it is not a halting state.\n  apply M.default.ne_halted",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_4.lean:745:10: error(lean.invalidField): Invalid field `default`: The environment does not contain `S4TuringPoisson.FinTM0.default`, so it is not possible to project the field `default` from an expression\n  M\nof type `FinTM0`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_4.lean:742:13: warning: This simp argument is unused:\n  FinTM0.initCfg\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 29053.03,
+      "lean_ms": 8234.72,
+      "tokens": 129,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem bennettInitCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : M.\u039b) (rel : Ordering) :\n    (bennettInitCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The configuration's state is M.default.\n  -- We need to show M.default \u2260 .halted q rel.\n  -- The property that M.default is not a halting state is given by M.default.ne_halted.\n  apply M.default.ne_halted",
+      "proof_body": "by\n  unfold bennettInitCfg\n  simp only [FinTM0.initCfg]\n  -- The configuration's state is M.default.\n  -- We need to show M.default \u2260 .halted q rel.\n  -- The property that M.default is not a halting state is given by M.default.ne_halted.\n  apply M.default.ne_halted",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_5.lean:746:10: error(lean.invalidField): Invalid field `default`: The environment does not contain `S4TuringPoisson.FinTM0.default`, so it is not possible to project the field `default` from an expression\n  M\nof type `FinTM0`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/bennett/.agents/gemma_scratch/S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted_5.lean:742:13: warning: This simp argument is unused:\n  FinTM0.initCfg\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 31460.33,
+      "lean_ms": 8582.79,
+      "tokens": 154,
+      "accepted": false
+    }
+  ]
+}
