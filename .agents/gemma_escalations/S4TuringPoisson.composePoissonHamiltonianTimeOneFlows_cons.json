@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons",
+  "raw_name": "composePoissonHamiltonianTimeOneFlows_cons",
+  "spec_file": "S4TuringPoisson/Extension/PoissonHamiltonian.lean",
+  "milestone": "P",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T07:08:56Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.composePoissonHamiltonianTimeOneFlows",
+    "S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration",
+    "S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph",
+    "S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H) :=\n  by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [composePoissonHamiltonianTimeOneFlows]",
+      "proof_body": "by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [composePoissonHamiltonianTimeOneFlows]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_1.lean:321:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 37148.87,
+      "lean_ms": 12304.25,
+      "tokens": 234,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H) :=\n  by\n  induction Hs with\n  | nil => by\n    simp [composePoissonHamiltonianTimeOneFlows, poissonHamiltonianTimeOneDiffeomorph]\n  | cons h' Hs' => by\n    simp [composePoissonHamiltonianTimeOneFlows, poissonHamiltonianTimeOneDiffeomorph]",
+      "proof_body": "by\n  induction Hs with\n  | nil => by\n    simp [composePoissonHamiltonianTimeOneFlows, poissonHamiltonianTimeOneDiffeomorph]\n  | cons h' Hs' => by\n    simp [composePoissonHamiltonianTimeOneFlows, poissonHamiltonianTimeOneDiffeomorph]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_2.lean:321:10: error: unexpected token 'by'; expected '?', '_', '{' or tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_2.lean:321:8: error: unsolved goals\ncase nil\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M\nA : AdmitsWrinkledOrBrokenLefschetzFibration M",
+      "error_class": "unsolved goals",
+      "latency_ms": 41595.4,
+      "lean_ms": 12312.6,
+      "tokens": 274,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H) :=\n  by\n  unfold composePoissonHamiltonianTimeOneFlows\n  intro h\n  have h1 : (composePoissonHamiltonianTimeOneFlows M Hs) (poissonHamiltonianTimeOneDiffeomorph M H) = \n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) := by\n    simp [composePoissonHamiltonianTimeOneFlows]\n  exact h1",
+      "proof_body": "by\n  unfold composePoissonHamiltonianTimeOneFlows\n  intro h\n  have h1 : (composePoissonHamiltonianTimeOneFlows M Hs) (poissonHamiltonianTimeOneDiffeomorph M H) = \n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) := by\n    simp [composePoissonHamiltonianTimeOneFlows]\n  exact h1",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_3.lean:321:8: error: Tactic `introN` failed: There are no additional binders or `let` bindings in the goal to introduce\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M\nA : AdmitsWrinkledOrBrokenLefschetzFibration M\nH : C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef\nHs : List C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef",
+      "error_class": "other",
+      "latency_ms": 47526.1,
+      "lean_ms": 11997.37,
+      "tokens": 290,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H) :=\n  by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [poissonHamiltonianTimeOneDiffeomorph]",
+      "proof_body": "by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [poissonHamiltonianTimeOneDiffeomorph]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_4.lean:319:2: error: unsolved goals\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M\nA : AdmitsWrinkledOrBrokenLefschetzFibration M\nH : C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef\nHs : List C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef",
+      "error_class": "unsolved goals",
+      "latency_ms": 43905.12,
+      "lean_ms": 12467.46,
+      "tokens": 235,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem composePoissonHamiltonianTimeOneFlows_cons\n    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace \u211d (Fin 4)) M]\n    [IsManifold (\ud835\udce1 4) \u221e M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]\n    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]\n    (H : C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) (Hs : List C^\u221e\u27ee\ud835\udce1 4, M; \u211d\u27ef) :\n    composePoissonHamiltonianTimeOneFlows M (H :: Hs) =\n      (composePoissonHamiltonianTimeOneFlows M Hs).trans\n        (poissonHamiltonianTimeOneDiffeomorph M H) :=\n  by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [poissonHamiltonianTimeOneDiffeomorph]",
+      "proof_body": "by\n  unfold composePoissonHamiltonianTimeOneFlows\n  simp [poissonHamiltonianTimeOneDiffeomorph]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/poisson-ham/.agents/gemma_scratch/S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_cons_5.lean:319:2: error: unsolved goals\nM : Type u_1\ninst\u271d\u2076 : TopologicalSpace M\ninst\u271d\u2075 : ChartedSpace (EuclideanSpace \u211d (Fin 4)) M\ninst\u271d\u2074 : IsManifold (\ud835\udce1 4) \u221e M\ninst\u271d\u00b3 : MeasurableSpace M\ninst\u271d\u00b2 : BorelSpace M\ninst\u271d\u00b9 : CompactSpace M\ninst\u271d : T2Space M\nA : AdmitsWrinkledOrBrokenLefschetzFibration M\nH : C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef\nHs : List C^\u221e\u27ee\ud835\udce1 4, M; \ud835\udcd8(\u211d, \u211d), \u211d\u27ef",
+      "error_class": "unsolved goals",
+      "latency_ms": 41722.46,
+      "lean_ms": 12409.87,
+      "tokens": 235,
+      "accepted": false
+    }
+  ]
+}
