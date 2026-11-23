@@ -1,7 +1,11 @@
 /-
 Copyright (c) 2026 Pablo Suárez-Serrato. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Pablo Suárez-Serrato
+Released under the GNU Affero General Public License v3.0 (AGPLv3) for non-commercial use;
+see LICENSE.md for details.
+This project is licensed under non-commercial use. If you wish to use this software in a
+commercial product, service, or enterprise environment, please contact the developer to purchase
+a commercial license or negotiate royalty terms.
+Authored by Pablo Suárez-Serrato (November 2026).
 -/
 module
 
@@ -790,10 +794,6 @@ theorem R_flipRight_realized_by_autonomous_hamiltonians :
 
 end CMPPRealizationSanity
 
-end S4TuringPoisson.Checks
-
-namespace S4TuringPoisson
-
 /-! ## 9. Milestone B3 Universal Reversible Simulator Sanity (`Gate G5`) -/
 
 /-- **Gate G5 End-to-End Sanity Witness (`UNCONDITIONAL`, Milestone B3)**:
@@ -803,26 +803,26 @@ typeclass hypotheses):
 2. Step-`0` exclusion and positive-step (`n ≥ 1`) cylinder reachability for `Checks.M_halt` with
    `Checks.w_halt`,
 3. All-time (`∀ n : ℕ`) cylinder non-reachability for `Checks.M_loop` with `Checks.w_loop`, and
-4. Full Gate 6 instantiation `@Checks.gate6_sphere4_witness_of_cmpp` directly on `Sphere4` (`S⁴`),
+4. Full Gate 6 instantiation `@gate6_sphere4_witness_of_cmpp` directly on `Sphere4` (`S⁴`),
    yielding an unconditional leaf-preserving, unimodular, volume-preserving, Turing-complete Poisson
    diffeomorphism `d_bar ≠ id`. -/
 -- tier: T2
 theorem universalReversibleSimulator_sanity :
-    (universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt).Nonempty ∧
-    (universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop).Nonempty ∧
-    (∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+    (universalReversibleSimulator.acceptBlocks M_halt 1 w_halt).Nonempty ∧
+    (universalReversibleSimulator.acceptBlocks M_loop 1 w_loop).Nonempty ∧
+    (∀ b ∈ universalReversibleSimulator.acceptBlocks M_halt 1 w_halt,
       universalReversibleSimulator.R.encodeCfg
-        (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
+        (universalReversibleSimulator.initRevCfg M_halt default) ∉
           cylinderIcc b.1 b.2) ∧
-    (∃ n ≥ 1, ∃ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+    (∃ n ≥ 1, ∃ b ∈ universalReversibleSimulator.acceptBlocks M_halt 1 w_halt,
       universalReversibleSimulator.R.encodeCfg
         (universalReversibleSimulator.R.step^[n]
-          (universalReversibleSimulator.initRevCfg Checks.M_halt default)) ∈
+          (universalReversibleSimulator.initRevCfg M_halt default)) ∈
         cylinderIcc b.1 b.2) ∧
-    (∀ (n : ℕ), ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop,
+    (∀ (n : ℕ), ∀ b ∈ universalReversibleSimulator.acceptBlocks M_loop 1 w_loop,
       universalReversibleSimulator.R.encodeCfg
         (universalReversibleSimulator.R.step^[n]
-          (universalReversibleSimulator.initRevCfg Checks.M_loop default)) ∉
+          (universalReversibleSimulator.initRevCfg M_loop default)) ∉
         cylinderIcc b.1 b.2) ∧
     (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
         (π_f : PoissonStructure (𝓡 4) Sphere4)
@@ -844,24 +844,24 @@ theorem universalReversibleSimulator_sanity :
       MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id) := by
   have hnot0 :
-      ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
+      ∀ b ∈ universalReversibleSimulator.acceptBlocks M_halt 1 w_halt,
         universalReversibleSimulator.R.encodeCfg
-          (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
+          (universalReversibleSimulator.initRevCfg M_halt default) ∉
             cylinderIcc b.1 b.2 :=
-    universalReversibleSimulator.encodeCfg_init_notMem_of_step_ne_none Checks.M_halt default 1
-      Checks.w_halt Checks.step_initCfg_M_halt_ne_none
-  refine ⟨universalReversibleSimulator.acceptBlocks_nonempty Checks.M_halt 1 Checks.w_halt,
-    universalReversibleSimulator.acceptBlocks_nonempty Checks.M_loop 1 Checks.w_loop,
-    hnot0, ?_, ?_, @Checks.gate6_sphere4_witness_of_cmpp universalReversibleSimulator_cmpp⟩
+    universalReversibleSimulator.encodeCfg_init_notMem_of_step_ne_none M_halt default 1
+      w_halt step_initCfg_M_halt_ne_none
+  refine ⟨universalReversibleSimulator.acceptBlocks_nonempty M_halt 1 w_halt,
+    universalReversibleSimulator.acceptBlocks_nonempty M_loop 1 w_loop,
+    hnot0, ?_, ?_, @gate6_sphere4_witness_of_cmpp universalReversibleSimulator_cmpp⟩
   · obtain ⟨n, b, hb, hcyl⟩ :=
-      (universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_halt default 1
-        Checks.w_halt).mpr Checks.haltsWithWindow_M_halt
+      (universalReversibleSimulator.orbit_mem_acceptBlocks_iff M_halt default 1
+        w_halt).mpr haltsWithWindow_M_halt
     rcases n with _ | n
     · exact False.elim (hnot0 b hb hcyl)
     · exact ⟨n + 1, Nat.succ_pos n, b, hb, hcyl⟩
   · intro n b hb hcyl
-    exact Checks.not_haltsWithWindow_M_loop_default
-      ((universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_loop default 1
-        Checks.w_loop).mp ⟨n, b, hb, hcyl⟩)
+    exact not_haltsWithWindow_M_loop_default
+      ((universalReversibleSimulator.orbit_mem_acceptBlocks_iff M_loop default 1
+        w_loop).mp ⟨n, b, hb, hcyl⟩)
 
-end S4TuringPoisson
+end S4TuringPoisson.Checks

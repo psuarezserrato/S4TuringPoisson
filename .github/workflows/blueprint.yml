@@ -1,0 +1,109 @@
+name: Blueprint CI & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Blueprint (Web & PDF)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout S4TuringPoisson
+        uses: actions/checkout@v4
+        with:
+          path: S4TuringPoisson
+
+      - name: Checkout companion Turing-recursive
+        uses: actions/checkout@v4
+        with:
+          repository: psuarezserrato/Turing-recursive
+          path: Turing-recursive
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install System Dependencies & TeX Live
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz libgraphviz-dev
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-fonts-recommended \
+            texlive-latex-extra \
+            texlive-pictures \
+            latexmk || echo "::warning::TeX Live optional packages had install warnings"
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install leanblueprint plasTeX graphviz
+
+      - name: Install elan
+        run: |
+          set -o pipefail
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- --default-toolchain none -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Verify Lean & Lake Toolchain
+        working-directory: S4TuringPoisson
+        run: |
+          lean --version
+          lake --version
+
+      - name: Fetch Mathlib Cache & Build Lean Project
+        working-directory: S4TuringPoisson
+        run: |
+          lake exe cache get
+          LEAN_NUM_THREADS=2 lake build --wfail
+
+      - name: Build Blueprint PDF
+        working-directory: S4TuringPoisson/blueprint/src
+        run: |
+          mkdir -p ../print
+          pdflatex -interaction=nonstopmode -output-directory=../print print.tex
+          pdflatex -interaction=nonstopmode -output-directory=../print print.tex
+
+      - name: Build Blueprint Web
+        working-directory: S4TuringPoisson
+        run: |
+          leanblueprint web
+          if [ -f blueprint/print/print.pdf ]; then
+            mkdir -p blueprint/web
+            cp blueprint/print/print.pdf blueprint/web/blueprint.pdf || true
+          fi
+          if [ -f report/final_executive_report.pdf ]; then
+            cp report/final_executive_report.pdf blueprint/web/final_executive_report.pdf || true
+          fi
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: S4TuringPoisson/blueprint/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

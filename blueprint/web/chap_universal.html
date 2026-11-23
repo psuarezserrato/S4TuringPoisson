@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Universal reversible computation</title>
+<link rel="next" href="chap_main.html" title="Main results" />
+<link rel="prev" href="chap_cmpp.html" title="Generalized shifts and Hamiltonian disk dynamics (CMPP21)" />
+<link rel="up" href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of S4" />
+<link rel="stylesheet" href="styles/theme-blue.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)</a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap_status.html"><span class="toc_ref">1</span> <span class="toc_entry">Status and conventions</span></a>
+ </li>
+<li class="">
+  <a href="chap_interfaces.html"><span class="toc_ref">2</span> <span class="toc_entry">Interfaces: Turing completeness and volume forms</span></a>
+ </li>
+<li class="">
+  <a href="chap_poisson.html"><span class="toc_ref">3</span> <span class="toc_entry">Poisson geometry</span></a>
+ </li>
+<li class="">
+  <a href="chap_fibrations.html"><span class="toc_ref">4</span> <span class="toc_entry">Fibrations</span></a>
+ </li>
+<li class="">
+  <a href="chap_lift.html"><span class="toc_ref">5</span> <span class="toc_entry">The aligned volume form and the leafwise lift</span></a>
+ </li>
+<li class="">
+  <a href="chap_cmpp.html"><span class="toc_ref">6</span> <span class="toc_entry">Generalized shifts and Hamiltonian disk dynamics (CMPP21)</span></a>
+ </li>
+<li class=" active current">
+  <a href="chap_universal.html"><span class="toc_ref">7</span> <span class="toc_entry">Universal reversible computation</span></a>
+ </li>
+<li class="">
+  <a href="chap_main.html"><span class="toc_ref">8</span> <span class="toc_entry">Main results</span></a>
+ </li>
+<li class="">
+  <a href="chap_checks.html"><span class="toc_ref">9</span> <span class="toc_entry">Sanity checks (anti-vacuity)</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap_universal">7 Universal reversible computation</h1>
+
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_universal_tm">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">7.1</span>
+    <span class="theorem_thmtitle">Universal \(\mathrm{TM0}\) machine</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_universal.html#thm_universal_tm">#</a>
+    
+    <a class="icon proof" href="chap_universal.html#a0000000019"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_fintm0">Definition 2.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/TuringRecursive.U" class="lean_decl">TuringRecursive.U</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/TuringRecursive.U_evalCfg_tape" class="lean_decl">TuringRecursive.U_evalCfg_tape</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    A single <span class="ttfamily">TM0</span> machine \(U\) over a finite alphabet simulates every <span class="ttfamily">TM0</span> code (companion repository <span class="ttfamily">Turing-recursive</span>). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000019">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Partial recursive evaluation of codes, compiled to <span class="ttfamily">TM0</span>. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_universal_fintm0">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">7.2</span>
+    <span class="theorem_thmtitle">Exact-output windowed universal machine</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_universal.html#thm_universal_fintm0">#</a>
+    
+    <a class="icon proof" href="chap_universal.html#a0000000020"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_universal.html#thm_universal_tm">Theorem 7.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Reversible.universalFinTM0" class="lean_decl">S4TuringPoisson.Reversible.universalFinTM0</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Reversible.universalFinTM0_halts_with_cylinder_iff" class="lean_decl">S4TuringPoisson.Reversible.universalFinTM0_halts_with_cylinder_iff</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    \(U\) packaged as a <span class="ttfamily">FinTM0</span>; \(M\) halts on \(t\) with window \(w\) iff \(U\) halts on the encoded input with an output in a nonempty set of accepting codes, detectable on a prefix cylinder. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000020">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Prefix-free natural-number encoding of outputs. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_bennett">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">7.3</span>
+    <span class="theorem_thmtitle">Bennett’s reversible compiler</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_universal.html#thm_bennett">#</a>
+    
+    <a class="icon proof" href="chap_universal.html#a0000000021"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_cmpp.html#def_shift">Definition 6.1</a></li>
+          
+          <li><a href="chap_interfaces.html#def_fintm0">Definition 2.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Reversible.bennettReversibleTM" class="lean_decl">S4TuringPoisson.Reversible.bennettReversibleTM</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Reversible.bennett_orbit_halted_iff" class="lean_decl">S4TuringPoisson.Reversible.bennett_orbit_halted_iff</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    Every <span class="ttfamily">FinTM0</span> has a unidirectional reversible machine whose orbit enters the halted state iff the original machine halts (with the same final tape). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000021">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Extend the partial injective transition rule to a permutation; history tape argument. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_simulator">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">7.4</span>
+    <span class="theorem_thmtitle">Unconditional universal reversible simulator</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_universal.html#thm_simulator">#</a>
+    
+    <a class="icon proof" href="chap_universal.html#a0000000022"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_universal.html#thm_universal_fintm0">Theorem 7.2</a></li>
+          
+          <li><a href="chap_universal.html#thm_bennett">Theorem 7.3</a></li>
+          
+          <li><a href="chap_cmpp.html#def_simulator">Definition 6.4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.universalReversibleSimulator" class="lean_decl">S4TuringPoisson.universalReversibleSimulator</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    There is a <span class="ttfamily">UniversalReversibleSimulator</span>, with primitive recursive initial digits. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000022">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Compose Bennett’s compiler with the windowed universal machine. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_cmpp_instance">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">7.5</span>
+    <span class="theorem_thmtitle">R1: the CMPP class is inhabited</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_universal.html#thm_cmpp_instance">#</a>
+    
+    <a class="icon proof" href="chap_universal.html#a0000000023"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_universal.html#thm_simulator">Theorem 7.4</a></li>
+          
+          <li><a href="chap_cmpp.html#thm_realize">Theorem 6.9</a></li>
+          
+          <li><a href="chap_cmpp.html#lem_sim_witness">Lemma 6.5</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians" class="lean_decl">S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    <span class="ttfamily">HasCMPPCantorCirculationHamiltonians</span> has a global instance, with no hypotheses. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000023">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p><span class="ttfamily">hasCMPP_of_simulator universalReversibleSimulator</span>. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap_cmpp.html" title="Generalized shifts and Hamiltonian disk dynamics (CMPP21)"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap_main.html" title="Main results"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

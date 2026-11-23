@@ -10,3 +10,13 @@
 **/__pycache__/
 *.pyc
 .DS_Store
+
+# LaTeX / plasTeX intermediate build artifacts (keep final PDFs and web output tracked)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.paux

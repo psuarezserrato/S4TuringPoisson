@@ -1,0 +1,648 @@
+% Copyright (c) 2026 Pablo Suárez-Serrato. All rights reserved.
+% Released under the GNU Affero General Public License v3.0 (AGPLv3) for non-commercial use;
+% see LICENSE.md for details.
+% This project is licensed under non-commercial use. If you wish to use this software in a
+% commercial product, service, or enterprise environment, please contact the developer to purchase
+% a commercial license or negotiate royalty terms.
+% Authors: Pablo Suárez-Serrato (November 2026).
+% Blueprint for S4TuringPoisson (state of main @ cb2b631, 23 November 2026).
+%
+% Conventions (leanblueprint).
+%   \lean{...}  Lean declaration(s) implementing the node (fully qualified names).
+%   \leanok     on a statement: formalized; on a proof: proved in Lean with no `sorry`, using only
+%               the axioms propext, Classical.choice, Quot.sound.
+%   \uses{...}  dependency edges.
+% Nodes WITHOUT \leanok are deliberately left unformalized: they record mathematical content of
+% the source paper that the Lean development does not (yet) prove. They are the honest residuals
+% of the audit and appear as non-green nodes in the dependency graph.
+
+% =========================================================================
+\chapter{Status and conventions}
+\label{chap_status}
+
+This blueprint describes the Lean~4 formalization of P.~Su\'arez-Serrato, \emph{Hamiltonian and
+Turing complete flows on smooth $4$-manifolds} (\texttt{S4TCdiffeo-Aug-2026.tex}), together with
+the smoothing theorem of Cardona--Miranda--Peralta-Salas--Presas (CMPP21, Thm.~5.2) on which it
+depends. All nodes carrying \texttt{\textbackslash leanok} are proved in Lean (toolchain
+\texttt{v4.36.0}, Mathlib and TauCeti \texttt{v4.36.0}) and depend only on \texttt{propext},
+\texttt{Classical.choice} and \texttt{Quot.sound}.
+
+The main results (\cref{thm_main_s4,thm_s4_short,thm_undecidable_s4,thm_r5}) carry
+\emph{no} hypotheses. The class \texttt{HasCMPPCantorCirculationHamiltonians}, which earlier
+versions assumed, is now an instance (\cref{thm_cmpp_instance}). The four-manifold corollary
+(\cref{thm_cor2}) is stated for every compact Hausdorff smooth $4$-manifold carrying an
+\texttt{AdmitsWrinkledOrBrokenLefschetzFibration} structure (\cref{def_admits}); the paper's
+version for \emph{every} closed oriented $4$-manifold additionally needs the existence of that
+structure, which is not formalized (\cref{ext_fibration_existence,cor_paper_all}).
+
+% =========================================================================
+\chapter{Interfaces: Turing completeness and volume forms}
+\label{chap_interfaces}
+
+\begin{definition}[Finite Turing machines and halting with an output window]
+\label{def_fintm0}
+\lean{S4TuringPoisson.FinTM0, S4TuringPoisson.HaltsWithWindow}
+\leanok
+A \texttt{FinTM0} is a Mathlib \texttt{Turing.TM0} machine with finite alphabet $\Gamma$ and finite
+state set $\Lambda$. $\mathrm{HaltsWithWindow}(M,t,k,w)$ says that $M$ started on tape $t$ reaches
+a terminal configuration whose tape agrees with $w$ on the cells $[-k,k]$.
+\end{definition}
+
+\begin{definition}[Turing complete self-map]
+\label{def_turing_complete}
+\lean{S4TuringPoisson.TuringCompleteWitness, S4TuringPoisson.IsTuringComplete}
+\leanok
+\uses{def_fintm0}
+$\varphi\colon X\to X$ is Turing complete if there are points $p_{M,t}$ (depending only on $(M,t)$,
+lying in a continuous injective disk chart with computable $2^{-m}$ rational approximations) and
+nonempty open sets $U_{M,k,w}$ (depending only on $(M,k,w)$, avoiding $p_{M,t}$ whenever the
+initial configuration is not terminal) such that
+$\exists n,\ \varphi^n(p_{M,t})\in U_{M,k,w} \iff \mathrm{HaltsWithWindow}(M,t,k,w)$.
+\end{definition}
+
+\begin{lemma}[Turing complete maps are not the identity]
+\label{lem_tc_ne_id}
+\lean{S4TuringPoisson.IsTuringComplete.ne_id}
+\leanok
+\uses{def_turing_complete}
+If $\varphi$ is Turing complete then $\varphi\neq\mathrm{id}$.
+\end{lemma}
+\begin{proof}\leanok
+Apply the witness to a two-state machine that halts after one step.
+\end{proof}
+
+\begin{theorem}[Undecidability of orbit reachability]
+\label{thm_undecidable_general}
+\lean{S4TuringPoisson.IsTuringComplete.undecidable_orbit_reachability}
+\leanok
+\uses{def_turing_complete}
+For a Turing complete $\varphi$, reachability of a fixed nonempty open set from computably
+approximable points is recursively enumerable but not decidable.
+\end{theorem}
+\begin{proof}\leanok
+Reduce the halting problem of Mathlib's partial recursive codes to orbit reachability, via a
+universal halting machine.
+\end{proof}
+
+\begin{lemma}[Transfer along open embeddings]
+\label{lem_transfer}
+\lean{S4TuringPoisson.IsTuringComplete.transfer}
+\leanok
+\uses{def_turing_complete}
+Turing completeness of a disk map transfers to any map that agrees with it on an open product
+$B_0\times D$ embedded in a larger space.
+\end{lemma}
+\begin{proof}\leanok
+Push the encoded points and open sets forward along the embedding.
+\end{proof}
+
+\begin{definition}[Positive volume form]
+\label{def_volume}
+\lean{S4TuringPoisson.PositiveVolumeForm}
+\leanok
+A nowhere-vanishing smooth top form together with its finite Borel measure, positive on nonempty
+open sets, such that pullback invariance implies measure preservation.
+\end{definition}
+
+\begin{definition}[Area-preserving disk isotopies]
+\label{def_disk_isotopy}
+\lean{S4TuringPoisson.AreaPreservingDiskIsotopy,
+  S4TuringPoisson.HasTuringCompleteAreaPreservingDiskIsotopy}
+\leanok
+\uses{def_turing_complete}
+Smooth isotopies of $\R^2$ with unit Jacobian, supported in a ball of radius $r_0<1$; the class
+packages one whose time-one map on the unit disk is Turing complete.
+\end{definition}
+
+% =========================================================================
+\chapter{Poisson geometry}
+\label{chap_poisson}
+
+\begin{definition}[Bivectors, Poisson structures, Hamiltonian fields]
+\label{def_poisson}
+\lean{S4TuringPoisson.SmoothBivector, S4TuringPoisson.PoissonStructure,
+  S4TuringPoisson.SmoothBivector.hamiltonianVectorField, S4TuringPoisson.SmoothBivector.IsPoissonMap,
+  S4TuringPoisson.SmoothBivector.rankAt}
+\leanok
+A smooth skew anchor $\#_\pi\colon T^*M\to TM$; a Poisson structure is one whose bracket satisfies
+the Jacobi identity. $X_h=-\#_\pi(dh)$, Poisson maps preserve brackets, and $\mathrm{rank}_x\pi$
+is the dimension of the image of $\#_{\pi,x}$.
+\end{definition}
+
+\begin{definition}[Unimodularity]
+\label{def_unimodular}
+\lean{S4TuringPoisson.PoissonStructure.IsUnimodularWithVolume,
+  S4TuringPoisson.PoissonStructure.IsUnimodularPoisson}
+\leanok
+\uses{def_poisson}
+$\pi$ is unimodular with respect to $\Omega$ if $\mathcal L_{X_h}\Omega=0$ for every $h$.
+\end{definition}
+
+\begin{definition}[Jacobian Poisson structure of a map to a surface]
+\label{def_jacobian}
+\lean{S4TuringPoisson.jacobianSmoothBivector, S4TuringPoisson.jacobianPoisson,
+  S4TuringPoisson.jacobianPoissonOfPositiveVolume}
+\leanok
+\uses{def_poisson, def_volume}
+For $f\colon M^4\to N^2$, a volume form $\Omega$ and an area form $\mu_N$, the bracket defined by
+$\{g,h\}\,\Omega = dg\wedge dh\wedge f^*\mu_N$.
+\end{definition}
+
+\begin{lemma}[Interior product of Hamiltonian fields]
+\label{lem_jacobian_interior}
+\lean{S4TuringPoisson.interior_hamiltonianVectorField_jacobianSmoothBivector,
+  S4TuringPoisson.funSMulₗ_bracket_jacobianSmoothBivector}
+\leanok
+\uses{def_jacobian}
+$\iota_{X_h}\Omega = dh\wedge f^*\mu_N$, and the defining top-form identity of the bracket holds.
+\end{lemma}
+\begin{proof}\leanok
+Pointwise linear algebra on the anchor built from $\Omega$.
+\end{proof}
+
+% =========================================================================
+\chapter{Fibrations}
+\label{chap_fibrations}
+
+\begin{definition}[Local singular models]
+\label{def_local_models}
+\lean{S4TuringPoisson.IsIndefiniteFoldAt, S4TuringPoisson.IsRealLefschetzAt}
+\leanok
+Indefinite quadratic fold and real Lefschetz singularities, defined through local charts.
+\end{definition}
+
+\begin{definition}[Wrinkled and broken Lefschetz fibrations]
+\label{def_wrinkled}
+\lean{S4TuringPoisson.WrinkledFibration, S4TuringPoisson.BrokenLefschetzFibration}
+\leanok
+\uses{def_local_models}
+A \texttt{WrinkledFibration} is a smooth map $f\colon M\to N$ with a disk-shaped open region of
+regular values over which $f$ is smoothly trivial with compact surface fiber. It places no
+constraint on the critical points; \texttt{BrokenLefschetzFibration} adds the requirement that
+every critical point is a Lefschetz point or an indefinite fold.
+\end{definition}
+
+\begin{definition}[Explicit singular fibration of $S^4$]
+\label{def_s4_fibration}
+\lean{S4TuringPoisson.s4Fibration, S4TuringPoisson.s4WrinkledFibration}
+\leanok
+\uses{def_wrinkled}
+$f(x_0,\dots,x_4)=\sigma^{-1}(x_0,x_1)$, with $\sigma^{-1}$ the inverse stereographic projection
+from the south pole, packaged as a \texttt{WrinkledFibration} with fiber $S^2$.
+\end{definition}
+
+\begin{lemma}[Critical locus of $f$]
+\label{lem_s4_crit}
+\lean{S4TuringPoisson.contMDiff_s4Fibration, S4TuringPoisson.criticalPoints_s4Fibration,
+  S4TuringPoisson.criticalPoints_s4Fibration_nonempty}
+\leanok
+\uses{def_s4_fibration}
+$f$ is smooth and $\Crit(f)=\{x_2=x_3=x_4=0\}$, a nonempty circle on which the fibers collapse to
+points (a definite fold, not the indefinite folds of Auroux--Donaldson--Katzarkov).
+\end{lemma}
+\begin{proof}\leanok
+Surjectivity of $df_x$ reduces to that of the planar projection restricted to $T_xS^4$.
+\end{proof}
+
+\begin{definition}[Fibration structure on a $4$-manifold]
+\label{def_admits}
+\lean{S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration}
+\leanok
+\uses{def_wrinkled, def_volume}
+A class packaging an ambient volume form, a \texttt{WrinkledFibration} $M\to S^2$ with compact
+fiber $F$, an area form on $F$, and positive co-orientation of the trivialization.
+\end{definition}
+
+\begin{lemma}[$S^4$ carries the fibration structure]
+\label{lem_s4_instance}
+\lean{S4TuringPoisson.instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4}
+\leanok
+\uses{def_admits, lem_s4_crit}
+$S^4$ is an instance, with fiber $S^2$ and the round volume forms.
+\end{lemma}
+\begin{proof}\leanok
+Explicit trivialization over a stereographic disk and a sign computation for co-orientation.
+\end{proof}
+
+\begin{lemma}[Darboux disk charts on surfaces]
+\label{lem_darboux}
+\lean{S4TuringPoisson.SymplecticDiskChart, S4TuringPoisson.exists_symplecticDiskChart,
+  S4TuringPoisson.SymplecticDiskChart.mpullback_embed_eq}
+\leanok
+Every nonempty symplectic surface has a disk chart pulling the area form back to a positive
+multiple of $dy_0\wedge dy_1$.
+\end{lemma}
+\begin{proof}\leanok
+TauCeti's Darboux theorem, rescaled into a ball.
+\end{proof}
+
+\begin{theorem}[Existence of the fibration structure (external input)]
+\label{ext_fibration_existence}
+\uses{def_admits}
+Every closed oriented smooth $4$-manifold admits an
+\texttt{AdmitsWrinkledOrBrokenLefschetzFibration} structure. The paper cites Gay--Kirby and Lekili.
+Because \texttt{WrinkledFibration} does not constrain singularities, an elementary local
+construction (an embedded $D^2\times S^2$ in a coordinate ball) may suffice. \textbf{Not
+formalized.}
+\end{theorem}
+
+% =========================================================================
+\chapter{The aligned volume form and the leafwise lift}
+\label{chap_lift}
+
+\begin{definition}[Aligned volume form and adapted Poisson structure]
+\label{def_aligned}
+\lean{S4TuringPoisson.alignedVolumeForm, S4TuringPoisson.alignedPositiveVolume,
+  S4TuringPoisson.adaptedJacobianPoisson}
+\leanok
+\uses{def_admits, def_jacobian}
+A volume form equal to the product form $\Phi^*(p_F^*\omega_F\wedge p_B^*\mu_B)$ over an inner
+base disk, interpolated with the ambient form by a cutoff, and the Jacobian Poisson structure it
+defines.
+\end{definition}
+
+\begin{lemma}[Equation (1): product form near the bump support]
+\label{lem_eq1}
+\lean{S4TuringPoisson.mpullback_innerPreimageOpen_alignedVolumeForm}
+\leanok
+\uses{def_aligned}
+On $f^{-1}(\text{inner disk})$ the aligned volume form is exactly the product form.
+\end{lemma}
+\begin{proof}\leanok
+The cutoff is identically $1$ there.
+\end{proof}
+
+\begin{theorem}[Unimodularity and rank of $\pi_f$]
+\label{thm_pi_f}
+\lean{S4TuringPoisson.isUnimodularWithVolume_adaptedJacobianPoisson,
+  S4TuringPoisson.isUnimodularPoisson_adaptedJacobianPoisson,
+  S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints,
+  S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_mem_criticalPoints}
+\leanok
+\uses{def_aligned, def_unimodular, lem_jacobian_interior}
+$\pi_f$ is unimodular with respect to the aligned volume form, of rank $2$ off $\Crit(f)$ and rank
+$0$ on $\Crit(f)$.
+\end{theorem}
+\begin{proof}\leanok
+$\mathcal L_{X_h}\Omega=d(dh\wedge f^*\mu)=0$; the rank is read off from $df_x$.
+\end{proof}
+
+\begin{definition}[Leafwise bump diffeomorphism]
+\label{def_leafwise}
+\lean{S4TuringPoisson.bumpProfile, S4TuringPoisson.leafwiseBumpDiffeomorphOfIsotopy}
+\leanok
+\uses{def_admits, def_disk_isotopy, lem_darboux}
+For a disk isotopy $d_t$ and base bump $\rho$, $\dbar(b,y)=(b,d_{\rho(b)}(y))$ on the trivialized
+region (through a Darboux chart of the fiber), extended by the identity.
+\end{definition}
+
+\begin{theorem}[Properties of the leafwise lift]
+\label{thm_leafwise_props}
+\lean{S4TuringPoisson.fibration_comp_leafwiseBumpDiffeomorphOfIsotopy,
+  S4TuringPoisson.mpullback_leafwiseBumpDiffeomorphOfIsotopy_alignedVolumeForm,
+  S4TuringPoisson.measurePreserving_leafwiseBumpDiffeomorphOfIsotopy,
+  S4TuringPoisson.isPoissonMap_leafwiseBumpDiffeomorphOfIsotopy}
+\leanok
+\uses{def_leafwise, lem_eq1, thm_pi_f}
+$\dbar$ preserves every fiber, the aligned volume form and its measure, and is a Poisson
+automorphism of $\pi_f$.
+\end{theorem}
+\begin{proof}\leanok
+Block-triangular wedge computation on the product region; identity elsewhere.
+\end{proof}
+
+\begin{theorem}[Turing completeness of the lift]
+\label{thm_lift_tc}
+\lean{S4TuringPoisson.leafwiseBumpDiffeomorph, S4TuringPoisson.isTuringComplete_leafwiseBumpDiffeomorph,
+  S4TuringPoisson.undecidable_orbit_reachability_leafwiseBumpDiffeomorph}
+\leanok
+\uses{def_leafwise, lem_transfer, thm_undecidable_general}
+If the disk time-one map is Turing complete, so is $\dbar$, and its orbit reachability is
+undecidable.
+\end{theorem}
+\begin{proof}\leanok
+$\rho\equiv1$ on the core disk $B_0$, so $\dbar$ equals $\mathrm{id}\times d_1$ on $B_0\times D$;
+apply \cref{lem_transfer}.
+\end{proof}
+
+% =========================================================================
+\chapter{Generalized shifts and Hamiltonian disk dynamics (CMPP21)}
+\label{chap_cmpp}
+
+\begin{definition}[Generalized shifts, reversible machines, Cantor embedding]
+\label{def_shift}
+\lean{S4TuringPoisson.GeneralizedShift, S4TuringPoisson.ReversibleTM, S4TuringPoisson.cantorDiskEmbed}
+\leanok
+Moore's generalized shifts, unidirectional reversible Turing machines with their induced shift,
+and the embedding of $\mathcal A^{\Z}$ onto a square Cantor set in the unit disk.
+\end{definition}
+
+\begin{lemma}[Reversible shifts are bijective]
+\label{lem_bijective}
+\lean{S4TuringPoisson.ReversibleTM.bijective_eval}
+\leanok
+\uses{def_shift}
+The shift of a reversible machine is a bijection of $\mathcal A^{\Z}$.
+\end{lemma}
+\begin{proof}\leanok
+Construct the inverse shift from the inverse transition permutation.
+\end{proof}
+
+\begin{definition}[Compactly supported planar Hamiltonians]
+\label{def_planar_ham}
+\lean{S4TuringPoisson.CompactlySupportedPlanarHamiltonian,
+  S4TuringPoisson.CompactlySupportedPlanarHamiltonian.toDiskIsotopy,
+  S4TuringPoisson.CompactlySupportedPlanarHamiltonian.listToDiskIsotopy,
+  S4TuringPoisson.CompactlySupportedPlanarHamiltonian.IsAutonomous}
+\leanok
+\uses{def_disk_isotopy}
+Smooth $H\colon\R\times\R^2\to\R$ vanishing outside a ball; their flows (TauCeti's ODE engine)
+are area-preserving disk isotopies, and finite lists compose.
+\end{definition}
+
+\begin{definition}[Universal reversible simulator and the CMPP class]
+\label{def_simulator}
+\lean{S4TuringPoisson.UniversalReversibleSimulator,
+  S4TuringPoisson.RealizesGeneralizedShiftByHamiltonians,
+  S4TuringPoisson.HasCMPPCantorCirculationHamiltonians}
+\leanok
+\uses{def_shift, def_planar_ham, def_fintm0}
+A reversible machine with Cantor encoding and accepting cylinder blocks (of variable radius)
+characterizing \texttt{HaltsWithWindow}; the class asks for such a simulator and a finite list of
+planar Hamiltonians whose time-one map equals the shift on the Cantor set.
+\end{definition}
+
+\begin{lemma}[Simulator to witness]
+\label{lem_sim_witness}
+\lean{S4TuringPoisson.UniversalReversibleSimulator.turingCompleteWitness,
+  S4TuringPoisson.instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP}
+\leanok
+\uses{def_simulator, def_turing_complete}
+A map conjugate to the simulator's shift on the Cantor set is Turing complete; hence the CMPP
+class yields a Turing complete area-preserving disk isotopy.
+\end{lemma}
+\begin{proof}\leanok
+Iterate the conjugacy and pull back the cylinder rectangles.
+\end{proof}
+
+\begin{lemma}[G0: disjoint target rectangles]
+\label{lem_g0}
+\lean{S4TuringPoisson.CMPP.imageRect_pairwise_disjoint}
+\leanok
+\uses{def_shift}
+For an injective shift, the images of the source Cantor rectangles are pairwise disjoint.
+\end{lemma}
+\begin{proof}\leanok
+Middle-Cantor digit gaps separate incompatible cylinders.
+\end{proof}
+
+\begin{lemma}[L1, L2: translation and stretch primitives]
+\label{lem_primitives}
+\lean{S4TuringPoisson.CMPP.exists_translation_hamiltonian,
+  S4TuringPoisson.CMPP.bumpedHyperbolicStretchIsotopy_timeOne_of_mem_rect}
+\leanok
+\uses{def_planar_ham}
+An autonomous Hamiltonian translates a compact set rigidly along a tube; a bumped hyperbolic
+Hamiltonian stretches a rectangle exactly.
+\end{lemma}
+\begin{proof}\leanok
+ODE uniqueness (\texttt{timeDependentFlowOf\_eq\_of\_hasMFDerivAt}) on explicit trajectories.
+\end{proof}
+
+\begin{theorem}[Relocation theorem]
+\label{thm_relocation}
+\lean{S4TuringPoisson.CMPP.exists_relocation_hamiltonians}
+\leanok
+\uses{lem_primitives}
+Finitely many pairwise disjoint axis-parallel rectangles can be moved by prescribed
+translation-and-stretch maps onto pairwise disjoint targets by finitely many autonomous
+Hamiltonians.
+\end{theorem}
+\begin{proof}\leanok
+Sliding lemma (decreasing left edge) plus a workbench for stretches.
+\end{proof}
+
+\begin{theorem}[Hamiltonian realization of reversible shifts]
+\label{thm_realize}
+\lean{S4TuringPoisson.CMPP.exists_autonomous_hamiltonians_realizing_reversibleTM,
+  S4TuringPoisson.hasCMPP_of_simulator, S4TuringPoisson.hasCMPP_of_simulator_isAutonomous}
+\leanok
+\uses{thm_relocation, lem_g0, lem_bijective, def_simulator}
+The shift of every reversible machine is realized exactly on the Cantor set by finitely many
+autonomous Hamiltonians supported in the ball of radius $17/20$. Consequently every universal
+reversible simulator yields an inhabitant of the CMPP class.
+\end{theorem}
+\begin{proof}\leanok
+On each source block the shift is affine (G0); apply the relocation theorem.
+\end{proof}
+
+% =========================================================================
+\chapter{Universal reversible computation}
+\label{chap_universal}
+
+\begin{theorem}[Universal $\mathrm{TM0}$ machine]
+\label{thm_universal_tm}
+\lean{TuringRecursive.U, TuringRecursive.U_evalCfg_tape}
+\leanok
+\uses{def_fintm0}
+A single \texttt{TM0} machine $U$ over a finite alphabet simulates every \texttt{TM0} code
+(companion repository \texttt{Turing-recursive}).
+\end{theorem}
+\begin{proof}\leanok
+Partial recursive evaluation of codes, compiled to \texttt{TM0}.
+\end{proof}
+
+\begin{theorem}[Exact-output windowed universal machine]
+\label{thm_universal_fintm0}
+\lean{S4TuringPoisson.Reversible.universalFinTM0,
+  S4TuringPoisson.Reversible.universalFinTM0_halts_with_cylinder_iff}
+\leanok
+\uses{thm_universal_tm}
+$U$ packaged as a \texttt{FinTM0}; $M$ halts on $t$ with window $w$ iff $U$ halts on the encoded
+input with an output in a nonempty set of accepting codes, detectable on a prefix cylinder.
+\end{theorem}
+\begin{proof}\leanok
+Prefix-free natural-number encoding of outputs.
+\end{proof}
+
+\begin{theorem}[Bennett's reversible compiler]
+\label{thm_bennett}
+\lean{S4TuringPoisson.Reversible.bennettReversibleTM, S4TuringPoisson.Reversible.bennett_orbit_halted_iff}
+\leanok
+\uses{def_shift, def_fintm0}
+Every \texttt{FinTM0} has a unidirectional reversible machine whose orbit enters the halted state
+iff the original machine halts (with the same final tape).
+\end{theorem}
+\begin{proof}\leanok
+Extend the partial injective transition rule to a permutation; history tape argument.
+\end{proof}
+
+\begin{theorem}[Unconditional universal reversible simulator]
+\label{thm_simulator}
+\lean{S4TuringPoisson.universalReversibleSimulator}
+\leanok
+\uses{thm_universal_fintm0, thm_bennett, def_simulator}
+There is a \texttt{UniversalReversibleSimulator}, with primitive recursive initial digits.
+\end{theorem}
+\begin{proof}\leanok
+Compose Bennett's compiler with the windowed universal machine.
+\end{proof}
+
+\begin{theorem}[R1: the CMPP class is inhabited]
+\label{thm_cmpp_instance}
+\lean{S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians}
+\leanok
+\uses{thm_simulator, thm_realize, lem_sim_witness}
+\texttt{HasCMPPCantorCirculationHamiltonians} has a global instance, with no hypotheses.
+\end{theorem}
+\begin{proof}\leanok
+\texttt{hasCMPP\_of\_simulator universalReversibleSimulator}.
+\end{proof}
+
+% =========================================================================
+\chapter{Main results}
+\label{chap_main}
+
+\begin{definition}[Canonical structures on $S^4$]
+\label{def_s4_structures}
+\lean{S4TuringPoisson.Main.s4AlignedPositiveVolume, S4TuringPoisson.Main.s4AdaptedPoisson,
+  S4TuringPoisson.Main.s4TuringDiffeomorph}
+\leanok
+\uses{def_aligned, lem_s4_instance, thm_lift_tc, thm_cmpp_instance}
+The aligned volume form, the adapted Jacobian Poisson structure, and the leafwise lift
+$\dbar$ of the CMPP disk isotopy on $S^4$.
+\end{definition}
+
+\begin{theorem}[Theorem 1, full form]
+\label{thm_main_s4}
+\lean{S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4}
+\leanok
+\uses{def_s4_structures, thm_pi_f, thm_leafwise_props, thm_lift_tc, lem_tc_ne_id}
+There are a positive volume form $V$, a unimodular Jacobian Poisson structure $\pi_f$ of rank $2$
+off the nonempty circle $\Crit(f)$ and rank $0$ on it, and a diffeomorphism $\dbar$ of $S^4$
+preserving $f$, $\pi_f$, $V$ and its measure, acting as an area-preserving diffeomorphism on every
+regular leaf, and Turing complete.
+\end{theorem}
+\begin{proof}\leanok
+Specialize the lift to $M=S^4$ with the CMPP instance.
+\end{proof}
+
+\begin{theorem}[Theorem 1, as stated in the paper]
+\label{thm_s4_short}
+\lean{S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_S4}
+\leanok
+\uses{thm_main_s4}
+There exists a Turing complete, volume-preserving diffeomorphism of $S^4$.
+\end{theorem}
+\begin{proof}\leanok
+Projection of \cref{thm_main_s4}.
+\end{proof}
+
+\begin{theorem}[Undecidability on $S^4$]
+\label{thm_undecidable_s4}
+\lean{S4TuringPoisson.Main.undecidable_orbit_reachability_S4}
+\leanok
+\uses{def_s4_structures, thm_lift_tc, thm_leafwise_props}
+For $\dbar$ there is a nonempty open $U\subset S^4$ such that reaching $U$ from computable points
+is r.e.\ but not decidable.
+\end{theorem}
+\begin{proof}\leanok
+\cref{thm_lift_tc} on $S^4$.
+\end{proof}
+
+\begin{theorem}[Corollary 2, formal version]
+\label{thm_cor2}
+\lean{S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold}
+\leanok
+\uses{def_admits, thm_pi_f, thm_leafwise_props, thm_lift_tc, thm_cmpp_instance}
+Every compact Hausdorff smooth $4$-manifold with an
+\texttt{AdmitsWrinkledOrBrokenLefschetzFibration} structure carries the same package as in
+\cref{thm_main_s4} (fibers of any genus).
+\end{theorem}
+\begin{proof}\leanok
+Same construction, through a Darboux disk in the fiber.
+\end{proof}
+
+\begin{corollary}[Corollary 2 as stated in the paper]
+\label{cor_paper_all}
+\uses{thm_cor2, ext_fibration_existence}
+Every closed oriented smooth $4$-manifold admits a volume-preserving, Turing complete
+diffeomorphism. \textbf{Not formalized}: it follows from \cref{thm_cor2} once
+\cref{ext_fibration_existence} is available.
+\end{corollary}
+
+\begin{definition}[Time-one flows of Poisson-Hamiltonian vector fields]
+\label{def_poisson_flows}
+\lean{S4TuringPoisson.liftPlanarHamiltonianTo4Manifold,
+  S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph,
+  S4TuringPoisson.composePoissonHamiltonianTimeOneFlows}
+\leanok
+\uses{def_aligned, def_planar_ham, lem_darboux}
+Lift of a planar Hamiltonian to $M$ by $\tilde H(\Phi^{-1}(b,C(y)))=\rho(b)\,r_C^2\,H(0,y)$;
+time-one flow of $X_{\tilde H}$ for $\pi_f$ (complete since $M$ is compact); finite compositions.
+\end{definition}
+
+\begin{theorem}[Leafwise lift equals a Poisson-Hamiltonian flow]
+\label{thm_flow_eq}
+\lean{S4TuringPoisson.hamiltonianVectorField_liftPlanarHamiltonian_embed,
+  S4TuringPoisson.leafwiseBumpDiffeomorphOfIsotopy_compSame,
+  S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_liftPlanarHamiltonian_eq,
+  S4TuringPoisson.composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq}
+\leanok
+\uses{def_poisson_flows, def_leafwise, lem_eq1, lem_jacobian_interior}
+For an autonomous planar Hamiltonian $P$, the time-one flow of $X_{\tilde P}$ equals the leafwise
+lift of $P$'s disk isotopy; the same holds for finite lists.
+\end{theorem}
+\begin{proof}\leanok
+$\iota_V\Omega = d\tilde P\wedge f^*\mu$ because $f^*(d\rho)\wedge f^*\mu=0$ on a surface base;
+then ODE uniqueness on the time-rescaled trajectory $u\mapsto P_{u\rho(b)}(y)$.
+\end{proof}
+
+\begin{theorem}[R5: Poisson-Hamiltonian realization on $S^4$]
+\label{thm_r5}
+\lean{S4TuringPoisson.exists_poisson_hamiltonian_realization_fourManifold,
+  S4TuringPoisson.exists_poisson_hamiltonian_realization_S4}
+\leanok
+\uses{thm_flow_eq, thm_main_s4, thm_cmpp_instance}
+There are finitely many smooth $\tilde H_j\colon S^4\to\R$ such that the composition $\dbar$ of
+the time-one flows of $X_{\tilde H_j}$ (for $\pi_f$) preserves $f$, $\pi_f$, the volume form and
+measure, is Turing complete, and is not the identity.
+\end{theorem}
+\begin{proof}\leanok
+Lift the autonomous CMPP generators and apply \cref{thm_flow_eq}.
+\end{proof}
+
+% =========================================================================
+\chapter{Sanity checks (anti-vacuity)}
+\label{chap_checks}
+
+\begin{lemma}[Halting/looping separation on $S^4$]
+\label{lem_gate6}
+\lean{S4TuringPoisson.Checks.gate6_foliation_and_halting_separation,
+  S4TuringPoisson.Checks.gate6_sphere4_witness,
+  S4TuringPoisson.Checks.gate6_fourManifold_corollary2_on_S4_unconditional,
+  S4TuringPoisson.Checks.gate6_poisson_hamiltonian_realization_S4}
+\leanok
+\uses{thm_main_s4, thm_cor2, thm_r5}
+For concrete halting and looping two-state machines, the $S^4$ diffeomorphism has an orbit that
+enters a positive-measure open set and another that never does.
+\end{lemma}
+\begin{proof}\leanok
+Instantiate the witness on the two machines.
+\end{proof}
+
+\begin{lemma}[Concrete Hamiltonian and simulator witnesses]
+\label{lem_concrete}
+\lean{S4TuringPoisson.Checks.R_flipRight_realized_by_autonomous_hamiltonians,
+  S4TuringPoisson.Checks.universalReversibleSimulator_sanity,
+  S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_s4Rotation_ne_refl,
+  S4TuringPoisson.Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional}
+\leanok
+\uses{thm_realize, thm_simulator, thm_flow_eq, thm_leafwise_props}
+A two-state reversible machine is realized by a nonempty list of autonomous Hamiltonians with
+time-one map $\neq\mathrm{id}$; the universal simulator separates halting from looping; a lifted
+rotation Hamiltonian has nontrivial time-one flow on $S^4$.
+\end{lemma}
+\begin{proof}\leanok
+Direct computation.
+\end{proof}

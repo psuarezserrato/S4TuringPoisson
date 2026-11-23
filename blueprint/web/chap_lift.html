@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The aligned volume form and the leafwise lift</title>
+<link rel="next" href="chap_cmpp.html" title="Generalized shifts and Hamiltonian disk dynamics (CMPP21)" />
+<link rel="prev" href="chap_fibrations.html" title="Fibrations" />
+<link rel="up" href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of S4" />
+<link rel="stylesheet" href="styles/theme-blue.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)</a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap_status.html"><span class="toc_ref">1</span> <span class="toc_entry">Status and conventions</span></a>
+ </li>
+<li class="">
+  <a href="chap_interfaces.html"><span class="toc_ref">2</span> <span class="toc_entry">Interfaces: Turing completeness and volume forms</span></a>
+ </li>
+<li class="">
+  <a href="chap_poisson.html"><span class="toc_ref">3</span> <span class="toc_entry">Poisson geometry</span></a>
+ </li>
+<li class="">
+  <a href="chap_fibrations.html"><span class="toc_ref">4</span> <span class="toc_entry">Fibrations</span></a>
+ </li>
+<li class=" active current">
+  <a href="chap_lift.html"><span class="toc_ref">5</span> <span class="toc_entry">The aligned volume form and the leafwise lift</span></a>
+ </li>
+<li class="">
+  <a href="chap_cmpp.html"><span class="toc_ref">6</span> <span class="toc_entry">Generalized shifts and Hamiltonian disk dynamics (CMPP21)</span></a>
+ </li>
+<li class="">
+  <a href="chap_universal.html"><span class="toc_ref">7</span> <span class="toc_entry">Universal reversible computation</span></a>
+ </li>
+<li class="">
+  <a href="chap_main.html"><span class="toc_ref">8</span> <span class="toc_entry">Main results</span></a>
+ </li>
+<li class="">
+  <a href="chap_checks.html"><span class="toc_ref">9</span> <span class="toc_entry">Sanity checks (anti-vacuity)</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap_lift">5 The aligned volume form and the leafwise lift</h1>
+
+<div class="definition_thmwrapper theorem-style-definition" id="def_aligned">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.1</span>
+    <span class="definition_thmtitle">Aligned volume form and adapted Poisson structure</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#def_aligned">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_fibrations.html#def_admits">Definition 4.5</a></li>
+          
+          <li><a href="chap_poisson.html#def_jacobian">Definition 3.3</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.alignedVolumeForm" class="lean_decl">S4TuringPoisson.alignedVolumeForm</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.alignedPositiveVolume" class="lean_decl">S4TuringPoisson.alignedPositiveVolume</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.adaptedJacobianPoisson" class="lean_decl">S4TuringPoisson.adaptedJacobianPoisson</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>    A volume form equal to the product form \(\Phi ^*(p_F^*\omega _F\wedge p_B^*\mu _B)\) over an inner base disk, interpolated with the ambient form by a cutoff, and the Jacobian Poisson structure it defines. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem_eq1">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">5.2</span>
+    <span class="lemma_thmtitle">Equation (1): product form near the bump support</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#lem_eq1">#</a>
+    
+    <a class="icon proof" href="chap_lift.html#a0000000009"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_lift.html#def_aligned">Definition 5.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.mpullback_innerPreimageOpen_alignedVolumeForm" class="lean_decl">S4TuringPoisson.mpullback_innerPreimageOpen_alignedVolumeForm</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    On \(f^{-1}(\text{inner disk})\) the aligned volume form is exactly the product form. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000009">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The cutoff is identically \(1\) there. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_pi_f">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">5.3</span>
+    <span class="theorem_thmtitle">Unimodularity and rank of \(\pi _f\)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#thm_pi_f">#</a>
+    
+    <a class="icon proof" href="chap_lift.html#a0000000010"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_lift.html#def_aligned">Definition 5.1</a></li>
+          
+          <li><a href="chap_poisson.html#def_unimodular">Definition 3.2</a></li>
+          
+          <li><a href="chap_poisson.html#lem_jacobian_interior">Lemma 3.4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.isUnimodularWithVolume_adaptedJacobianPoisson" class="lean_decl">S4TuringPoisson.isUnimodularWithVolume_adaptedJacobianPoisson</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.isUnimodularPoisson_adaptedJacobianPoisson" class="lean_decl">S4TuringPoisson.isUnimodularPoisson_adaptedJacobianPoisson</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints" class="lean_decl">S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_mem_criticalPoints" class="lean_decl">S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_mem_criticalPoints</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    \(\pi _f\) is unimodular with respect to the aligned volume form, of rank \(2\) off \(\mathrm{Crit}(f)\) and rank \(0\) on \(\mathrm{Crit}(f)\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000010">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>\(\mathcal L_{X_h}\Omega =d(dh\wedge f^*\mu )=0\); the rank is read off from \(df_x\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def_leafwise">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">5.4</span>
+    <span class="definition_thmtitle">Leafwise bump diffeomorphism</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#def_leafwise">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_fibrations.html#def_admits">Definition 4.5</a></li>
+          
+          <li><a href="chap_interfaces.html#def_disk_isotopy">Definition 2.7</a></li>
+          
+          <li><a href="chap_fibrations.html#lem_darboux">Lemma 4.7</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.bumpProfile" class="lean_decl">S4TuringPoisson.bumpProfile</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.leafwiseBumpDiffeomorphOfIsotopy" class="lean_decl">S4TuringPoisson.leafwiseBumpDiffeomorphOfIsotopy</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>    For a disk isotopy \(d_t\) and base bump \(\rho \), \(\overline{d}(b,y)=(b,d_{\rho (b)}(y))\) on the trivialized region (through a Darboux chart of the fiber), extended by the identity. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_leafwise_props">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">5.5</span>
+    <span class="theorem_thmtitle">Properties of the leafwise lift</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#thm_leafwise_props">#</a>
+    
+    <a class="icon proof" href="chap_lift.html#a0000000011"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_lift.html#def_leafwise">Definition 5.4</a></li>
+          
+          <li><a href="chap_lift.html#lem_eq1">Lemma 5.2</a></li>
+          
+          <li><a href="chap_lift.html#thm_pi_f">Theorem 5.3</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.fibration_comp_leafwiseBumpDiffeomorphOfIsotopy" class="lean_decl">S4TuringPoisson.fibration_comp_leafwiseBumpDiffeomorphOfIsotopy</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.mpullback_leafwiseBumpDiffeomorphOfIsotopy_alignedVolumeForm" class="lean_decl">S4TuringPoisson.mpullback_leafwiseBumpDiffeomorphOfIsotopy_alignedVolumeForm</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.measurePreserving_leafwiseBumpDiffeomorphOfIsotopy" class="lean_decl">S4TuringPoisson.measurePreserving_leafwiseBumpDiffeomorphOfIsotopy</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.isPoissonMap_leafwiseBumpDiffeomorphOfIsotopy" class="lean_decl">S4TuringPoisson.isPoissonMap_leafwiseBumpDiffeomorphOfIsotopy</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    \(\overline{d}\) preserves every fiber, the aligned volume form and its measure, and is a Poisson automorphism of \(\pi _f\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000011">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Block-triangular wedge computation on the product region; identity elsewhere. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_lift_tc">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">5.6</span>
+    <span class="theorem_thmtitle">Turing completeness of the lift</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#thm_lift_tc">#</a>
+    
+    <a class="icon proof" href="chap_lift.html#a0000000012"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_lift.html#def_leafwise">Definition 5.4</a></li>
+          
+          <li><a href="chap_interfaces.html#lem_transfer">Lemma 2.5</a></li>
+          
+          <li><a href="chap_interfaces.html#thm_undecidable_general">Theorem 2.4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.leafwiseBumpDiffeomorph" class="lean_decl">S4TuringPoisson.leafwiseBumpDiffeomorph</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.isTuringComplete_leafwiseBumpDiffeomorph" class="lean_decl">S4TuringPoisson.isTuringComplete_leafwiseBumpDiffeomorph</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.undecidable_orbit_reachability_leafwiseBumpDiffeomorph" class="lean_decl">S4TuringPoisson.undecidable_orbit_reachability_leafwiseBumpDiffeomorph</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    If the disk time-one map is Turing complete, so is \(\overline{d}\), and its orbit reachability is undecidable. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000012">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>\(\rho \equiv 1\) on the core disk \(B_0\), so \(\overline{d}\) equals \(\mathrm{id}\times d_1\) on \(B_0\times D\); apply <a href="chap_interfaces.html#lem_transfer">lemma 2.5</a>. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap_fibrations.html" title="Fibrations"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap_cmpp.html" title="Generalized shifts and Hamiltonian disk dynamics (CMPP21)"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

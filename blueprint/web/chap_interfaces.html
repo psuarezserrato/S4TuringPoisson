@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interfaces: Turing completeness and volume forms</title>
+<link rel="next" href="chap_poisson.html" title="Poisson geometry" />
+<link rel="prev" href="chap_status.html" title="Status and conventions" />
+<link rel="up" href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of S4" />
+<link rel="stylesheet" href="styles/theme-blue.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)</a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap_status.html"><span class="toc_ref">1</span> <span class="toc_entry">Status and conventions</span></a>
+ </li>
+<li class=" active current">
+  <a href="chap_interfaces.html"><span class="toc_ref">2</span> <span class="toc_entry">Interfaces: Turing completeness and volume forms</span></a>
+ </li>
+<li class="">
+  <a href="chap_poisson.html"><span class="toc_ref">3</span> <span class="toc_entry">Poisson geometry</span></a>
+ </li>
+<li class="">
+  <a href="chap_fibrations.html"><span class="toc_ref">4</span> <span class="toc_entry">Fibrations</span></a>
+ </li>
+<li class="">
+  <a href="chap_lift.html"><span class="toc_ref">5</span> <span class="toc_entry">The aligned volume form and the leafwise lift</span></a>
+ </li>
+<li class="">
+  <a href="chap_cmpp.html"><span class="toc_ref">6</span> <span class="toc_entry">Generalized shifts and Hamiltonian disk dynamics (CMPP21)</span></a>
+ </li>
+<li class="">
+  <a href="chap_universal.html"><span class="toc_ref">7</span> <span class="toc_entry">Universal reversible computation</span></a>
+ </li>
+<li class="">
+  <a href="chap_main.html"><span class="toc_ref">8</span> <span class="toc_entry">Main results</span></a>
+ </li>
+<li class="">
+  <a href="chap_checks.html"><span class="toc_ref">9</span> <span class="toc_entry">Sanity checks (anti-vacuity)</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap_interfaces">2 Interfaces: Turing completeness and volume forms</h1>
+
+<div class="definition_thmwrapper theorem-style-definition" id="def_fintm0">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.1</span>
+    <span class="definition_thmtitle">Finite Turing machines and halting with an output window</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#def_fintm0">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.FinTM0" class="lean_decl">S4TuringPoisson.FinTM0</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.HaltsWithWindow" class="lean_decl">S4TuringPoisson.HaltsWithWindow</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   A <span class="ttfamily">FinTM0</span> is a Mathlib <span class="ttfamily">Turing.TM0</span> machine with finite alphabet \(\Gamma \) and finite state set \(\Lambda \). \(\mathrm{HaltsWithWindow}(M,t,k,w)\) says that \(M\) started on tape \(t\) reaches a terminal configuration whose tape agrees with \(w\) on the cells \([-k,k]\). </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def_turing_complete">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.2</span>
+    <span class="definition_thmtitle">Turing complete self-map</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#def_turing_complete">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_fintm0">Definition 2.1</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.TuringCompleteWitness" class="lean_decl">S4TuringPoisson.TuringCompleteWitness</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsTuringComplete" class="lean_decl">S4TuringPoisson.IsTuringComplete</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>    \(\varphi \colon X\to X\) is Turing complete if there are points \(p_{M,t}\) (depending only on \((M,t)\), lying in a continuous injective disk chart with computable \(2^{-m}\) rational approximations) and nonempty open sets \(U_{M,k,w}\) (depending only on \((M,k,w)\), avoiding \(p_{M,t}\) whenever the initial configuration is not terminal) such that \(\exists n,\  \varphi ^n(p_{M,t})\in U_{M,k,w} \iff \mathrm{HaltsWithWindow}(M,t,k,w)\). </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem_tc_ne_id">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">2.3</span>
+    <span class="lemma_thmtitle">Turing complete maps are not the identity</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#lem_tc_ne_id">#</a>
+    
+    <a class="icon proof" href="chap_interfaces.html#a0000000002"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_turing_complete">Definition 2.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsTuringComplete.ne_id" class="lean_decl">S4TuringPoisson.IsTuringComplete.ne_id</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    If \(\varphi \) is Turing complete then \(\varphi \neq \mathrm{id}\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000002">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Apply the witness to a two-state machine that halts after one step. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_undecidable_general">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">2.4</span>
+    <span class="theorem_thmtitle">Undecidability of orbit reachability</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#thm_undecidable_general">#</a>
+    
+    <a class="icon proof" href="chap_interfaces.html#a0000000003"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_turing_complete">Definition 2.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsTuringComplete.undecidable_orbit_reachability" class="lean_decl">S4TuringPoisson.IsTuringComplete.undecidable_orbit_reachability</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    For a Turing complete \(\varphi \), reachability of a fixed nonempty open set from computably approximable points is recursively enumerable but not decidable. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000003">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Reduce the halting problem of Mathlib’s partial recursive codes to orbit reachability, via a universal halting machine. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem_transfer">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">2.5</span>
+    <span class="lemma_thmtitle">Transfer along open embeddings</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#lem_transfer">#</a>
+    
+    <a class="icon proof" href="chap_interfaces.html#a0000000004"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_turing_complete">Definition 2.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsTuringComplete.transfer" class="lean_decl">S4TuringPoisson.IsTuringComplete.transfer</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    Turing completeness of a disk map transfers to any map that agrees with it on an open product \(B_0\times D\) embedded in a larger space. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000004">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Push the encoded points and open sets forward along the embedding. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def_volume">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.6</span>
+    <span class="definition_thmtitle">Positive volume form</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#def_volume">#</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.PositiveVolumeForm" class="lean_decl">S4TuringPoisson.PositiveVolumeForm</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   A nowhere-vanishing smooth top form together with its finite Borel measure, positive on nonempty open sets, such that pullback invariance implies measure preservation. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def_disk_isotopy">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">2.7</span>
+    <span class="definition_thmtitle">Area-preserving disk isotopies</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_interfaces.html#def_disk_isotopy">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_turing_complete">Definition 2.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AreaPreservingDiskIsotopy" class="lean_decl">S4TuringPoisson.AreaPreservingDiskIsotopy</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.HasTuringCompleteAreaPreservingDiskIsotopy" class="lean_decl">S4TuringPoisson.HasTuringCompleteAreaPreservingDiskIsotopy</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>    Smooth isotopies of \(\mathbb {R}^2\) with unit Jacobian, supported in a ball of radius \(r_0{\lt}1\); the class packages one whose time-one map on the unit disk is Turing complete. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap_status.html" title="Status and conventions"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+  <a href="chap_poisson.html" title="Poisson geometry"><svg  class="icon icon-arrow-right "><use xlink:href="symbol-defs.svg#icon-arrow-right"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>

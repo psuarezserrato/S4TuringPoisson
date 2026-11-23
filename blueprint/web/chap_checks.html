@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+  MathJax = { 
+    tex: {
+		    inlineMath: [['$','$'], ['\\(','\\)']]
+	} }
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<meta name="generator" content="plasTeX" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sanity checks (anti-vacuity)</title>
+<link rel="prev" href="chap_main.html" title="Main results" />
+<link rel="up" href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of S4" />
+<link rel="stylesheet" href="styles/theme-blue.css" />
+<link rel="stylesheet" href="styles/amsthm.css" />
+<link rel="stylesheet" href="styles/showmore.css" />
+<link rel="stylesheet" href="styles/blueprint.css" />
+<link rel="stylesheet" href="styles/extra_styles.css" />
+</head>
+
+<body>
+<header>
+<svg  id="toc-toggle" class="icon icon-list-numbered "><use xlink:href="symbol-defs.svg#icon-list-numbered"></use></svg>
+<h1 id="doc_title"><a href="index.html">Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)</a></h1>
+</header>
+
+<div class="wrapper">
+<nav class="toc">
+<ul class="sub-toc-0">
+<li class="">
+  <a href="chap_status.html"><span class="toc_ref">1</span> <span class="toc_entry">Status and conventions</span></a>
+ </li>
+<li class="">
+  <a href="chap_interfaces.html"><span class="toc_ref">2</span> <span class="toc_entry">Interfaces: Turing completeness and volume forms</span></a>
+ </li>
+<li class="">
+  <a href="chap_poisson.html"><span class="toc_ref">3</span> <span class="toc_entry">Poisson geometry</span></a>
+ </li>
+<li class="">
+  <a href="chap_fibrations.html"><span class="toc_ref">4</span> <span class="toc_entry">Fibrations</span></a>
+ </li>
+<li class="">
+  <a href="chap_lift.html"><span class="toc_ref">5</span> <span class="toc_entry">The aligned volume form and the leafwise lift</span></a>
+ </li>
+<li class="">
+  <a href="chap_cmpp.html"><span class="toc_ref">6</span> <span class="toc_entry">Generalized shifts and Hamiltonian disk dynamics (CMPP21)</span></a>
+ </li>
+<li class="">
+  <a href="chap_universal.html"><span class="toc_ref">7</span> <span class="toc_entry">Universal reversible computation</span></a>
+ </li>
+<li class="">
+  <a href="chap_main.html"><span class="toc_ref">8</span> <span class="toc_entry">Main results</span></a>
+ </li>
+<li class=" active current">
+  <a href="chap_checks.html"><span class="toc_ref">9</span> <span class="toc_entry">Sanity checks (anti-vacuity)</span></a>
+ </li>
+<li ><a href="dep_graph_document.html">Dependency graph</a></li>
+</ul>
+</nav>
+
+<div class="content">
+<div class="content-wrapper">
+
+
+<div class="main-text">
+<h1 id="chap_checks">9 Sanity checks (anti-vacuity)</h1>
+
+<div class="lemma_thmwrapper theorem-style-plain" id="lem_gate6">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">9.1</span>
+    <span class="lemma_thmtitle">Halting/looping separation on \(S^4\)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_checks.html#lem_gate6">#</a>
+    
+    <a class="icon proof" href="chap_checks.html#a0000000030"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_main.html#thm_main_s4">Theorem 8.2</a></li>
+          
+          <li><a href="chap_main.html#thm_cor2">Theorem 8.5</a></li>
+          
+          <li><a href="chap_main.html#thm_r5">Theorem 8.9</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate6_foliation_and_halting_separation" class="lean_decl">S4TuringPoisson.Checks.gate6_foliation_and_halting_separation</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate6_sphere4_witness" class="lean_decl">S4TuringPoisson.Checks.gate6_sphere4_witness</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate6_fourManifold_corollary2_on_S4_unconditional" class="lean_decl">S4TuringPoisson.Checks.gate6_fourManifold_corollary2_on_S4_unconditional</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate6_poisson_hamiltonian_realization_S4" class="lean_decl">S4TuringPoisson.Checks.gate6_poisson_hamiltonian_realization_S4</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    For concrete halting and looping two-state machines, the \(S^4\) diffeomorphism has an orbit that enters a positive-measure open set and another that never does. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000030">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Instantiate the witness on the two machines. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem_concrete">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">9.2</span>
+    <span class="lemma_thmtitle">Concrete Hamiltonian and simulator witnesses</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_checks.html#lem_concrete">#</a>
+    
+    <a class="icon proof" href="chap_checks.html#a0000000031"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_cmpp.html#thm_realize">Theorem 6.9</a></li>
+          
+          <li><a href="chap_universal.html#thm_simulator">Theorem 7.4</a></li>
+          
+          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.8</a></li>
+          
+          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.5</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.R_flipRight_realized_by_autonomous_hamiltonians" class="lean_decl">S4TuringPoisson.Checks.R_flipRight_realized_by_autonomous_hamiltonians</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.universalReversibleSimulator_sanity" class="lean_decl">S4TuringPoisson.Checks.universalReversibleSimulator_sanity</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_s4Rotation_ne_refl" class="lean_decl">S4TuringPoisson.poissonHamiltonianTimeOneDiffeomorph_s4Rotation_ne_refl</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional" class="lean_decl">S4TuringPoisson.Main.exists_nontrivial_volumePreserving_poissonDiffeomorph_S4_unconditional</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    A two-state reversible machine is realized by a nonempty list of autonomous Hamiltonians with time-one map \(\neq \mathrm{id}\); the universal simulator separates halting from looping; a lifted rotation Hamiltonian has nontrivial time-one flow on \(S^4\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000031">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Direct computation. </p>
+
+  </div>
+</div>
+
+</div> <!--main-text -->
+</div> <!-- content-wrapper -->
+</div> <!-- content -->
+</div> <!-- wrapper -->
+
+<nav class="prev_up_next">
+  <svg  id="showmore-minus" class="icon icon-eye-minus showmore"><use xlink:href="symbol-defs.svg#icon-eye-minus"></use></svg>
+
+  <svg  id="showmore-plus" class="icon icon-eye-plus showmore"><use xlink:href="symbol-defs.svg#icon-eye-plus"></use></svg>
+
+  <a href="chap_main.html" title="Main results"><svg  class="icon icon-arrow-left "><use xlink:href="symbol-defs.svg#icon-arrow-left"></use></svg>
+</a>
+  <a href="index.html" title="Turing Complete, Volume-Preserving Poisson Diffeomorphisms of \(S^4\)"><svg  class="icon icon-arrow-up "><use xlink:href="symbol-defs.svg#icon-arrow-up"></use></svg>
+</a>
+</nav>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/plastex.js"></script>
+<script type="text/javascript" src="js/svgxuse.js"></script>
+<script type="text/javascript" src="js/js.cookie.min.js"></script>
+<script type="text/javascript" src="js/showmore.js"></script>
+</body>
+</html>
