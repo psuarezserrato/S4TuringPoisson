@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.cmppR0_lt_one",
+  "raw_name": "cmppR0_lt_one",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "theorem cmppR0_lt_one : cmppR0 < 1",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:15:40Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.cmppR0",
+    "S4TuringPoisson.CMPP.AxisRect.center_one",
+    "S4TuringPoisson.CMPP.cantorPrefixCode_one",
+    "S4TuringPoisson.CMPP.scaledCantorCoord_shift_one"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem cmppR0_lt_one : cmppR0 < 1 :=\n  by\n  norm_compress\n  linarith",
+      "proof_body": "by\n  norm_compress\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_1.lean:94:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_1.lean:93:2: error: unsolved goals\n\u22a2 cmppR0 < 1",
+      "error_class": "unsolved goals",
+      "latency_ms": 13694.73,
+      "lean_ms": 9479.57,
+      "tokens": 34,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem cmppR0_lt_one : cmppR0 < 1 :=\n  by\n  unfold cmppR0\n  norm_compress",
+      "proof_body": "by\n  unfold cmppR0\n  norm_compress",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_2.lean:95:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_2.lean:93:2: error: unsolved goals\n\u22a2 17 / 20 < 1",
+      "error_class": "unsolved goals",
+      "latency_ms": 16246.38,
+      "lean_ms": 6688.39,
+      "tokens": 38,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem cmppR0_lt_one : cmppR0 < 1 :=\n  by\n  unfold cmppR0\n  norm_compress",
+      "proof_body": "by\n  unfold cmppR0\n  norm_compress",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_3.lean:95:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_3.lean:93:2: error: unsolved goals\n\u22a2 17 / 20 < 1",
+      "error_class": "unsolved goals",
+      "latency_ms": 15443.45,
+      "lean_ms": 7121.16,
+      "tokens": 38,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem cmppR0_lt_one : cmppR0 < 1 :=\n  by\n  unfold cmppR0\n  norm_compress",
+      "proof_body": "by\n  unfold cmppR0\n  norm_compress",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_4.lean:95:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_4.lean:93:2: error: unsolved goals\n\u22a2 17 / 20 < 1",
+      "error_class": "unsolved goals",
+      "latency_ms": 16246.92,
+      "lean_ms": 6621.64,
+      "tokens": 38,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem cmppR0_lt_one : cmppR0 < 1 :=\n  by\n  unfold cmppR0\n  norm_compress",
+      "proof_body": "by\n  unfold cmppR0\n  norm_compress",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_5.lean:95:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_lt_one_5.lean:93:2: error: unsolved goals\n\u22a2 17 / 20 < 1",
+      "error_class": "unsolved goals",
+      "latency_ms": 16102.06,
+      "lean_ms": 6699.32,
+      "tokens": 38,
+      "accepted": false
+    }
+  ]
+}

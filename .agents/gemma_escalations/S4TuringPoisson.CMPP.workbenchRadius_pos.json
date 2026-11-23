@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.workbenchRadius_pos",
+  "raw_name": "workbenchRadius_pos",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "theorem workbenchRadius_pos : 0 < workbenchRadius",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:24:11Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.workbenchRadius",
+    "S4TuringPoisson.CMPP.workbenchCenter",
+    "S4TuringPoisson.baseRadius_pos",
+    "S4TuringPoisson.s4BaseDiskRadius_pos"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem workbenchRadius_pos : 0 < workbenchRadius :=\n  by\n  norm_approx",
+      "proof_body": "by\n  norm_approx",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_1.lean:98:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_1.lean:97:2: error: unsolved goals\n\u22a2 0 < workbenchRadius",
+      "error_class": "unsolved goals",
+      "latency_ms": 13682.05,
+      "lean_ms": 9600.37,
+      "tokens": 24,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem workbenchRadius_pos : 0 < workbenchRadius :=\n  by\n  unfold workbenchRadius\n  norm_approx",
+      "proof_body": "by\n  unfold workbenchRadius\n  norm_approx",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_2.lean:99:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_2.lean:97:2: error: unsolved goals\n\u22a2 0 < 3 / 10",
+      "error_class": "unsolved goals",
+      "latency_ms": 15555.36,
+      "lean_ms": 6445.34,
+      "tokens": 30,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem workbenchRadius_pos : 0 < workbenchRadius :=\n  by\n  unfold workbenchRadius\n  norm_approx",
+      "proof_body": "by\n  unfold workbenchRadius\n  norm_approx",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_3.lean:99:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_3.lean:97:2: error: unsolved goals\n\u22a2 0 < 3 / 10",
+      "error_class": "unsolved goals",
+      "latency_ms": 15685.85,
+      "lean_ms": 6880.22,
+      "tokens": 30,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem workbenchRadius_pos : 0 < workbenchRadius :=\n  by\n  unfold workbenchRadius\n  norm_approx",
+      "proof_body": "by\n  unfold workbenchRadius\n  norm_approx",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_4.lean:99:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_4.lean:97:2: error: unsolved goals\n\u22a2 0 < 3 / 10",
+      "error_class": "unsolved goals",
+      "latency_ms": 15682.24,
+      "lean_ms": 6565.93,
+      "tokens": 30,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem workbenchRadius_pos : 0 < workbenchRadius :=\n  by\n  unfold workbenchRadius\n  norm_approx",
+      "proof_body": "by\n  unfold workbenchRadius\n  norm_approx",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_5.lean:99:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchRadius_pos_5.lean:97:2: error: unsolved goals\n\u22a2 0 < 3 / 10",
+      "error_class": "unsolved goals",
+      "latency_ms": 17151.68,
+      "lean_ms": 6753.03,
+      "tokens": 30,
+      "accepted": false
+    }
+  ]
+}

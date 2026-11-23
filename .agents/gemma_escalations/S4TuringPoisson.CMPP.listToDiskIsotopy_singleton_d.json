@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d",
+  "raw_name": "listToDiskIsotopy_singleton_d",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:10:02Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.listToDiskIsotopy",
+    "S4TuringPoisson.CompactlySupportedPlanarHamiltonian.toDiskIsotopy",
+    "S4TuringPoisson.CMPP.exists_translation_hamiltonian",
+    "S4TuringPoisson.CMPP.exists_translation_hamiltonian_isotopy"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y) :=\n  by\n  rcases listToDiskIsotopy_cons hr\u2080 P [] as h\n  have h_comp : (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]) = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [])\n  rfl\n  simp [listToDiskIsotopy_cons]\n  simp [listToDiskIsotopy]\n  rfl",
+      "proof_body": "by\n  rcases listToDiskIsotopy_cons hr\u2080 P [] as h\n  have h_comp : (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]) = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [])\n  rfl\n  simp [listToDiskIsotopy_cons]\n  simp [listToDiskIsotopy]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_1.lean:87:169: error: unexpected identifier; expected ':=' or '|'",
+      "error_class": "syntax",
+      "latency_ms": 30942.21,
+      "lean_ms": 6858.43,
+      "tokens": 213,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y) :=\n  by\n  have h_list : CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P] = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "proof_body": "by\n  have h_list : CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P] = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_2.lean:86:16: error(lean.unknownIdentifier): Unknown identifier `CompactlySupportedPlanarHamilton.listToDiskIsotopy`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_2.lean:86:103: error(lean.unknownIdentifier): Unknown identifier `CompactlySupportedPlanarHamilton.listToDiskIsotopy`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_2.lean:87:4: error(lean.unknownIdentifier): Unknown identifier `listToDiskIsotopy_cons`",
+      "error_class": "unknown identifier",
+      "latency_ms": 30626.21,
+      "lean_ms": 7068.79,
+      "tokens": 181,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y) :=\n  by\n  let Is := CompactlySupportedPlanarHamiltonian.listToIsotopy\n  have h : CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P] = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    by_reflect listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "proof_body": "by\n  let Is := CompactlySupportedPlanarHamiltonian.listToIsotopy\n  have h : CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P] = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    by_reflect listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_3.lean:86:12: error(lean.unknownIdentifier): Unknown constant `S4TuringPoisson.CompactlySupportedPlanarHamiltonian.listToIsotopy`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_3.lean:85:2: error: unsolved goals\nr\u2080 : \u211d\nhr\u2080 : r\u2080 \u2208 Ioo 0 1\nP : CompactlySupportedPlanarHamiltonian r\u2080\nt : \u211d\ny : EuclideanPlane\n\u22a2 (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) = P.toDiskIsotopy.d (t, y)",
+      "error_class": "unknown identifier",
+      "latency_ms": 31654.92,
+      "lean_ms": 6785.83,
+      "tokens": 199,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y) :=\n  by\n  have h : (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P]) = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "proof_body": "by\n  have h : (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 [P]) = P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamilton.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_4.lean:86:12: error(lean.unknownIdentifier): Unknown identifier `CompactlySupportedPlanarHamilton.listToDiskIsotopy`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_4.lean:86:100: error(lean.unknownIdentifier): Unknown identifier `CompactlySupportedPlanarHamilton.listToDiskIsotopy`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_4.lean:87:4: error(lean.unknownIdentifier): Unknown identifier `listToDiskIsotopy_cons`",
+      "error_class": "unknown identifier",
+      "latency_ms": 29510.61,
+      "lean_ms": 8377.83,
+      "tokens": 180,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem listToDiskIsotopy_singleton_d {r\u2080 : \u211d} (hr\u2080 : r\u2080 \u2208 Set.Ioo (0 : \u211d) 1)\n    (P : CompactlySupportedPlanarHamiltonian r\u2080) (t : \u211d) (y : EuclideanPlane) :\n    (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]).d (t, y) =\n      P.toDiskIsotopy.d (t, y) :=\n  by\n  have h : (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]) = \n    P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "proof_body": "by\n  have h : (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 [P]) = \n    P.toDiskIsotopy.compSame (CompactlySupportedPlanarHamiltonian.listToDiskIsotopy hr\u2080 []) :=\n    listToDiskIsotopy_cons hr\u2080 P []\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.listToDiskIsotopy_singleton_d_5.lean:88:4: error(lean.unknownIdentifier): Unknown identifier `listToDiskIsotopy_cons`",
+      "error_class": "unknown identifier",
+      "latency_ms": 28847.74,
+      "lean_ms": 8508.74,
+      "tokens": 185,
+      "accepted": false
+    }
+  ]
+}
