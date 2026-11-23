@@ -10,6 +10,7 @@ public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
 public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Dynamics.Reversible.Bennett
+public import S4TuringPoisson.Dynamics.Reversible.Universal
 public import S4TuringPoisson.Smoothing.DiskSmoothing
 public import S4TuringPoisson.Smoothing.CMPP.Digits
 public import S4TuringPoisson.Smoothing.CMPP.Primitives

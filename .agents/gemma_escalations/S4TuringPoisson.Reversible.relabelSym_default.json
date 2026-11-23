@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.relabelSym_default",
+  "raw_name": "relabelSym_default",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+  "milestone": "B2",
+  "tier": "T0",
+  "statement": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T04:32:33Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.Reversible.relabelSym",
+    "S4TuringPoisson.Reversible.relabelSym_injective",
+    "S4TuringPoisson.Reversible.relabel_evalCfg",
+    "S4TuringPoisson.Reversible.encodeInputList"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0 :=\n  by\n  unfold relabelSym\n  rcases (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1 as \u27e8f, hf, hf_inj\u27e9\n  have h : (f default) = 0 := by\n    obtain \u27e8h_eq\u27e9 := hf (by constructor; refl)\n    \u00b7 exact h_eq\n    \u00b7 constructor\n    \u00b7 mutt\n  -- The definition of PointedMap requires that the mapping of the default element is 0.\n  -- In Mathlib/Theory, PointedMap's definition implies this property.\n  simp [PointedMap]",
+      "proof_body": "by\n  unfold relabelSym\n  rcases (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1 as \u27e8f, hf, hf_inj\u27e9\n  have h : (f default) = 0 := by\n    obtain \u27e8h_eq\u27e9 := hf (by constructor; refl)\n    \u00b7 exact h_eq\n    \u00b7 constructor\n    \u00b7 mutt\n  -- The definition of PointedMap requires that the mapping of the default element is 0.\n  -- In Mathlib/Theory, PointedMap's definition implies this property.\n  simp [PointedMap]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_1.lean:113:42: error: unknown tactic",
+      "error_class": "syntax",
+      "latency_ms": 27051.35,
+      "lean_ms": 6698.05,
+      "tokens": 177,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0 :=\n  by\n  unfold relabelSym\n  let (f, hf, hf_inj) := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  have h : f default = 0 := hf (by constructor; refl)\n  simp at h\n  exact h",
+      "proof_body": "by\n  unfold relabelSym\n  let (f, hf, hf_inj) := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  have h : f default = 0 := hf (by constructor; refl)\n  simp at h\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_2.lean:112:49: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_2.lean:111:6: error: Type mismatch\n  (f, hf, hf_inj)\nhas type\n  ?m.24 \u00d7 ?m.25 \u00d7 ?m.26\nof sort `Type (max ?u.21 ?u.22 ?u.23)` but is expected to have type\n  Function.Injective \u22ef.choose.f\nof sort `Prop`",
+      "error_class": "type mismatch",
+      "latency_ms": 22207.26,
+      "lean_ms": 6465.12,
+      "tokens": 107,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0 :=\n  by\n  unfold relabelSym\n  let (f, hf, hf_inj) := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "proof_body": "by\n  unfold relabelSym\n  let (f, hf, hf_inj) := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_3.lean:113:29: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_3.lean:111:6: error: Type mismatch\n  (f, hf, hf_inj)\nhas type\n  ?m.24 \u00d7 ?m.25 \u00d7 ?m.26\nof sort `Type (max ?u.21 ?u.22 ?u.23)` but is expected to have type\n  Function.Injective \u22ef.choose.f\nof sort `Prop`",
+      "error_class": "type mismatch",
+      "latency_ms": 22757.18,
+      "lean_ms": 6696.03,
+      "tokens": 96,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0 :=\n  by\n  unfold relabelSym\n  let \u27e8f, hf, hf_inj\u27e9 := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "proof_body": "by\n  unfold relabelSym\n  let \u27e8f, hf, hf_inj\u27e9 := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_4.lean:113:29: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_4.lean:111:6: error: Invalid `\u27e8...\u27e9` notation: The expected type\n  \u2200 \u2983a\u2081 a\u2082 : M.\u0393\u2984, \u22ef.choose.f a\u2081 = \u22ef.choose.f a\u2082 \u2192 a\u2081 = a\u2082\nis not an inductive type\nNote: This notation can only be used when the expected type is an inductive type with a single constructor",
+      "error_class": "syntax",
+      "latency_ms": 23050.45,
+      "lean_ms": 6795.08,
+      "tokens": 97,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem relabelSym_default (M : FinTM0) : relabelSym M default = 0 :=\n  by\n  unfold relabelSym\n  let \u27e8f, hf, hf_inj\u27e9 := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "proof_body": "by\n  unfold relabelSym\n  let \u27e8f, hf, hf_inj\u27e9 := (TM0Code.exists_relabeling M.machine).choose_spec.choose_spec.choose_spec.1\n  simp at hf\n  exact hf (by constructor; refl)",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_5.lean:113:29: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelSym_default_5.lean:111:6: error: Invalid `\u27e8...\u27e9` notation: The expected type\n  \u2200 \u2983a\u2081 a\u2082 : M.\u0393\u2984, \u22ef.choose.f a\u2081 = \u22ef.choose.f a\u2082 \u2192 a\u2081 = a\u2082\nis not an inductive type\nNote: This notation can only be used when the expected type is an inductive type with a single constructor",
+      "error_class": "syntax",
+      "latency_ms": 23831.44,
+      "lean_ms": 6856.44,
+      "tokens": 97,
+      "accepted": false
+    }
+  ]
+}

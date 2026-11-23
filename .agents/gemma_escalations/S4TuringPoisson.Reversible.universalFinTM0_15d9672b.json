@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.universalFinTM0_\u0393",
+  "raw_name": "universalFinTM0_\u0393",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+  "milestone": "B2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T04:26:37Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.Reversible.universalFinTM0",
+    "S4TuringPoisson.Reversible.universalFinTM0_halts_with_code_iff",
+    "S4TuringPoisson.Reversible.encodeInputTape",
+    "S4TuringPoisson.Reversible.univToyLoop_universal_never_halts"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080 :=\n  by\n  unfold universalFinTM0\n  simp_in [letI]\n  rfl",
+      "proof_body": "by\n  unfold universalFinTM0\n  simp_in [letI]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_1.lean:75:3: error: unknown tactic\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_1.lean:73:2: error: unsolved goals\n\u22a2 { \u0393 := \u0393\u2080, \u039b := Universal\u039b, instFintype\u0393 := Fintype.ofEquiv (Bool \u00d7 (Fin 4 \u2192 Option (Fin 4))) gamma0Equiv.symm,\n        instDecidableEq\u0393 := instDecidableEq\u0393\u2080, instInhabited\u0393 := TM2to1.\u0393'.inhabited,\n        instFintype\u039b := instFintypeUniversal\u039b, instDecidableEq\u039b := instDecidableEqUniversal\u039b,\n        instInhabited\u039b := instInhabitedUniversal\u039b, machine := U }.\u0393 =\n    \u0393\u2080",
+      "error_class": "unsolved goals",
+      "latency_ms": 21956.52,
+      "lean_ms": 10475.99,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080 :=\n  by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_2.lean:75:8: error: unexpected token 'letI'; expected identifier",
+      "error_class": "syntax",
+      "latency_ms": 22106.86,
+      "lean_ms": 7169.29,
+      "tokens": 46,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080 :=\n  by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_3.lean:75:8: error: unexpected token 'letI'; expected identifier",
+      "error_class": "syntax",
+      "latency_ms": 21120.43,
+      "lean_ms": 6871.92,
+      "tokens": 46,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080 :=\n  by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_4.lean:75:8: error: unexpected token 'letI'; expected identifier",
+      "error_class": "syntax",
+      "latency_ms": 21031.28,
+      "lean_ms": 7061.18,
+      "tokens": 46,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_\u0393 : universalFinTM0.\u0393 = \u0393\u2080 :=\n  by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold letI\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_15d9672b_5.lean:75:8: error: unexpected token 'letI'; expected identifier",
+      "error_class": "syntax",
+      "latency_ms": 21570.84,
+      "lean_ms": 6725.74,
+      "tokens": 46,
+      "accepted": false
+    }
+  ]
+}

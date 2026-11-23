@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk\u2081",
+  "raw_name": "universalFinTM0_initCfg_mk\u2081",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+  "milestone": "B2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T04:30:00Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.FinTM0.initCfg",
+    "S4TuringPoisson.Reversible.universalFinTM0_halt_tape_eq_encNat",
+    "S4TuringPoisson.Reversible.universalFinTM0_halts_with_code_iff",
+    "S4TuringPoisson.Reversible.univToyHalt_universal_simulation"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l :=\n  by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk_64ed1e90_1.lean:95:9: error(lean.unknownIdentifier): Unknown identifier `initCfg`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22148.04,
+      "lean_ms": 6697.52,
+      "tokens": 70,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l :=\n  by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk_64ed1e90_2.lean:95:9: error(lean.unknownIdentifier): Unknown identifier `initCfg`",
+      "error_class": "unknown identifier",
+      "latency_ms": 23023.62,
+      "lean_ms": 7096.08,
+      "tokens": 70,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l :=\n  by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk_64ed1e90_3.lean:95:9: error(lean.unknownIdentifier): Unknown identifier `initCfg`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22478.13,
+      "lean_ms": 6938.68,
+      "tokens": 70,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l :=\n  by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk_64ed1e90_4.lean:95:9: error(lean.unknownIdentifier): Unknown identifier `initCfg`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22742.26,
+      "lean_ms": 6848.62,
+      "tokens": 70,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem universalFinTM0_initCfg_mk\u2081 (l : List \u0393\u2080) :\n    universalFinTM0.initCfg (Tape.mk\u2081 l) = TM0.init l :=\n  by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "proof_body": "by\n  unfold universalFinTM0\n  unfold initCfg\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.universalFinTM0_initCfg_mk_64ed1e90_5.lean:95:9: error(lean.unknownIdentifier): Unknown identifier `initCfg`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22601.22,
+      "lean_ms": 8196.69,
+      "tokens": 70,
+      "accepted": false
+    }
+  ]
+}
