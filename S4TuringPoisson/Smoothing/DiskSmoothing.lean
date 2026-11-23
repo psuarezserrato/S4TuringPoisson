@@ -1559,27 +1559,25 @@ structure UniversalReversibleSimulator : Type 1 where
   encShift : R.ShiftAlphabet ≃ Fin shiftCard
   /-- Initial reversible configuration encoding `(M, t)` (independent of `(k, w)`). -/
   initRevCfg : (M : FinTM0) → FinSupportedTape M → R.Cfg
-  /-- Accepting cylinder radius `K(M, k)` for window queries of radius `k` on `M`. -/
-  windowRadius : FinTM0 → ℕ → ℕ
-  /-- Nonempty family of accepting cylinder blocks on `[-K(M, k), K(M, k)]` (independent of `t`). -/
+  /-- Nonempty family of variable-radius accepting cylinder blocks (independent of `t`). -/
   acceptBlocks :
     (M : FinTM0) → (k : ℕ) → Window M k →
-      Set (Set.Icc (-(windowRadius M k : ℤ)) (windowRadius M k : ℤ) → R.ShiftAlphabet)
+      Set (Σ K : ℕ, Set.Icc (-(K : ℤ)) (K : ℤ) → R.ShiftAlphabet)
   /-- Non-emptiness of `acceptBlocks M k w` for every `(M, k, w)`. -/
   acceptBlocks_nonempty :
     ∀ (M : FinTM0) (k : ℕ) (w : Window M k), (acceptBlocks M k w).Nonempty
   /-- Forward reversible orbit enters an accepting cylinder block iff `HaltsWithWindow M t k w`. -/
   orbit_mem_acceptBlocks_iff :
     ∀ (M : FinTM0) (t : FinSupportedTape M) (k : ℕ) (w : Window M k),
-      (∃ n : ℕ, ∃ W ∈ acceptBlocks M k w,
-        R.encodeCfg (R.step^[n] (initRevCfg M t)) ∈ cylinderIcc (windowRadius M k) W) ↔
+      (∃ n : ℕ, ∃ b ∈ acceptBlocks M k w,
+        R.encodeCfg (R.step^[n] (initRevCfg M t)) ∈ cylinderIcc b.1 b.2) ↔
       HaltsWithWindow M t k w
   /-- Non-terminal `TM0` initial configurations lie outside all accepting blocks at `n = 0`. -/
   encodeCfg_init_notMem_of_step_ne_none :
     ∀ (M : FinTM0) (t : FinSupportedTape M) (k : ℕ) (w : Window M k),
       Turing.TM0.step M.machine (M.initCfg t) ≠ none →
-      ∀ W ∈ acceptBlocks M k w,
-        R.encodeCfg (initRevCfg M t) ∉ cylinderIcc (windowRadius M k) W
+      ∀ b ∈ acceptBlocks M k w,
+        R.encodeCfg (initRevCfg M t) ∉ cylinderIcc b.1 b.2
   /-- Primitive-recursive digit enumerators for the negative and non-negative Cantor halves of
   `R.encodeCfg (initRevCfg M (Turing.Tape.mk₂ L R_tape))`. -/
   primrec_initDigits :
@@ -1599,15 +1597,15 @@ structure UniversalReversibleSimulator : Type 1 where
 `S.acceptBlocks M k w`. -/
 noncomputable def UniversalReversibleSimulator.targetOpen (S : UniversalReversibleSimulator)
     (M : FinTM0) (k : ℕ) (w : Window M k) : Opens UnitDisk2 :=
-  ⟨⋃ W ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift (S.windowRadius M k) W).1,
-    isOpen_biUnion fun W _ ↦ (cantorCylinderRect S.encShift (S.windowRadius M k) W).2⟩
+  ⟨⋃ b ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift b.1 b.2).1,
+    isOpen_biUnion fun b _ ↦ (cantorCylinderRect S.encShift b.1 b.2).2⟩
 
 theorem UniversalReversibleSimulator.targetOpen_nonempty (S : UniversalReversibleSimulator)
     (M : FinTM0) (k : ℕ) (w : Window M k) :
     (S.targetOpen M k w).1.Nonempty := by
-  obtain ⟨W₀, hW₀⟩ := S.acceptBlocks_nonempty M k w
-  obtain ⟨y, hy⟩ := cantorCylinderRect_nonempty S.encShift (S.windowRadius M k) W₀
-  exact ⟨y, Set.mem_biUnion hW₀ hy⟩
+  obtain ⟨b₀, hb₀⟩ := S.acceptBlocks_nonempty M k w
+  obtain ⟨y, hy⟩ := cantorCylinderRect_nonempty S.encShift b₀.1 b₀.2
+  exact ⟨y, Set.mem_biUnion hb₀ hy⟩
 
 /-- **Unconditional Cantor-Shift-to-`TuringCompleteWitness` Theorem**:
 Any self-map `φ : UnitDisk2 → UnitDisk2` conjugating `S.R.toGeneralizedShift.eval` on
@@ -1633,17 +1631,17 @@ noncomputable def UniversalReversibleSimulator.turingCompleteWitness
     refine (exists_congr fun n ↦ ?_).trans (S.orbit_mem_acceptBlocks_iff M t k w)
     rw [hiter n (S.R.encodeCfg (S.initRevCfg M t)), S.R.iterate_eval_encodeCfg]
     change cantorDiskEmbed S.encShift (S.R.encodeCfg (S.R.step^[n] (S.initRevCfg M t))) ∈
-      ⋃ W ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift (S.windowRadius M k) W).1 ↔ _
+      ⋃ b ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift b.1 b.2).1 ↔ _
     simp only [Set.mem_iUnion, exists_prop]
-    refine exists_congr fun W ↦ and_congr_right fun _ ↦ ?_
-    exact cantorDiskEmbed_mem_cantorCylinderRect_iff S.encShift _ (S.windowRadius M k) W
+    refine exists_congr fun b ↦ and_congr_right fun _ ↦ ?_
+    exact cantorDiskEmbed_mem_cantorCylinderRect_iff S.encShift _ b.1 b.2
   notMem_encodeOpen_of_step_ne_none M t k w hstep hmem := by
     change cantorDiskEmbed S.encShift (S.R.encodeCfg (S.initRevCfg M t)) ∈
-      ⋃ W ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift (S.windowRadius M k) W).1 at hmem
+      ⋃ b ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift b.1 b.2).1 at hmem
     rw [Set.mem_iUnion₂] at hmem
-    obtain ⟨W, hW, hrect⟩ := hmem
-    have hcyl := (cantorDiskEmbed_mem_cantorCylinderRect_iff S.encShift _ _ W).mp hrect
-    exact S.encodeCfg_init_notMem_of_step_ne_none M t k w hstep W hW hcyl
+    obtain ⟨b, hb, hrect⟩ := hmem
+    have hcyl := (cantorDiskEmbed_mem_cantorCylinderRect_iff S.encShift _ b.1 b.2).mp hrect
+    exact S.encodeCfg_init_notMem_of_step_ne_none M t k w hstep b hb hcyl
   chart := id
   chart_continuous := continuous_id
   chart_injective := Function.injective_id

@@ -16,6 +16,7 @@ public import S4TuringPoisson.Smoothing.CMPP.Digits
 public import S4TuringPoisson.Smoothing.CMPP.Primitives
 public import S4TuringPoisson.Smoothing.CMPP.Relocation
 public import S4TuringPoisson.Smoothing.CMPP.Realize
+public import S4TuringPoisson.Smoothing.CMPP.Simulator
 public import S4TuringPoisson.Extension.AlignedUnimodularVolume
 public import S4TuringPoisson.Extension.BumpIsotopyLift
 public import S4TuringPoisson.Main

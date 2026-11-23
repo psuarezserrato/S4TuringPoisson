@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted",
+  "raw_name": "universalInitRevCfg_q_ne_halted",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Simulator.lean",
+  "milestone": "B3",
+  "tier": "T0",
+  "statement": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T05:23:50Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.universalInitRevCfg",
+    "S4TuringPoisson.Reversible.bennettInitCfg_q_ne_halted",
+    "S4TuringPoisson.Reversible.bennett_orbit_halted_full",
+    "S4TuringPoisson.Reversible.bennett_orbit_halted_backward"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel :=\n  by\n  let M' := Reversible.universalFinTM0\n  let initCfg := Reversible.bennettInitCfg M' t\n  have h : (initCfg).q \u2260 .halted q rel := bennettInitCfg_q_ne_halted M' t q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "proof_body": "by\n  let M' := Reversible.universalFinTM0\n  let initCfg := Reversible.bennettInitCfg M' t\n  have h : (initCfg).q \u2260 .halted q rel := bennettInitCfg_q_ne_halted M' t q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_1.lean:109:46: error: Application type mismatch: The argument\n  t\nhas type\n  FinSupportedTape M\nbut is expected to have type\n  FinSupportedTape M'\nin the application\n  Reversible.bennettInitCfg M' t\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_1.lean:110:42: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q_ne_halted`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_1.lean:112:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 29856.87,
+      "lean_ms": 10169.31,
+      "tokens": 148,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold universalInitRevCfg\n  -- universalInitRevCfg M t = Reversible.bennettInitCfg Reversible.universalFinTM0 (Reversible.encodeInputTape M t)\n  -- The type of Reversible.bennettInitCfg is (M : FinTM0) (t : FinSupportedTape M)\n  -- However, Reversible.universalFinTM0 is a machine, and Reversible.encodeInputTape M t \n  -- is a FinSupportedTape (Reversible.universalFinTM0).\n  let M' := Reversible.universalFinTM0\n  let t' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    bennettInitCfg_q_ne_halted M' t' q rel\n  rfl\n  exact h",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  -- universalInitRevCfg M t = Reversible.bennettInitCfg Reversible.universalFinTM0 (Reversible.encodeInputTape M t)\n  -- The type of Reversible.bennettInitCfg is (M : FinTM0) (t : FinSupportedTape M)\n  -- However, Reversible.universalFinTM0 is a machine, and Reversible.encodeInputTape M t \n  -- is a FinSupportedTape (Reversible.universalFinTM0).\n  let M' := Reversible.universalFinTM0\n  let t' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    bennettInitCfg_q_ne_halted M' t' q rel\n  rfl\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_2.lean:116:4: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q_ne_halted`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_2.lean:117:2: error: Tactic `rfl` failed: Expected the goal to be a binary relation\nHint: Reflexivity tactics can only be used on goals of the form `x ~ x` or `R x x`\nM : FinTM0\nt : FinSupportedTape M\nq : Reversible.universalFinTM0.\u039b\nrel : Ordering\nM' : FinTM0 := Reversible.universalFinTM0\nt' : FinSupportedTape Reversible.universalFinTM0 := Reversible.encodeInputTape M t\nh : (Reversible.bennettInitCfg M' t').q \u2260 Reversible.BennettState.halted q rel\n\u22a2 (Reversible.bennettInitCfg Reversible.universalFinTM0 (Reversible.encodeInputTape M t)).q \u2260\n    Reversible.BennettState.halted q rel",
+      "error_class": "unknown identifier",
+      "latency_ms": 40154.72,
+      "lean_ms": 9817.53,
+      "tokens": 266,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel :=\n  by\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel := \n    bennettInitCfg_q_ne_halted M' t' q rel\n  unfold universalInitRevCfg\n  simp [universalInitRevCfg]\n  exact h",
+      "proof_body": "by\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel := \n    bennettInitCfg_q_ne_halted M' t' q rel\n  unfold universalInitRevCfg\n  simp [universalInitRevCfg]\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_3.lean:111:4: error(lean.unknownIdentifier): Unknown identifier `bennettInitCfg_q_ne_halted`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_3.lean:114:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_3.lean:113:8: warning: This simp argument is unused:\n  universalInitRevCfg\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 32440.42,
+      "lean_ms": 9912.05,
+      "tokens": 176,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold universalInitRevCfg\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    Reversible.bennettInitCfg_q_ne_halted M' t' q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    Reversible.bennettInitCfg_q_ne_halted M' t' q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_4.lean:114:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_4.lean:113:8: warning: This simp argument is unused:\n  universalInitRevCfg\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 33394.6,
+      "lean_ms": 9875.75,
+      "tokens": 178,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem universalInitRevCfg_q_ne_halted (M : FinTM0) (t : FinSupportedTape M)\n    (q : Reversible.universalFinTM0.\u039b) (rel : Ordering) :\n    (universalInitRevCfg M t).q \u2260 .halted q rel :=\n  by\n  unfold universalInitRevCfg\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    Reversible.bennettInitCfg_q_ne_halted M' t' q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "proof_body": "by\n  unfold universalInitRevCfg\n  let M' : FinTM0 := Reversible.universalFinTM0\n  let t' : FinSupportedTape M' := Reversible.encodeInputTape M t\n  have h : (Reversible.bennettInitCfg M' t').q \u2260 .halted q rel :=\n    Reversible.bennettInitCfg_q_ne_halted M' t' q rel\n  simp [universalInitRevCfg]\n  exact h",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_5.lean:114:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/simulator/.agents/gemma_scratch/S4TuringPoisson.CMPP.universalInitRevCfg_q_ne_halted_5.lean:113:8: warning: This simp argument is unused:\n  universalInitRevCfg\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 32231.9,
+      "lean_ms": 10167.97,
+      "tokens": 178,
+      "accepted": false
+    }
+  ]
+}
