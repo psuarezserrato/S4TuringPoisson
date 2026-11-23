@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.parkBox_xMax",
+  "raw_name": "parkBox_xMax",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:32:57Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.parkBox",
+    "S4TuringPoisson.CMPP.workBox",
+    "S4TuringPoisson.CMPP.AxisRect.translate_xMax",
+    "S4TuringPoisson.CMPP.AxisRect.tubeRect_xMax"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin\n  unfold _xMax\n  unfold _yMin\n  unfold _yMax\n  unfold _xMin",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_xMax_1.lean:138:9: error(lean.unknownIdentifier): Unknown identifier `translate`",
+      "error_class": "unknown identifier",
+      "latency_ms": 34837.71,
+      "lean_ms": 9181.37,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_xMax_2.lean:138:9: error(lean.unknownIdentifier): Unknown identifier `translate`",
+      "error_class": "unknown identifier",
+      "latency_ms": 23915.64,
+      "lean_ms": 7356.15,
+      "tokens": 72,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_xMax_3.lean:138:9: error(lean.unknownIdentifier): Unknown identifier `translate`",
+      "error_class": "unknown identifier",
+      "latency_ms": 22267.34,
+      "lean_ms": 6645.1,
+      "tokens": 72,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_xMax_4.lean:138:9: error(lean.unknownIdentifier): Unknown identifier `translate`",
+      "error_class": "unknown identifier",
+      "latency_ms": 23441.35,
+      "lean_ms": 7066.34,
+      "tokens": 72,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_xMax : parkBox.xMax = -7 / 20 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  unfold _xMax\n  exact translate_xMax quarterSquare (-3 / 5) 0",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_xMax_5.lean:138:9: error(lean.unknownIdentifier): Unknown identifier `translate`",
+      "error_class": "unknown identifier",
+      "latency_ms": 24084.5,
+      "lean_ms": 7529.73,
+      "tokens": 72,
+      "accepted": false
+    }
+  ]
+}

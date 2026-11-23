@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.parkBox_yMax",
+  "raw_name": "parkBox_yMax",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:37:49Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.parkBox",
+    "S4TuringPoisson.CMPP.workBox",
+    "S4TuringPoisson.CMPP.AxisRect.translate_yMax",
+    "S4TuringPoisson.CMPP.AxisRect.tubeRect_yMax"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_1.lean:140:9: error(lean.unknownIdentifier): Unknown identifier `_translate`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_1.lean:141:12: error: unexpected identifier; expected command",
+      "error_class": "unknown identifier",
+      "latency_ms": 19790.4,
+      "lean_ms": 6908.79,
+      "tokens": 68,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_2.lean:140:9: error(lean.unknownIdentifier): Unknown identifier `_translate`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_2.lean:141:12: error: unexpected identifier; expected command",
+      "error_class": "unknown identifier",
+      "latency_ms": 33017.67,
+      "lean_ms": 7545.65,
+      "tokens": 190,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_3.lean:140:9: error(lean.unknownIdentifier): Unknown identifier `translate`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_3.lean:141:12: error: unexpected identifier; expected command",
+      "error_class": "unknown identifier",
+      "latency_ms": 21228.37,
+      "lean_ms": 6655.75,
+      "tokens": 67,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold _translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_4.lean:140:9: error(lean.unknownIdentifier): Unknown identifier `_translate`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_4.lean:141:12: error: unexpected identifier; expected command",
+      "error_class": "unknown identifier",
+      "latency_ms": 21309.93,
+      "lean_ms": 6693.82,
+      "tokens": 68,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem parkBox_yMax : parkBox.yMax = 1 / 4 :=\n  by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "proof_body": "by\n  unfold parkBox\n  unfold quarterSquare\n  unfold translate\n  simp only translate_yMax\n  simp [quarterSquare]\n  norm_num",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_5.lean:140:9: error(lean.unknownIdentifier): Unknown identifier `translate`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.parkBox_yMax_5.lean:141:12: error: unexpected identifier; expected command",
+      "error_class": "unknown identifier",
+      "latency_ms": 21919.78,
+      "lean_ms": 6745.95,
+      "tokens": 67,
+      "accepted": false
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.workbenchCenter_one",
+  "raw_name": "workbenchCenter_one",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:22:16Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.workbenchCenter",
+    "S4TuringPoisson.CMPP.workbenchRadius",
+    "S4TuringPoisson.CMPP.AxisRect.center",
+    "S4TuringPoisson.CMPP.AxisRect.center_one"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20 :=\n  by\n  simp [workbenchCenter]\n  simp [center]\n  simp [center_one]",
+      "proof_body": "by\n  simp [workbenchCenter]\n  simp [center]\n  simp [center_one]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_1.lean:99:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 16255.48,
+      "lean_ms": 4747.55,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20 :=\n  by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]\n  rfl",
+      "proof_body": "by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_2.lean:100:8: error(lean.unknownIdentifier): Unknown identifier `center_one`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_2.lean:101:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_2.lean:99:13: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 19228.17,
+      "lean_ms": 7149.98,
+      "tokens": 54,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20 :=\n  by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]\n  rfl",
+      "proof_body": "by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_3.lean:100:8: error(lean.unknownIdentifier): Unknown identifier `center_one`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_3.lean:101:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_3.lean:99:13: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 20359.53,
+      "lean_ms": 6631.28,
+      "tokens": 54,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20 :=\n  by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]",
+      "proof_body": "by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_4.lean:100:8: error(lean.unknownIdentifier): Unknown identifier `center_one`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_4.lean:99:13: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 20102.77,
+      "lean_ms": 6697.0,
+      "tokens": 50,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem workbenchCenter_one : workbenchCenter 1 = -7 / 20 :=\n  by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]",
+      "proof_body": "by\n  unfold workbenchCenter\n  simp only [center]\n  simp [center_one]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_5.lean:100:8: error(lean.unknownIdentifier): Unknown identifier `center_one`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.workbenchCenter_one_5.lean:99:13: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp only\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "unknown identifier",
+      "latency_ms": 19479.33,
+      "lean_ms": 6553.62,
+      "tokens": 50,
+      "accepted": false
+    }
+  ]
+}

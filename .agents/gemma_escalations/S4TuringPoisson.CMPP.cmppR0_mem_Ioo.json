@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.cmppR0_mem_Ioo",
+  "raw_name": "cmppR0_mem_Ioo",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:18:05Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.cmppR0",
+    "S4TuringPoisson.CMPP.AxisRect.mem_openExpand_iff",
+    "S4TuringPoisson.CMPP.exists_Ioo_subset_of_isOpen_of_Icc_subset",
+    "S4TuringPoisson.CMPP.cmppPrimitives_sanity"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1 :=\n  by\n  unfold cmppR0\n  norm_cast\n  linarith",
+      "proof_body": "by\n  unfold cmppR0\n  norm_cast\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_1.lean:97:2: error: linarith failed to find a contradiction\n\u22a2 False\nfailed",
+      "error_class": "other",
+      "latency_ms": 15826.32,
+      "lean_ms": 6660.82,
+      "tokens": 52,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1 :=\n  by\n  unfold cmppR0\n  norm_cast\n  apply Ioo.mem_iff\n  constructor\n  \u00b7 apply lt\n    linarith\n  \u00b7 apply gt\n    linarith",
+      "proof_body": "by\n  unfold cmppR0\n  norm_cast\n  apply Ioo.mem_iff\n  constructor\n  \u00b7 apply lt\n    linarith\n  \u00b7 apply gt\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_2.lean:97:8: error(lean.unknownIdentifier): Unknown constant `Set.Ioo.mem_iff`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_2.lean:98:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 20492.27,
+      "lean_ms": 6457.82,
+      "tokens": 78,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1 :=\n  by\n  unfold cmppR0\n  norm_cast\n  apply Ioo.mem\n  constructor\n  \u00b7 apply lt\n    linarith\n  \u00b7 apply gt\n    linarith",
+      "proof_body": "by\n  unfold cmppR0\n  norm_cast\n  apply Ioo.mem\n  constructor\n  \u00b7 apply lt\n    linarith\n  \u00b7 apply gt\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_3.lean:97:8: error(lean.unknownIdentifier): Unknown constant `Set.Ioo.mem`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_3.lean:98:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 20795.85,
+      "lean_ms": 6742.75,
+      "tokens": 76,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1 :=\n  by\n  unfold cmppR0\n  have h1 : (17 : \u211d) / 20 < 1 := by norm_cast; linarith\n  have h2 : (17 : \u211d) / 20 > 0 := by norm_cast; linarith\n  exact Ioo.mem h1 h2",
+      "proof_body": "by\n  unfold cmppR0\n  have h1 : (17 : \u211d) / 20 < 1 := by norm_cast; linarith\n  have h2 : (17 : \u211d) / 20 > 0 := by norm_cast; linarith\n  exact Ioo.mem h1 h2",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_4.lean:98:8: error(lean.unknownIdentifier): Unknown constant `Set.Ioo.mem`",
+      "error_class": "unknown identifier",
+      "latency_ms": 23533.86,
+      "lean_ms": 6880.54,
+      "tokens": 110,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem cmppR0_mem_Ioo : cmppR0 \u2208 Set.Ioo (0 : \u211d) 1 :=\n  by\n  unfold cmppR0\n  apply Ioo.mem\n  constructor\n  \u00b7 apply lt\n    norm_cast\n    linarith\n  \u00b7 apply gt\n    norm_cast\n    linarith",
+      "proof_body": "by\n  unfold cmppR0\n  apply Ioo.mem\n  constructor\n  \u00b7 apply lt\n    norm_cast\n    linarith\n  \u00b7 apply gt\n    norm_cast\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_5.lean:96:8: error(lean.unknownIdentifier): Unknown constant `Set.Ioo.mem`\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.cmppR0_mem_Ioo_5.lean:97:2: error: No goals to be solved",
+      "error_class": "unknown identifier",
+      "latency_ms": 29348.27,
+      "lean_ms": 8007.53,
+      "tokens": 81,
+      "accepted": false
+    }
+  ]
+}

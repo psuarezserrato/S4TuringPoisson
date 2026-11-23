@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.quarterSquare_subset_workBox",
+  "raw_name": "quarterSquare_subset_workBox",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:40:52Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.workBox",
+    "S4TuringPoisson.CMPP.quarterSquare",
+    "S4TuringPoisson.CMPP.sourceRect_subset_quarterSquare",
+    "S4TuringPoisson.CMPP.quarterSquare_subset_unitDisk2"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet :=\n  by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff, quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hp\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at hp\n  linarith",
+      "proof_body": "by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff, quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hp\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at hp\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_1.lean:140:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  workBox.xMin\nin the target expression\n  p.ofLp 0 \u2208 Icc 0 (1 / 4) \u2227 p.ofLp 1 \u2208 Icc 0 (1 / 4)\np : EuclideanPlane\nhp : p.ofLp 0 \u2208 Icc 0 (1 / 4) \u2227 p.ofLp 1 \u2208 Icc 0 (1 / 4)\n\u22a2 p \u2208 workBox.toSet",
+      "error_class": "other",
+      "latency_ms": 22704.67,
+      "lean_ms": 6651.87,
+      "tokens": 108,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet :=\n  by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff, quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hp\n  rcases hp with \u27e8h1, h2\u27e9\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at h1 h2\n  linarith",
+      "proof_body": "by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff, quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hp\n  rcases hp with \u27e8h1, h2\u27e9\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at h1 h2\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_2.lean:141:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  workBox.xMin\nin the target expression\n  p.ofLp 0 \u2208 Icc 0 (1 / 4)\np : EuclideanPlane\nh1 : p.ofLp 0 \u2208 Icc 0 (1 / 4)\nh2 : p.ofLp 1 \u2208 Icc 0 (1 / 4)\n\u22a2 p \u2208 workBox.toSet",
+      "error_class": "other",
+      "latency_ms": 29140.37,
+      "lean_ms": 7432.8,
+      "tokens": 125,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet :=\n  by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  rw [quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hx hy\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at hx hy\n  linarith",
+      "proof_body": "by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  rw [quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hx hy\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at hx hy\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_3.lean:141:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  quarterSquare.xMin\nin the target expression\n  p.ofLp 1 \u2208 Icc quarterSquare.yMin quarterSquare.yMax\np : EuclideanPlane\nhx : p.ofLp 0 \u2208 Icc 0 quarterSquare.xMax\nhy : p.ofLp 1 \u2208 Icc quarterSquare.yMin quarterSquare.yMax\n\u22a2 p \u2208 workBox.toSet",
+      "error_class": "other",
+      "latency_ms": 30346.9,
+      "lean_ms": 6758.39,
+      "tokens": 130,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet :=\n  by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  rcases (rw [quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hx) with \u27e8h1, h2\u27e9\n  rcases (rw [quarterSquare_yMin, quarterSquare_yMax] at hy) with \u27e8h3, h4\u27e9\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at h1 h2 h3 h4\n  linarith",
+      "proof_body": "by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  rcases (rw [quarterSquare_xMin, quarterSquare_xMax, quarterSquare_yMin, quarterSquare_yMax] at hx) with \u27e8h1, h2\u27e9\n  rcases (rw [quarterSquare_yMin, quarterSquare_yMax] at hy) with \u27e8h3, h4\u27e9\n  rw [workBox_xMin, workBox_xMax, workBox_yMin, workBox_yMax] at h1 h2 h3 h4\n  linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_4.lean:141:93: error: unexpected token 'at'; expected ')', ',' or ':'\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_4.lean:141:10: error(lean.unknownIdentifier): Unknown identifier `rw`",
+      "error_class": "unknown identifier",
+      "latency_ms": 34023.85,
+      "lean_ms": 7052.0,
+      "tokens": 178,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem quarterSquare_subset_workBox : quarterSquare.toSet \u2286 workBox.toSet :=\n  by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  \u00b7 rw [quarterSquare_xMin, quarterSquare_xMax, workBox_xMin, workBox_xMax] at hx\n    linarith\n  \u00b7 rw [quarterSquare_yMin, quarterSquare_yMax, workBox_yMin, workBox_yMax] at hy\n    linarith",
+      "proof_body": "by\n  intro p hp\n  rw [AxisRect.mem_toSet_iff] at hp\n  rcases hp with \u27e8hx, hy\u27e9\n  \u00b7 rw [quarterSquare_xMin, quarterSquare_xMax, workBox_xMin, workBox_xMax] at hx\n    linarith\n  \u00b7 rw [quarterSquare_yMin, quarterSquare_yMax, workBox_yMin, workBox_yMax] at hy\n    linarith",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_5.lean:141:48: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern\n  workBox.xMin\nin the target expression\n  p.ofLp 0 \u2208 Icc 0 (1 / 4)\np : EuclideanPlane\nhx : p.ofLp 0 \u2208 Icc 0 (1 / 4)\nhy : p.ofLp 1 \u2208 Icc quarterSquare.yMin quarterSquare.yMax\n\u22a2 p \u2208 workBox.toSet\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.quarterSquare_subset_workBox_5.lean:143:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 31827.03,
+      "lean_ms": 7054.75,
+      "tokens": 133,
+      "accepted": false
+    }
+  ]
+}

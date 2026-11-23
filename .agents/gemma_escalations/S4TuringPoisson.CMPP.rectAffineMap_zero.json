@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.CMPP.rectAffineMap_zero",
+  "raw_name": "rectAffineMap_zero",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPP/Relocation.lean",
+  "milestone": "A3",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T00:44:16Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.CMPP.rectAffineMap",
+    "S4TuringPoisson.CMPP.AxisRect.center",
+    "S4TuringPoisson.CMPP.AxisRect.mem_ofCenter_iff",
+    "S4TuringPoisson.CMPP.AxisRect.ofCenter"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0) :=\n  by\n  unfold rectAffineMap\n  unfold center\n  field_simp\n  simp [AxisRect.ofCenter]",
+      "proof_body": "by\n  unfold rectAffineMap\n  unfold center\n  field_simp\n  simp [AxisRect.ofCenter]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.rectAffineMap_zero_1.lean:155:9: error: Tactic `unfold` failed to unfold `center` in\n  (P'.center + !\u2082[Real.exp (-\u03bc) * (y.ofLp 0 - P.center.ofLp 0), Real.exp \u03bc * (y.ofLp 1 - P.center.ofLp 1)]).ofLp 0 =\n    P'.center.ofLp 0 + Real.exp (-\u03bc) * (y.ofLp 0 - P.center.ofLp 0)",
+      "error_class": "other",
+      "latency_ms": 55747.86,
+      "lean_ms": 7353.99,
+      "tokens": 384,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0) :=\n  by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "proof_body": "by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.rectAffineMap_zero_2.lean:156:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 29166.7,
+      "lean_ms": 7137.97,
+      "tokens": 93,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0) :=\n  by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "proof_body": "by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.rectAffineMap_zero_3.lean:156:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 27261.33,
+      "lean_ms": 6938.01,
+      "tokens": 93,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0) :=\n  by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "proof_body": "by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.rectAffineMap_zero_4.lean:156:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 27331.99,
+      "lean_ms": 7285.26,
+      "tokens": 93,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem rectAffineMap_zero (P P' : AxisRect) (\u03bc : \u211d) (y : EuclideanPlane) :\n    rectAffineMap P P' \u03bc y 0 = P'.center 0 + Real.exp (-\u03bc) * (y 0 - P.center 0) :=\n  by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "proof_body": "by\n  unfold rectAffineMap\n  field_simp\n  simp [center]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/relocate/.agents/gemma_scratch/S4TuringPoisson.CMPP.rectAffineMap_zero_5.lean:156:8: warning: This simp argument is unused:\n  center\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 27843.28,
+      "lean_ms": 6972.77,
+      "tokens": 93,
+      "accepted": false
+    }
+  ]
+}
