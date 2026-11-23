@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.tape_mk\u2082_map",
+  "raw_name": "tape_mk\u2082_map",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+  "milestone": "B2",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f)",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T04:38:31Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.Reversible.tape_map_injective",
+    "S4TuringPoisson.Reversible.listBlank_map_injective",
+    "S4TuringPoisson.Reversible.cfg_map_injective",
+    "S4TuringPoisson.Reversible.bennettInitTape_mk\u2082_nth_zero"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f) :=\n  by\n  ext\n  simp [Tape.map, Tape.mk\u2082]",
+      "proof_body": "by\n  ext\n  simp [Tape.map, Tape.mk\u2082]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.tape_mk__map_61b0665d_1.lean:165:2: error: No applicable extensionality theorem found for type\n  Tape \u0393'\nNote: Extensionality theorems can be registered by marking them with the `[ext]` attribute",
+      "error_class": "other",
+      "latency_ms": 19954.34,
+      "lean_ms": 7059.23,
+      "tokens": 102,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f) :=\n  by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "proof_body": "by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.tape_mk__map_61b0665d_2.lean:165:2: error: No applicable extensionality theorem found for type\n  Tape \u0393'\nNote: Extensionality theorems can be registered by marking them with the `[ext]` attribute",
+      "error_class": "other",
+      "latency_ms": 23389.75,
+      "lean_ms": 6729.3,
+      "tokens": 103,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f) :=\n  by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "proof_body": "by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.tape_mk__map_61b0665d_3.lean:165:2: error: No applicable extensionality theorem found for type\n  Tape \u0393'\nNote: Extensionality theorems can be registered by marking them with the `[ext]` attribute",
+      "error_class": "other",
+      "latency_ms": 22753.97,
+      "lean_ms": 7043.99,
+      "tokens": 103,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f) :=\n  by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "proof_body": "by\n  ext h\n  simp [Tape.map, Tape.mk\u2082]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.tape_mk__map_61b0665d_4.lean:165:2: error: No applicable extensionality theorem found for type\n  Tape \u0393'\nNote: Extensionality theorems can be registered by marking them with the `[ext]` attribute",
+      "error_class": "other",
+      "latency_ms": 22444.58,
+      "lean_ms": 6890.72,
+      "tokens": 103,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem tape_mk\u2082_map {\u0393 \u0393' : Type*} [Inhabited \u0393] [Inhabited \u0393'] (f : PointedMap \u0393 \u0393')\n    (L R : List \u0393) :\n    (Tape.mk\u2082 L R).map f = Tape.mk\u2082 (L.map f) (R.map f) :=\n  by\n  rfl",
+      "proof_body": "by\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.tape_mk__map_61b0665d_5.lean:165:2: error: Tactic `rfl` failed: The left-hand side\n  Tape.map f (Tape.mk\u2082 L R)\nis not definitionally equal to the right-hand side\n  Tape.mk\u2082 (List.map f.f L) (List.map f.f R)\n\u0393 : Type u_1\n\u0393' : Type u_2\ninst\u271d\u00b9 : Inhabited \u0393\ninst\u271d : Inhabited \u0393'\nf : PointedMap \u0393 \u0393'\nL R : List \u0393\n\u22a2 Tape.map f (Tape.mk\u2082 L R) = Tape.mk\u2082 (List.map f.f L) (List.map f.f R)",
+      "error_class": "other",
+      "latency_ms": 22150.82,
+      "lean_ms": 6632.21,
+      "tokens": 90,
+      "accepted": false
+    }
+  ]
+}

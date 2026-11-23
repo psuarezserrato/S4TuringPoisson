@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.Reversible.relabelState_default",
+  "raw_name": "relabelState_default",
+  "spec_file": "S4TuringPoisson/Dynamics/Reversible/Universal.lean",
+  "milestone": "B2",
+  "tier": "T0",
+  "statement": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T04:35:08Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.Reversible.relabelState",
+    "S4TuringPoisson.Reversible.relabelState_injective",
+    "S4TuringPoisson.Reversible.relabel_evalCfg",
+    "S4TuringPoisson.FinTM0"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0 :=\n  by\n  unfold relabelState\n  simp [relabelState]\n  -- The definition of relabelState involves choosing a relabeling from TM0Code.exists_relabeling M.machine.\n  -- By the definition of TM0Code.exists_relabeling, the relabeling is a PointedMap M.\u039b \u2115.\n  -- A PointedMap (M.\u039b \u2192 \u2115) is such that the value at the default element is 0.\n  -- The choice made by `choose` respects this property.\n  rfl",
+      "proof_body": "by\n  unfold relabelState\n  simp [relabelState]\n  -- The definition of relabelState involves choosing a relabeling from TM0Code.exists_relabeling M.machine.\n  -- By the definition of TM0Code.exists_relabeling, the relabeling is a PointedMap M.\u039b \u2115.\n  -- A PointedMap (M.\u039b \u2192 \u2115) is such that the value at the default element is 0.\n  -- The choice made by `choose` respects this property.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_1.lean:117:2: error: No goals to be solved\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_1.lean:112:8: warning: This simp argument is unused:\n  relabelState\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 23863.62,
+      "lean_ms": 7524.89,
+      "tokens": 152,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0 :=\n  by\n  unfold relabelState\n  simp only [relabelState]\n  -- From the definition of relabelState, it's a PointedMap M.\u039b \u2115 \n  -- where the point is default. By definition of PointedMap, \n  -- the map points to 0 at the default element.\n  simp",
+      "proof_body": "by\n  unfold relabelState\n  simp only [relabelState]\n  -- From the definition of relabelState, it's a PointedMap M.\u039b \u2115 \n  -- where the point is default. By definition of PointedMap, \n  -- the map points to 0 at the default element.\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_2.lean:112:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 23629.8,
+      "lean_ms": 7023.23,
+      "tokens": 104,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0 :=\n  by\n  unfold relabelState\n  simp only [relabelState]\n  -- The definition of relabelState involves choosing a relabeling from \n  -- TM0Code.exists_relabeling M.machine.\n  -- By definition of TM0Code.exists_relabeling, the relabeling is a PointedMap M.\u039b \u2115\n  -- where the point is default. By definition of PointedMap, \n  -- the map points to 0 at the default element.\n  simp",
+      "proof_body": "by\n  unfold relabelState\n  simp only [relabelState]\n  -- The definition of relabelState involves choosing a relabeling from \n  -- TM0Code.exists_relabeling M.machine.\n  -- By definition of TM0Code.exists_relabeling, the relabeling is a PointedMap M.\u039b \u2115\n  -- where the point is default. By definition of PointedMap, \n  -- the map points to 0 at the default element.\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_3.lean:112:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 25059.23,
+      "lean_ms": 6768.78,
+      "tokens": 143,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0 :=\n  by\n  unfold relabelState\n  simp only [relabelState]\n  -- Since relabelState M is a PointedMap M.\u039b \u2115,\n  -- by definition of PointedMap, its value at the default element is 0.\n  simp",
+      "proof_body": "by\n  unfold relabelState\n  simp only [relabelState]\n  -- Since relabelState M is a PointedMap M.\u039b \u2115,\n  -- by definition of PointedMap, its value at the default element is 0.\n  simp",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_4.lean:112:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 22387.41,
+      "lean_ms": 6541.99,
+      "tokens": 88,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "theorem relabelState_default (M : FinTM0) : relabelState M default = 0 :=\n  by\n  unfold relabelState\n  simp only [relabelState]\n  -- A PointedMap (M.\u039b \u2192 \u2115) points to 0 at its default element.\n  -- The definition of PointedMap ensures that (m default) = 0.\n  rfl",
+      "proof_body": "by\n  unfold relabelState\n  simp only [relabelState]\n  -- A PointedMap (M.\u039b \u2192 \u2115) points to 0 at its default element.\n  -- The definition of PointedMap ensures that (m default) = 0.\n  rfl",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/univ-tm/.agents/gemma_scratch/S4TuringPoisson.Reversible.relabelState_default_5.lean:112:2: error: `simp` made no progress",
+      "error_class": "other",
+      "latency_ms": 23953.18,
+      "lean_ms": 6899.24,
+      "tokens": 93,
+      "accepted": false
+    }
+  ]
+}
