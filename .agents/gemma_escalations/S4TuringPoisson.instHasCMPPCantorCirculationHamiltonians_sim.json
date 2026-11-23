@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim",
+  "raw_name": "instHasCMPPCantorCirculationHamiltonians_sim",
+  "spec_file": "S4TuringPoisson/Smoothing/CMPPInstance.lean",
+  "milestone": "Z",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-23T09:00:47Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians",
+    "S4TuringPoisson.HasCMPPCantorCirculationHamiltonians",
+    "S4TuringPoisson.universalReversibleSimulator_cmpp",
+    "S4TuringPoisson.hasCMPP_of_simulator"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator :=\n  by\n  rcases instHasCMPPCantorCirculationHamiltonians as \u27e8_, sim, _\u27e9\n  simp [instHasCMPPCantorCirculationHamiltonians]",
+      "proof_body": "by\n  rcases instHasCMPPCantorCirculationHamiltonians as \u27e8_, sim, _\u27e9\n  simp [instHasCMPPCantorCirculationHamiltonians]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_1.lean:63:9: error: Function expected at\n  instHasCMPPCantorCirculationHamiltonians\nbut this term has type\n  HasCMPPCantorCirculationHamiltonians\nNote: Expected a function because this term is being applied to the argument\n  as\n/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_1.lean:63:2: error: Tactic `rcases` failed: `x\u271d : ?m.4` is not an inductive datatype",
+      "error_class": "other",
+      "latency_ms": 17687.43,
+      "lean_ms": 5639.49,
+      "tokens": 82,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator :=\n  by\n  simp [instHasCMPPCantorCirculationHamiltonians]",
+      "proof_body": "by\n  simp [instHasCMPPCantorCirculationHamiltonians]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_2.lean:63:8: warning: This simp argument is unused:\n  instHasCMPPCantorCirculationHamiltonians\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 19430.05,
+      "lean_ms": 6931.43,
+      "tokens": 60,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator :=\n  by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "proof_body": "by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_3.lean:64:8: warning: This simp argument is unused:\n  hasCMPP_of_simulator\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 18819.44,
+      "lean_ms": 8352.81,
+      "tokens": 71,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator :=\n  by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "proof_body": "by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_4.lean:64:8: warning: This simp argument is unused:\n  hasCMPP_of_simulator\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 19264.3,
+      "lean_ms": 6843.43,
+      "tokens": 71,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem instHasCMPPCantorCirculationHamiltonians_sim :\n    instHasCMPPCantorCirculationHamiltonians.sim = universalReversibleSimulator :=\n  by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "proof_body": "by\n  unfold instHasCMPPCantorCirculationHamiltonians\n  simp [hasCMPP_of_simulator]",
+      "compiler_error": "/Users/pablosuarez/Desktop/S4TuringPoisson/.worktrees/cmpp-final/.agents/gemma_scratch/S4TuringPoisson.instHasCMPPCantorCirculationHamiltonians_sim_5.lean:64:8: warning: This simp argument is unused:\n  hasCMPP_of_simulator\nHint: Omit it from the simp argument list.\n  [apply] simp\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`",
+      "error_class": "other",
+      "latency_ms": 19212.13,
+      "lean_ms": 6563.14,
+      "tokens": 71,
+      "accepted": false
+    }
+  ]
+}

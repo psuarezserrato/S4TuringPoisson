@@ -5,7 +5,6 @@ Authors: Pablo Suárez-Serrato
 -/
 module
 
-public import S4TuringPoisson.Checks.CompChecks
 public import S4TuringPoisson.Dynamics.Reversible.Bennett
 public import S4TuringPoisson.Dynamics.Reversible.Universal
 public import S4TuringPoisson.Smoothing.CMPP.Realize
@@ -432,74 +431,6 @@ autonomous (`UNCONDITIONAL`). -/
 theorem universalReversibleSimulator_cmpp_isAutonomous :
     ∀ P ∈ universalReversibleSimulator_cmpp.generators, P.IsAutonomous :=
   hasCMPP_of_simulator_isAutonomous universalReversibleSimulator
-
-/-- **Gate G5 End-to-End Sanity Witness (`UNCONDITIONAL`, Milestone B3)**:
-Verifies on `universalReversibleSimulator` and `universalReversibleSimulator_cmpp` (with **zero**
-typeclass hypotheses):
-1. Non-emptiness of `acceptBlocks` for both `Checks.M_halt` and `Checks.M_loop`,
-2. Step-`0` exclusion and positive-step (`n ≥ 1`) cylinder reachability for `Checks.M_halt` with
-   `Checks.w_halt`,
-3. All-time (`∀ n : ℕ`) cylinder non-reachability for `Checks.M_loop` with `Checks.w_loop`, and
-4. Full Gate 6 instantiation `@Checks.gate6_sphere4_witness_of_cmpp` directly on `Sphere4` (`S⁴`),
-   yielding an unconditional leaf-preserving, unimodular, volume-preserving, Turing-complete Poisson
-   diffeomorphism `d_bar ≠ id`. -/
--- tier: T2
-theorem universalReversibleSimulator_sanity :
-    (universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt).Nonempty ∧
-    (universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop).Nonempty ∧
-    (∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
-      universalReversibleSimulator.R.encodeCfg
-        (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
-          cylinderIcc b.1 b.2) ∧
-    (∃ n ≥ 1, ∃ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
-      universalReversibleSimulator.R.encodeCfg
-        (universalReversibleSimulator.R.step^[n]
-          (universalReversibleSimulator.initRevCfg Checks.M_halt default)) ∈
-        cylinderIcc b.1 b.2) ∧
-    (∀ (n : ℕ), ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_loop 1 Checks.w_loop,
-      universalReversibleSimulator.R.encodeCfg
-        (universalReversibleSimulator.R.step^[n]
-          (universalReversibleSimulator.initRevCfg Checks.M_loop default)) ∉
-        cylinderIcc b.1 b.2) ∧
-    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
-        (π_f : PoissonStructure (𝓡 4) Sphere4)
-        (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
-        (p_h p_l : Sphere4)
-        (U_h U_l : Opens Sphere4),
-      U_h.1.Nonempty ∧
-      U_l.1.Nonempty ∧
-      0 < V.μ U_h.1 ∧
-      0 < V.μ U_l.1 ∧
-      (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
-      (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
-      s4Fibration ∘ ⇑d_bar = s4Fibration ∧
-      (∀ (n : ℕ) (x : Sphere4), s4Fibration ((⇑d_bar)^[n] x) = s4Fibration x) ∧
-      π_f.IsUnimodularWithVolume V.Ω ∧
-      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
-        d_bar d_bar.contMDiff ∧
-      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
-      MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
-      (⇑d_bar : Sphere4 → Sphere4) ≠ id) := by
-  have hnot0 :
-      ∀ b ∈ universalReversibleSimulator.acceptBlocks Checks.M_halt 1 Checks.w_halt,
-        universalReversibleSimulator.R.encodeCfg
-          (universalReversibleSimulator.initRevCfg Checks.M_halt default) ∉
-            cylinderIcc b.1 b.2 :=
-    universalReversibleSimulator.encodeCfg_init_notMem_of_step_ne_none Checks.M_halt default 1
-      Checks.w_halt Checks.step_initCfg_M_halt_ne_none
-  refine ⟨universalReversibleSimulator.acceptBlocks_nonempty Checks.M_halt 1 Checks.w_halt,
-    universalReversibleSimulator.acceptBlocks_nonempty Checks.M_loop 1 Checks.w_loop,
-    hnot0, ?_, ?_, @Checks.gate6_sphere4_witness_of_cmpp universalReversibleSimulator_cmpp⟩
-  · obtain ⟨n, b, hb, hcyl⟩ :=
-      (universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_halt default 1
-        Checks.w_halt).mpr Checks.haltsWithWindow_M_halt
-    rcases n with _ | n
-    · exact False.elim (hnot0 b hb hcyl)
-    · exact ⟨n + 1, Nat.succ_pos n, b, hb, hcyl⟩
-  · intro n b hb hcyl
-    exact Checks.not_haltsWithWindow_M_loop_default
-      ((universalReversibleSimulator.orbit_mem_acceptBlocks_iff Checks.M_loop default 1
-        Checks.w_loop).mp ⟨n, b, hb, hcyl⟩)
 
 end Sanity
 

@@ -14,32 +14,49 @@ If bound variable `#0` does not occur in `body` (`!body.hasLooseBVar 0`), `val` 
 decorative binding that does not contribute to the proof term and is stripped.
 -/
 partial def pruneDecorativeBindings (e : Expr) : Expr :=
-  match e with
-  | .app f a =>
-    let f' := pruneDecorativeBindings f
-    let a' := pruneDecorativeBindings a
-    match f' with
-    | .lam _ _ body _ =>
-      if !body.hasLooseBVar 0 then
-        pruneDecorativeBindings (body.lowerLooseBVars 1 1)
-      else
-        .app f' a'
-    | _ => .app f' a'
-  | .letE n t v b nonDep =>
-    let b' := pruneDecorativeBindings b
-    if !b'.hasLooseBVar 0 then
-      pruneDecorativeBindings (b'.lowerLooseBVars 1 1)
-    else
-      .letE n (pruneDecorativeBindings t) (pruneDecorativeBindings v) b' nonDep
-  | .lam n t b bi =>
-    .lam n (pruneDecorativeBindings t) (pruneDecorativeBindings b) bi
-  | .forallE n t b bi =>
-    .forallE n (pruneDecorativeBindings t) (pruneDecorativeBindings b) bi
-  | .mdata _ b =>
-    pruneDecorativeBindings b
-  | .proj s i b =>
-    .proj s i (pruneDecorativeBindings b)
-  | _ => e
+  (go e).run' {}
+where
+  go (e : Expr) : StateM (Std.HashMap Expr Expr) Expr := do
+    if let some cached := (← get)[e]? then
+      return cached
+    let res ←
+      match e with
+      | .app f a => do
+        let f' ← go f
+        match f' with
+        | .lam _ _ body _ =>
+          if !body.hasLooseBVar 0 then
+            go (body.lowerLooseBVars 1 1)
+          else do
+            let a' ← go a
+            pure (.app f' a')
+        | _ => do
+          let a' ← go a
+          pure (.app f' a')
+      | .letE n t v b nonDep => do
+        let b' ← go b
+        if !b'.hasLooseBVar 0 then
+          go (b'.lowerLooseBVars 1 1)
+        else do
+          let t' ← go t
+          let v' ← go v
+          pure (.letE n t' v' b' nonDep)
+      | .lam n t b bi => do
+        let t' ← go t
+        let b' ← go b
+        pure (.lam n t' b' bi)
+      | .forallE n t b bi => do
+        let t' ← go t
+        let b' ← go b
+        pure (.forallE n t' b' bi)
+      | .mdata _ b =>
+        go b
+      | .proj s i b => do
+        let b' ← go b
+        pure (.proj s i b')
+      | _ => pure e
+    modify fun cache => cache.insert e res
+    return res
 
 /--
 Extract constants referenced in the proof/value body of `ci` after stripping decorative
