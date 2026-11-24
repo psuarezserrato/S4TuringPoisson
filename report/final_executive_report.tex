@@ -68,7 +68,7 @@
 \title{\vspace{-1.8em}\textbf{Independent Audit of the \code{S4TuringPoisson} Formalization:\\
 Turing Complete, Volume-Preserving Poisson Diffeomorphisms of $S^4$ and $4$-Manifolds}}
 \author{Pablo Su\'arez-Serrato\\[2pt]\small Formalization, blueprint, and independent kernel audit}
-\date{23 November 2026 \quad (HEAD \code{v4.36.0}; ADK $S^4$, Lekili Moves~1--4, and closed $4$-manifolds)\vspace{-1.0em}}
+\date{23 November 2026 \quad (re-audit of commit \code{fa3e3fc}; kernel gates and semantic statement review)\vspace{-1.0em}}
 
 \begin{document}
 \maketitle
@@ -82,22 +82,26 @@ and the global Auroux--Donaldson--Katzarkov (ADK05) broken Lefschetz fibration o
 \NModules{} project modules (\NLines{} lines) and the 8 files of the companion library
 \code{Turing-recursive} (2{,}091 lines) replay cleanly through the Lean kernel
 (\code{leanchecker}, 35/35 leaf modules), and a fresh axiom census over all 5{,}575 project
-constants finds strictly \code{propext}, \code{Classical.choice}, and \code{Quot.sound}. Both
-Theorem~1 on $S^4$ (under both the explicit definite-fold map and the global ADK indefinite-fold
-fibration) and Corollary~2 on every closed oriented smooth $4$-manifold $(M,V_M)$ are unconditionally
-proved. All \NTotalNodes{} nodes (\NLeanDecls{} linked declarations) of the \code{leanblueprint}
-dependency graph are green (\NProvedNodes{} theorems, \NDefNodes{} definitions, \NOpenNodes{} open).
+constants finds strictly \code{propext}, \code{Classical.choice}, and \code{Quot.sound}.
+Theorem~1 on $S^4$ is proved unconditionally for two explicit maps (a definite-fold projection and
+the global ADK indefinite-fold fibration), with the full Poisson package of the paper's proof. The
+literal statement of Corollary~2 (every closed oriented smooth $4$-manifold admits a volume
+preserving, Turing complete diffeomorphism) is proved unconditionally; its accompanying fibration is
+a coordinate-ball map, so the paper's global wrinkled-fibration route is \emph{not} formalized
+(finding~S1). A semantic review of definitions and statements found no unsoundness, but six points
+where documentation overstates what the exported statements assert (Table~\ref{tab:findings}). All
+\NTotalNodes{} blueprint nodes (\NLeanDecls{} linked declarations) are green.
 \end{abstract}
 
 \section{Executive Audit Verdict and Verification Gate}
 
-\textbf{Verdict.} The formalization is \textbf{sound and complete} (every gate in
-Table~\ref{tab:audit} passes): Theorem~1 on $S^4$, undecidable orbit reachability, Poisson--Hamiltonian
-realization (R5), the global ADK $S^4$ broken Lefschetz theorem, Lekili's broken-to-wrinkled
-smoothing theorem, and Corollary~2 for every closed oriented $4$-manifold $(M,V_M)$ all typecheck
-with \textbf{\NSorryAx{} \code{sorryAx}}. We explicitly distinguish the Track~A global ADK/Lekili
-fibration results from the Track~B coordinate-ball \code{WrinkledFibration} used to discharge
-Corollary~2 without external global definite-fold elimination.
+\textbf{Verdict.} The formalization is \textbf{kernel-sound}: every gate in Table~\ref{tab:audit}
+passes, with \textbf{\NSorryAx{} \code{sorryAx}} and no custom axioms. Theorem~1 on $S^4$, undecidable
+orbit reachability, Poisson--Hamiltonian realization (R5), the ADK $S^4$ theorem, the
+broken-to-purely-wrinkled theorem, and the literal Corollary~2 all typecheck. The semantic review
+(Table~\ref{tab:findings}) found no false theorem, but the closed-manifold fibration and two
+interfaces are weaker than their names and docstrings suggest; the report's claims below are
+worded to match the exported Lean statements.
 
 \begin{table}[!ht]
 \centering\footnotesize
@@ -122,31 +126,49 @@ Tooling tests & \code{unittest} & planner, CLI, provenance, and wiring checks & 
 \label{tab:audit}
 \end{table}
 
-\paragraph{Audit Findings (F1--F5 Resolution).}
-\begin{enumerate}[label=\textbf{F\arabic*}]\sloppy
-\item \textbf{Corollary~2 scope (closed via Track~B).} \code{Main.exists\_turingComplete\_\allowbreak
-  volumePreserving\_poissonDiffeomorph\_closedFourManifold} requires only
-  \code{[CompactSpace M] [T2Space M] [Nonempty M]} and a positive volume 4-form $V_M$. It
-  discharges \code{AdmitsWrinkledOrBrokenLefschetzFibration M} via \code{ofPositiveVolumeForm}
-  (Track~B: an orientation-preserving coordinate-ball \code{WrinkledFibration} over
-  \code{s4BaseRegion}). Global Saeki/Gay--Kirby definite-fold elimination on arbitrary $M$ is
-  unneeded for the interface and remains outside Track~B.
-\item \textbf{$S^4$ fibration model (resolved via Track~A).} In addition to the simple definite-fold
-  projection \code{s4Fibration}, we now formalize \code{PurelyWrinkledFibration}, all four explicit
-  planar Lekili moves, the compact broken-to-purely-wrinkled theorem
-  (\code{BrokenLefschetzFibration.exists\_purelyWrinkledFibration}), and the global ADK broken
-  Lefschetz fibration \code{s4BrokenLefschetzFibration} with regular $S^2$ and $T^2$ fibers and an
-  equatorial circle of indefinite folds (\code{*\_S4\_ADK}).
-\item \textbf{Volume form.} The preserved volume $V$ is constructed as an \emph{aligned} positive
-  4-form co-oriented with the ambient form (e.g.\ $V_M$) and equaling the product form near the
-  bump support, matching the existential theorems and unimodularity.
-\item \textbf{Definition strength.} \code{IsTuringComplete} uses the decoupled CMPP predicate;
-  \code{\#audit\_wiring} confirms transitive use of Bennett's compiler, \code{TuringRecursive.U},
-  relocation, ADK indefinite folds, Lekili surgery, and coordinate-ball trivializations.
-\item \textbf{Hygiene.} All \NModules{} Lean files carry the AGPLv3 non-commercial header, zero lines
-  exceed 100 columns, and all anti-vacuity checks reside in \code{Checks/GeomChecks.lean} and
-  \code{Checks/CompChecks.lean}.
-\end{enumerate}
+\begin{table}[!ht]
+\centering\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}l l X@{}}
+\toprule
+ID & Severity & Finding (evidence) \\
+\midrule
+S1 & Scope & \textbf{Corollary~2 fibration is local.} \code{ofPositiveVolumeForm} builds $f\colon M\to S^2$ as a
+  bumped copy of the $S^4$ projection on one coordinate ball and \emph{constant} outside it
+  (\code{closedManifoldLocalMap\_eq\_const\_of\_notMem\_closedImage}). On compact $M$ this region is a
+  nonempty open subset of $\Crit f$, so $\pi_f\equiv 0$ there; ``rank 2 off $\Crit f$'' holds but the
+  docstring's ``generically rank-2'' (\code{Main.lean}:500) does not. The paper's global
+  wrinkled-fibration route (Gay--Kirby/Lekili existence) is not formalized. \\
+S2 & Interface & \textbf{\code{WrinkledFibration} has no singularity conditions.} It requires global
+  smoothness and a trivialized regular disk only; fold/cusp/Lefschetz conditions appear only in
+  \code{BrokenLefschetzFibration} and \code{PurelyWrinkledFibration}. Hence
+  \code{AdmitsWrinkledOrBrokenLefschetzFibration} is ``wrinkled'' in name only. \\
+S3 & Interface & \textbf{Target sets need not be effective.} \code{TuringCompleteWitness} requires a
+  computable initial point, but \code{encodeOpen} may be any nonempty open set. The concrete witness
+  is honest by inspection (cylinders over \code{AcceptingOutputCodes}, defined by window agreement,
+  not halting), but no theorem certifies effectiveness; the undecidability theorems inherit this. \\
+S4 & Statement & \textbf{Broken-to-wrinkled theorem exports less than it proves.}
+  \code{exists\_purelyWrinkledFibration} asserts only agreement with $B$ over a half-radius regular
+  disk; the compact-support locality and homotopy are proof-internal (the docstring's ``deformation''
+  and its theorem-number citation of Lekili were not verified). \\
+S5 & Wording & \textbf{``Moves 1--4'' are local $\R^4\to\R^2$ models.} Move~1 is fully classified and
+  globalized; Moves~2--3 have cusp/fold charts; Move~4 has only its critical locus (the header
+  claims closed-form charts). Moves~2--4 are unused elsewhere. \\
+S6 & Minor & ADK fibres are homeomorphisms (not diffeomorphisms) and the structure trivializes only
+  the $S^2$ side; $V$ is positively proportional to $V_M$ (not $V_M$); the theorem statements do not
+  pin $V.\mu$ to $V.\Omega$; \code{IsRealLefschetzAt} admits achiral charts. \\
+\bottomrule
+\end{tabularx}
+\caption{Semantic findings of this re-audit (no unsound theorem; documentation and interface scope).}
+\label{tab:findings}
+\end{table}
+
+\noindent\textbf{Confirmed faithful.} \code{PoissonStructure} enforces the Jacobi identity on all of
+$C^\infty(M)$; unimodularity is $\mathcal L_{X_h}\Omega=0$ for nowhere-vanishing $\Omega$;
+\code{PositiveVolumeForm} is smooth and nowhere-vanishing; singularity predicates are genuine smooth
+chart normal forms; ADK critical set is exactly $\{x_2=x_3=x_4=0\}$, all indefinite folds; Bennett's
+compiler is reversible and \code{bennett\_orbit\_halted\_iff} is exact; \code{TuringRecursive.U} is
+universal; \code{IsTuringComplete} excludes the identity and fixes the dependencies of point and set.
 
 \section{Mathematical Achievements: The Main Theorems}
 
@@ -159,17 +181,22 @@ $\pi$, regular leaf areas, $V$, and its measure, such that $\overline d$ is Turi
 undecidable orbit reachability.
 \end{theorem}
 
-\begin{theorem}[R5 \& Lekili broken-to-wrinkled smoothing]\label{thm:r5}
+\begin{theorem}[R5 \& broken-to-purely-wrinkled theorem]\label{thm:r5}
 On $S^4$ (for both $f$ and $f_{\mathrm{ADK}}$) and on any $(M,V_M)$, $\overline d =
 \phi^1_{\tilde H_1}\circ\dots\circ\phi^1_{\tilde H_n}$ for smooth Hamiltonians $\tilde H_j\colon
-M\to\R$. Furthermore, every \texttt{BrokenLefschetzFibration} on a compact $4$-manifold deforms to
-a \texttt{PurelyWrinkledFibration} via compactly supported Lekili Move~1 wrinkling.
+M\to\R$. Every \texttt{BrokenLefschetzFibration} on a compact Hausdorff $4$-manifold yields a
+\texttt{PurelyWrinkledFibration} on the same $M$, base and fibre that agrees with it over a
+half-radius regular disk; the proof replaces each real Lefschetz point by a compactly supported
+Lekili Move~1 wrinkle (locality and homotopy are not exported; finding~S4).
 \end{theorem}
 
-\begin{corollary}[Corollary 2, unconditional closed $4$-manifold form]
+\begin{corollary}[Corollary 2, literal form]
 Every nonempty compact Hausdorff smooth $4$-manifold $M$ with a positive volume $4$-form $V_M$
-carries the same package as Theorem~\ref{thm:main} via \code{ofPositiveVolumeForm} (Track~B), with
-$V$ strictly positively co-oriented with $V_M$.
+(orientation is supplied by $V_M$; connectedness is not needed) carries a volume form $V$ positively
+proportional to $V_M$ and a $V$-preserving, Turing complete diffeomorphism $\overline d$. Lean also
+gives a smooth $f\colon M\to S^2$ and unimodular $\pi_f$ (rank $2$ off $\Crit f$, $0$ on it) preserved by
+$\overline d$, but $f$ is constant outside a coordinate ball, so $\pi_f$ vanishes on an open set
+(finding~S1).
 \end{corollary}
 
 \paragraph{Lean~4 entry points.}
@@ -220,20 +247,22 @@ Total & 18/36/0 & \NTotalNodes{} nodes, \NLeanDecls{} Lean declarations (\textbf
 \label{tab:layers}
 \end{table}
 
-\paragraph{1. Unconditional Track~A and Track~B layers.}\sloppy
+\paragraph{1. Track~A and Track~B layers.}\sloppy
 The chain from computability (\code{TuringRecursive.U}, Bennett's compiler, and
 \code{universalReversibleSimulator}) through CMPP21 autonomous Hamiltonian relocation and leafwise
-flows is completely unconditional. On $S^4$ and compact broken Lefschetz fibrations, Track~A adds
-\code{s4BrokenLefschetzFibration} (with $S^2/T^2$ fibers and indefinite folds) and Lekili's Moves~1--4
-plus broken-to-wrinkled smoothing (\code{exists\_purelyWrinkledFibration}). For arbitrary closed
-oriented $4$-manifolds $(M,V_M)$, Track~B (\code{ClosedManifoldLocal.lean}) provides an unconditional
-positively co-oriented \code{WrinkledFibration} inside an orientation-preserving coordinate ball.
+flows is unconditional. Track~A (\code{PurelyWrinkled}, \code{LekiliMoves}, \code{ADKS4Fibration})
+formalizes genuine fold/cusp/Lefschetz theory: the ADK map on $S^4$ and the broken-to-purely-wrinkled
+theorem. Track~B (\code{ClosedManifoldLocal}) inhabits the unconstrained \code{WrinkledFibration}
+interface on any $(M,V_M)$ with a coordinate-ball map; it is \emph{not} used to transport Track~A
+fibration theory to $M$, and does not formalize the existence of global wrinkled or broken Lefschetz
+fibrations on arbitrary $4$-manifolds.
 
-\paragraph{2. Transparency of scope.}\sloppy
-Both the earlier parametric statement \code{*\_fourManifold} (parameterized by
-\code{[AdmitsWrinkledOrBrokenLefschetzFibration M]}) and the \code{*\_of\_cmpp} reductions remain
-exported; Track~B is explicitly documented as constructing the unconstrained \code{WrinkledFibration}
-interface locally rather than proving global definite-fold elimination on arbitrary $M$.
+\paragraph{2. Recommendations.}\sloppy
+(i) Correct the docstrings at \code{Main.lean}:496--503, \code{LekiliMoves.lean}:36--39 and
+:5278--5281; (ii) require \code{encodeOpen} to be a computably enumerated union of rational boxes;
+(iii) export the locality of the wrinkling surgery; (iv) add a Corollary~2 variant over a positively
+co-oriented \code{PurelyWrinkledFibration} (via \code{ofPurelyWrinkled}) that also exports density of
+the rank-$2$ locus, so a future Gay--Kirby formalization yields the paper's generically rank-$2$ form.
 
 \section{Multi-Agent Autoformalization and Verification Workflow}
 
@@ -278,9 +307,10 @@ $40/146$ (27.4\%) and pass@5 $71/146$ (48.6\%); harder tiers stayed with frontie
 
 \paragraph{3. This audit.}
 The audit avoided the repository's own scripts for its core claims: kernel replay with the
-toolchain's \code{leanchecker}, a fresh axiom census, binder and instance checks, a dependency
-integrity check, and a blueprint written from the Lean sources and the paper, whose \NLeanDecls{}
-declarations were re-checked for axioms.
+toolchain's \code{leanchecker}, a fresh axiom census, binder and instance checks, and a blueprint
+re-check of all \NLeanDecls{} linked declarations. A separate semantic review by three independent
+read-only reviewers (fibration layer, Corollary~2, core interfaces) compared each exported
+statement with its definitions and with the paper, producing Table~\ref{tab:findings}.
 
 \begin{thebibliography}{99}\footnotesize\sloppy
 \setlength{\itemsep}{1pt}
