@@ -35,7 +35,7 @@ Every semantic finding and recommendation from `report/final_executive_report.te
            IsWrinkledCuspAt (𝓡 4) (𝓡 2) fibration.toFun p ∨
            IsRealLefschetzAt (𝓡 4) (𝓡 2) fibration.toFun p
      ```
-     Provide constructors `.ofPurelyWrinkled` and `.ofBrokenLefschetz`, and register `instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4` via `s4ADKAdmits` (`s4BrokenLefschetzFibration`).
+     Provide constructors `.ofPurelyWrinkled` and `.ofBrokenLefschetz`, register `instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4` via `s4ADKAdmits` (`s4BrokenLefschetzFibration`), and update the module docstrings in `LocalSingularModels.lean:31` and `PurelyWrinkled.lean:21` from `Suárez-Serrato–Torres 2016` to `Suárez-Serrato–Torres Orozco 2016` (`Bol. Soc. Mat. Mex. 22(1) (2016), 263–280`).
 
 ### `SC-R2`: Generic Rank-2 Density & `PurelyWrinkledFibration` Corollary 2 (`PurelyWrinkled.lean`, `Main.lean`, `PoissonHamiltonian.lean`)
 1. In `Poisson/BivectorAndModular.lean` (or `Poisson/JacobianPoisson.lean`), define:
@@ -238,9 +238,10 @@ No milestone may merge onto `main` unless every applicable gate passes with zero
 - **ADK05**: D. Auroux, S. K. Donaldson, L. Katzarkov, *Singular Lefschetz pencils*, Geom. Topol. **9** (2005), 1043–1114.
 - **CMPP21**: R. Cardona, E. Miranda, D. Peralta-Salas, F. Presas, *Constructing Turing complete Euler flows in dimension 3*, PNAS **118** (2021), e2026818118.
 - **GK07**: D. T. Gay, R. Kirby, *Constructing Lefschetz-type fibrations on four-manifolds*, Geom. Topol. **11** (2007), 2075–2115.
+- **GSV15**: L. C. García-Naranjo, P. Suárez-Serrato, R. Vera, *Poisson structures on smooth 4-manifolds*, Lett. Math. Phys. **105**(11) (2015), 1533–1550.
 - **Lek09**: Y. Lekili, *Wrinkled fibrations on near-symplectic manifolds*, Geom. Topol. **13** (2009), 277–318 (§3.1 Move 1, §3.2 Moves 2–4, §4 Theorem 4).
 - **Mos65**: J. Moser, *On the volume elements on a manifold*, Trans. Amer. Math. Soc. **120** (1965), 286–294.
-- **ST16**: P. Suárez-Serrato, R. Torres, *Poisson structures on wrinkled fibrations*, Geom. Dedicata **183** (2016), 99–114.
+- **ST16**: P. Suárez-Serrato, J. Torres Orozco, *Poisson structures on wrinkled fibrations*, Bol. Soc. Mat. Mex. **22**(1) (2016), 263–280.
 
 ---
 

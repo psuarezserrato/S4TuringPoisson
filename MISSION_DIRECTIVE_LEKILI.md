@@ -24,7 +24,7 @@ Currently, `AdmitsWrinkledOrBrokenLefschetzFibration` has a global instance **on
    Extends `WrinkledFibration` with:
    $$\forall p \in \mathrm{Crit}(f),\quad \mathrm{IsRealLefschetzAt}(f, p) \lor \mathrm{IsIndefiniteFoldAt}(f, p).$$
    No definite folds and no cusps occur; critical loci are isolated Lefschetz points and $1$-dimensional circles of indefinite folds.
-3. **`PurelyWrinkledFibration`** (Lekili 2009, *Geom. Topol.* **13**, 277–318; Suárez-Serrato–Torres 2016):
+3. **`PurelyWrinkledFibration`** (Lekili 2009, *Geom. Topol.* **13**, 277–318; Suárez-Serrato–Torres Orozco 2016):
    Extends `WrinkledFibration` with:
    $$\forall p \in \mathrm{Crit}(f),\quad \mathrm{IsIndefiniteFoldAt}(f, p) \lor \mathrm{IsWrinkledCuspAt}(f, p).$$
    Every singularity is modeled either on Eq. (2) indefinite quadratic folds `(y₁, y₂, y₃, t) ↦ (y₁² - (y₂² + y₃²)/2, t)` or wrinkled cusps `(t, x₁, x₂, x₃) ↦ (t, x₁³ - 3 t x₁ + x₂² - x₃²)`, with **zero** definite folds (`IsIndefiniteFoldAt` already defined in `LocalSingularModels.lean` L952; `IsWrinkledCuspAt` already defined alongside `wrinkledCuspMap`).
@@ -120,9 +120,10 @@ All milestones follow `.agents/rules/lean-integrity.md` (`LEAN_NUM_THREADS=2 lak
 
 - **ADK05**: D. Auroux, S. K. Donaldson, L. Katzarkov, *Singular Lefschetz pencils*, Geom. Topol. **9** (2005), 1043–1114.
 - **GK07**: D. T. Gay, R. Kirby, *Constructing Lefschetz-type fibrations on four-manifolds*, Geom. Topol. **11** (2007), 2075–2115.
+- **GSV15**: L. C. García-Naranjo, P. Suárez-Serrato, R. Vera, *Poisson structures on smooth 4-manifolds*, Lett. Math. Phys. **105**(11) (2015), 1533–1550.
 - **Lek09**: Y. Lekili, *Wrinkled fibrations on near-symplectic manifolds*, Geom. Topol. **13** (2009), 277–318.
 - **Sae06**: O. Saeki, *Elimination of definite fold*, Kyushu J. Math. **60** (2006), 363–382.
-- **ST16**: P. Suárez-Serrato, R. Torres, *Poisson structures on wrinkled fibrations*, Geom. Dedicata **183** (2016), 99–114.
+- **ST16**: P. Suárez-Serrato, J. Torres Orozco, *Poisson structures on wrinkled fibrations*, Bol. Soc. Mat. Mex. **22**(1) (2016), 263–280.
 
 ---
 
