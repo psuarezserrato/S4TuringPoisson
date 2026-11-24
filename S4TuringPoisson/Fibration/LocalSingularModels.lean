@@ -13,6 +13,7 @@ public import S4TuringPoisson.Interfaces
 public import Mathlib.Analysis.Calculus.Deriv.Add
 public import Mathlib.Analysis.Calculus.Deriv.Mul
 public import Mathlib.Analysis.Calculus.Deriv.Pow
+public import Mathlib.Analysis.Calculus.Deriv.Slope
 public import Mathlib.Analysis.Calculus.FDeriv.Add
 public import Mathlib.Analysis.Calculus.FDeriv.Comp
 public import Mathlib.Analysis.Calculus.FDeriv.Linear
@@ -20,7 +21,10 @@ public import Mathlib.Analysis.Calculus.FDeriv.Mul
 public import Mathlib.Analysis.Calculus.FDeriv.Pow
 public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import Mathlib.LinearAlgebra.Matrix.ToLin
 public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Basic
+public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Constructions
+public import TauCeti.Geometry.Manifold.Orientation.Pullback
 public import TauCeti.Geometry.Sphere.Connected
 
 /-!
@@ -42,14 +46,16 @@ Suárez-Serrato–Torres 2016):
      `(1, 0, 0, t) ∉ Crit`, and the ADK equatorial cobordism fiber topology transition
      (disconnected two-sheeted hyperboloid over `c > 0` vs. connected cylinder `Circle × ℝ` with
      vanishing cycle over `c < 0`).
-3. **Real Lefschetz & Wrinkled Cusp Normal Forms (`Lekili 2009`, `ST16`)**:
-   - `realLefschetzMap` (`(x₁, y₁, x₂, y₂) ↦ (x₁² - y₁² + x₂² - y₂², 2 x₁ y₁ + 2 x₂ y₂)`) with
-     isolated critical point `{0}`.
+3. **Real Lefschetz & Wrinkled Cusp Normal Forms (`Lekili 2009`, `GK07`, `ST16`)**:
+   - `realLefschetzMap` (`(x₁, y₁, x₂, y₂) ↦ (x₁² - y₁² + x₂² - y₂², 2 x₁ y₁ + 2 x₂ y₂)`) and
+     achiral companion `achiralRealLefschetzMap` (`(z₁, z₂) ↦ z̄₁² + z₂²`), each with isolated
+     critical point `{0}`.
    - `wrinkledCuspMap` (`(t, x₁, x₂, x₃) ↦ (t, x₁³ - 3 t x₁ + x₂² - x₃²)`) with parabolic critical
      curve `{p | p 0 = p 1 ^ 2 ∧ p 2 = 0 ∧ p 3 = 0}` projecting to the semi-cubical cusp
      `(s², -2 s³)`.
    - Local chart singularity predicates `IsLocallyModeledOn`, `IsIndefiniteFoldAt`,
-     `IsRealLefschetzAt`, and `IsWrinkledCuspAt`.
+     `IsRealLefschetzAt`, `IsChiralRealLefschetzAt` (orientation-preserving charts via
+     `TauCeti.Manifold.Orientation.IsOrientationPreservingAt`), and `IsWrinkledCuspAt`.
 4. **`WrinkledFibration` & `BrokenLefschetzFibration`**:
    - Global smooth singular fibration structures packaging a nonempty regular open disk
      `baseRegion ⊆ Base` disjoint from `f '' Crit(f)`, a compact nonempty smooth 2-manifold fiber
@@ -651,9 +657,12 @@ end IndefiniteFold
 
 section LefschetzAndCusp
 
-/-- Real normal form of an **achiral / oriented Lefschetz singularity** (`ℂ² → ℂ`,
+/-- Real normal form of a **chiral (complex-holomorphic) Lefschetz singularity** (`ℂ² → ℂ`,
 `(z₁, z₂) ↦ z₁² + z₂²` in real coordinates `(x₁, y₁, x₂, y₂)`):
-`(x₁, y₁, x₂, y₂) ↦ (x₁² - y₁² + x₂² - y₂², 2 x₁ y₁ + 2 x₂ y₂)`. -/
+`(x₁, y₁, x₂, y₂) ↦ (x₁² - y₁² + x₂² - y₂², 2 x₁ y₁ + 2 x₂ y₂)`.
+Up to smooth unoriented chart diffeomorphisms (`IsRealLefschetzAt`), this normal form also models
+achiral Lefschetz critical points `(z₁, z₂) ↦ z̄₁² + z₂²` (`achiralRealLefschetzMap`); see
+`IsChiralRealLefschetzAt` for the orientation-sensitive chiral refinement. -/
 noncomputable def realLefschetzMap (p : EuclideanSpace ℝ (Fin 4)) : EuclideanPlane :=
   vec2 (p 0 ^ 2 - p 1 ^ 2 + p 2 ^ 2 - p 3 ^ 2) (2 * p 0 * p 1 + 2 * p 2 * p 3)
 
@@ -964,7 +973,11 @@ def IsIndefiniteFoldAt
     (f : M → Base) (p : M) : Prop :=
   IsLocallyModeledOn I_M I_B f p indefiniteFoldMap 0
 
-/-- `f` has a **real Lefschetz singularity** at `p` (`ADK05`, `ST16`). -/
+/-- `f` has a **real (possibly achiral) Lefschetz singularity** at `p` (`ADK05`, `GK07`, `ST16`):
+there exist smooth local coordinate charts `(φ, ψ)` (not required to preserve orientation) modeling
+`f` on `realLefschetzMap` at `0`. Omitting orientation preservation allows `IsRealLefschetzAt` to
+cover both chiral (`(z₁, z₂) ↦ z₁² + z₂²`) and achiral (`(z₁, z₂) ↦ z̄₁² + z₂²`) Lefschetz points;
+see `IsChiralRealLefschetzAt` for the orientation-preserving chiral refinement. -/
 def IsRealLefschetzAt
     {E_M H_M E_B H_B M Base : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
@@ -1020,6 +1033,701 @@ theorem isWrinkledCuspAt_wrinkledCuspMap_zero :
   isLocallyModeledOn_self wrinkledCuspMap 0
 
 end LefschetzAndCusp
+
+/-! ### Chiral vs. Achiral Real Lefschetz Singularities (`ADK05`, `GK07`, `Lekili 2009`) -/
+
+section ChiralLefschetz
+
+/-- Standard manifold orientation of `ℝ⁴ = EuclideanSpace ℝ (Fin 4)` induced by
+`EuclideanSpace.basisFun (Fin 4) ℝ`. -/
+-- tier: T1
+noncomputable def euclidean4Orientation :
+    TauCeti.Manifold.Orientation (𝓡 4) (EuclideanSpace ℝ (Fin 4)) (Fin 4) :=
+  TauCeti.Manifold.Orientation.model (I := 𝓡 4)
+    (EuclideanSpace.basisFun (Fin 4) ℝ).toBasis.orientation (by simp)
+
+/-- Standard manifold orientation of `ℝ² = EuclideanPlane` induced by
+`EuclideanSpace.basisFun (Fin 2) ℝ`. -/
+-- tier: T1
+noncomputable def euclideanPlaneOrientation :
+    TauCeti.Manifold.Orientation (𝓡 2) EuclideanPlane (Fin 2) :=
+  TauCeti.Manifold.Orientation.model (I := 𝓡 2)
+    (EuclideanSpace.basisFun (Fin 2) ℝ).toBasis.orientation (by simp)
+
+/-- Canonical `TauCeti.Manifold.Orientation` induced by any `PositiveVolumeForm` via
+`TauCeti.Manifold.Orientation.ofTopForm`. -/
+-- tier: T1
+noncomputable def PositiveVolumeForm.orientation
+    {E H M : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+    [TopologicalSpace H] {I : ModelWithCorners ℝ E H}
+    [TopologicalSpace M] [ChartedSpace H M] [IsManifold I ∞ M]
+    [MeasurableSpace M] [BorelSpace M] {n : ℕ} [hdim : HasFinrank E n]
+    (V : PositiveVolumeForm I M) :
+    TauCeti.Manifold.Orientation I M (Fin n) :=
+  TauCeti.Manifold.Orientation.ofTopForm hdim.finrank_eq V.Ω.1
+    (V.Ω.isSmoothForm.of_le bot_le) V.Ω_ne_zero
+
+/-- `f : M → Base` has a **chiral (positively oriented) real Lefschetz singularity** at `p`
+with respect to manifold orientations `o_M` on `M` and `o_B` on `Base` (`ADK05`, `GK07`):
+there exist smooth partial diffeomorphisms `φ` around `p` and `ψ` around `f p` that are
+orientation-preserving (`TauCeti.Manifold.Orientation.IsOrientationPreservingAt`) onto
+`euclidean4Orientation` and `euclideanPlaneOrientation` and intertwine `f` with `realLefschetzMap`
+(`(z₁, z₂) ↦ z₁² + z₂²`) centered at `0`.
+
+In contrast, `IsRealLefschetzAt` omits orientation preservation so that `BrokenLefschetzFibration`
+also covers **achiral** Lefschetz singularities `(z₁, z₂) ↦ z̄₁² + z₂²` (`achiralRealLefschetzMap`),
+which arise in Gay–Kirby's existence theorem (`Geom. Topol.` 11, 2007) on arbitrary closed oriented
+4-manifolds and are equally eliminated by Lekili's local wrinkling surgery (`Lekili 2009`, §3.1 &
+§4 / Theorem 4). -/
+-- tier: T2
+def IsChiralRealLefschetzAt
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [FiniteDimensional ℝ E_M]
+    [TopologicalSpace H_M] {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [FiniteDimensional ℝ E_B]
+    [TopologicalSpace H_B] {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M 1 M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B 1 Base]
+    (o_M : TauCeti.Manifold.Orientation I_M M (Fin 4))
+    (o_B : TauCeti.Manifold.Orientation I_B Base (Fin 2))
+    (f : M → Base) (p : M) : Prop :=
+  ∃ (φ : PartialDiffeomorph I_M (𝓡 4) M (EuclideanSpace ℝ (Fin 4)) ∞)
+    (ψ : PartialDiffeomorph I_B (𝓡 2) Base EuclideanPlane ∞),
+    p ∈ φ.source ∧ f p ∈ ψ.source ∧ φ p = 0 ∧ ψ (f p) = realLefschetzMap 0 ∧
+    (∀ q ∈ φ.source,
+      TauCeti.Manifold.Orientation.IsOrientationPreservingAt o_M euclidean4Orientation φ q) ∧
+    (∀ y ∈ ψ.source,
+      TauCeti.Manifold.Orientation.IsOrientationPreservingAt o_B euclideanPlaneOrientation ψ y) ∧
+    ∀ q ∈ φ.source, f q ∈ ψ.source ∧ ψ (f q) = realLefschetzMap (φ q)
+
+/-- Volume-form specialization of `IsChiralRealLefschetzAt` on `(M, V_M)` over `(Base, V_B)`. -/
+-- tier: T1
+abbrev IsChiralRealLefschetzAtOfVolume
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [FiniteDimensional ℝ E_M] [HasFinrank E_M 4]
+    [TopologicalSpace H_M] {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [FiniteDimensional ℝ E_B] [HasFinrank E_B 2]
+    [TopologicalSpace H_B] {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
+    [MeasurableSpace M] [BorelSpace M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
+    [MeasurableSpace Base] [BorelSpace Base]
+    (V_M : PositiveVolumeForm I_M M) (V_B : PositiveVolumeForm I_B Base)
+    (f : M → Base) (p : M) : Prop :=
+  IsChiralRealLefschetzAt V_M.orientation V_B.orientation f p
+
+/-- Every chiral real Lefschetz critical point satisfies `IsRealLefschetzAt`. -/
+-- tier: T1
+theorem IsChiralRealLefschetzAt.isRealLefschetzAt
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [FiniteDimensional ℝ E_M]
+    [TopologicalSpace H_M] {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [FiniteDimensional ℝ E_B]
+    [TopologicalSpace H_B] {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M 1 M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B 1 Base]
+    {o_M : TauCeti.Manifold.Orientation I_M M (Fin 4)}
+    {o_B : TauCeti.Manifold.Orientation I_B Base (Fin 2)}
+    {f : M → Base} {p : M}
+    (h : IsChiralRealLefschetzAt o_M o_B f p) :
+    IsRealLefschetzAt I_M I_B f p := by
+  obtain ⟨φ, ψ, hp, hfp, hφ0, hψ0, _, _, hmod⟩ := h
+  exact ⟨φ, ψ, hp, hfp, hφ0, hψ0, hmod⟩
+
+/-- Pointwise orientation preservation at `p` and `f p` suffices to obtain orientation-preserving
+charts on their full open domains (for `f` continuous at `p`). -/
+-- tier: T2
+theorem isChiralRealLefschetzAt_of_pointwise
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [FiniteDimensional ℝ E_M]
+    [TopologicalSpace H_M] {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [FiniteDimensional ℝ E_B]
+    [TopologicalSpace H_B] {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
+    {o_M : TauCeti.Manifold.Orientation I_M M (Fin 4)}
+    {o_B : TauCeti.Manifold.Orientation I_B Base (Fin 2)}
+    {f : M → Base} {p : M} (hf_cont : ContinuousAt f p)
+    (φ : PartialDiffeomorph I_M (𝓡 4) M (EuclideanSpace ℝ (Fin 4)) ∞)
+    (ψ : PartialDiffeomorph I_B (𝓡 2) Base EuclideanPlane ∞)
+    (hp : p ∈ φ.source) (hfp : f p ∈ ψ.source)
+    (hφ0 : φ p = 0) (hψ0 : ψ (f p) = realLefschetzMap 0)
+    (hφ_or : TauCeti.Manifold.Orientation.IsOrientationPreservingAt o_M euclidean4Orientation φ p)
+    (hψ_or :
+      TauCeti.Manifold.Orientation.IsOrientationPreservingAt o_B euclideanPlaneOrientation ψ (f p))
+    (hmod : ∀ q ∈ φ.source, f q ∈ ψ.source ∧ ψ (f q) = realLefschetzMap (φ q)) :
+    IsChiralRealLefschetzAt o_M o_B f p := by
+  have hψ_at : ContMDiffAt I_B (𝓡 2) 1 ψ (f p) :=
+    (ψ.contMDiffOn.contMDiffAt (ψ.open_source.mem_nhds hfp)).of_le (by simp)
+  have hφ_at : ContMDiffAt I_M (𝓡 4) 1 φ p :=
+    (φ.contMDiffOn.contMDiffAt (φ.open_source.mem_nhds hp)).of_le (by simp)
+  obtain ⟨V, hV_sub, hV_open, hfpV⟩ :=
+    _root_.eventually_nhds_iff.mp
+      (TauCeti.Manifold.Orientation.eventually_isOrientationPreservingAt hψ_at hψ_or)
+  let V' : Set Base := ψ.source ∩ V
+  have hV'_open : IsOpen V' := ψ.open_source.inter hV_open
+  let ψ' := ψ.restrOpen V' hV'_open
+  have hψ'_src : ψ'.source = ψ.source ∩ V' := PartialDiffeomorph.restrOpen_source ψ hV'_open
+  have hψ'_eq : ∀ y, ψ' y = ψ y := fun y ↦ by
+    rw [PartialDiffeomorph.restrOpen_toPartialEquiv]; rfl
+  have hfp_V' : f p ∈ V' := ⟨hfp, hfpV⟩
+  have hev_dom :
+      ∀ᶠ q in 𝓝 p,
+        TauCeti.Manifold.Orientation.IsOrientationPreservingAt o_M euclidean4Orientation φ q ∧
+          f q ∈ V' :=
+    (TauCeti.Manifold.Orientation.eventually_isOrientationPreservingAt hφ_at hφ_or).and
+      (hf_cont.preimage_mem_nhds (hV'_open.mem_nhds hfp_V'))
+  obtain ⟨U, hU_sub, hU_open, hpU⟩ := _root_.eventually_nhds_iff.mp hev_dom
+  let U' : Set M := φ.source ∩ U
+  have hU'_open : IsOpen U' := φ.open_source.inter hU_open
+  let φ' := φ.restrOpen U' hU'_open
+  have hφ'_src : φ'.source = φ.source ∩ U' := PartialDiffeomorph.restrOpen_source φ hU'_open
+  have hφ'_eq : ∀ q, φ' q = φ q := fun q ↦ by
+    rw [PartialDiffeomorph.restrOpen_toPartialEquiv]; rfl
+  refine ⟨φ', ψ', ?_, ?_, by rw [hφ'_eq, hφ0], by rw [hψ'_eq, hψ0], ?_, ?_, ?_⟩
+  · rw [hφ'_src]; exact ⟨hp, hp, hpU⟩
+  · rw [hψ'_src]; exact ⟨hfp, hfp_V'⟩
+  · intro q hq
+    rw [hφ'_src] at hq
+    have hcongr : (φ' : M → EuclideanSpace ℝ (Fin 4)) = φ := funext hφ'_eq
+    rw [hcongr]
+    exact (hU_sub q hq.2.2).1
+  · intro y hy
+    rw [hψ'_src] at hy
+    have hcongr : (ψ' : Base → EuclideanPlane) = ψ := funext hψ'_eq
+    rw [hcongr]
+    exact hV_sub y hy.2.2
+  · intro q hq
+    rw [hφ'_src] at hq
+    refine ⟨?_, ?_⟩
+    · rw [hψ'_src]
+      exact ⟨(hmod q hq.1).1, (hU_sub q hq.2.2).2⟩
+    · rw [hψ'_eq, hφ'_eq, (hmod q hq.1).2]
+
+/-- `realLefschetzMap` (`(z₁, z₂) ↦ z₁² + z₂²`) is chiral at `0` with respect to the standard
+orientations of `ℝ⁴` and `ℝ²`. -/
+-- tier: T2
+theorem isChiralRealLefschetzAt_realLefschetzMap_zero :
+    IsChiralRealLefschetzAt euclidean4Orientation euclideanPlaneOrientation realLefschetzMap 0 :=
+  ⟨reflPartialDiffeomorph (𝓡 4) (EuclideanSpace ℝ (Fin 4)),
+    reflPartialDiffeomorph (𝓡 2) EuclideanPlane,
+    Set.mem_univ _, Set.mem_univ _, rfl, rfl,
+    fun q _ ↦ TauCeti.Manifold.Orientation.isOrientationPreservingAt_id euclidean4Orientation q,
+    fun y _ ↦
+      TauCeti.Manifold.Orientation.isOrientationPreservingAt_id euclideanPlaneOrientation y,
+    fun _ _ ↦ ⟨Set.mem_univ _, rfl⟩⟩
+
+/-- Real normal form of an **achiral (negatively oriented) Lefschetz singularity** (`ℂ² → ℂ`,
+`(z₁, z₂) ↦ z̄₁² + z₂²` in real coordinates `(p₀, p₁, p₂, p₃)`):
+`(p₀, p₁, p₂, p₃) ↦ (p₀² - p₁² + p₂² - p₃², -2 p₀ p₁ + 2 p₂ p₃)`. -/
+-- tier: T1
+noncomputable def achiralRealLefschetzMap (p : EuclideanSpace ℝ (Fin 4)) : EuclideanPlane :=
+  vec2 (p 0 ^ 2 - p 1 ^ 2 + p 2 ^ 2 - p 3 ^ 2) (-2 * p 0 * p 1 + 2 * p 2 * p 3)
+
+@[simp]
+theorem achiralRealLefschetzMap_apply_zero (p : EuclideanSpace ℝ (Fin 4)) :
+    achiralRealLefschetzMap p 0 = p 0 ^ 2 - p 1 ^ 2 + p 2 ^ 2 - p 3 ^ 2 := rfl
+
+@[simp]
+theorem achiralRealLefschetzMap_apply_one (p : EuclideanSpace ℝ (Fin 4)) :
+    achiralRealLefschetzMap p 1 = -2 * p 0 * p 1 + 2 * p 2 * p 3 := rfl
+
+/-- `achiralRealLefschetzMap` is $C^\infty$ smooth (`ContDiff ℝ ∞`). -/
+-- tier: T1
+theorem contDiff_achiralRealLefschetzMap : ContDiff ℝ ∞ achiralRealLefschetzMap := by
+  have hp (i : Fin 4) : ContDiff ℝ ∞ (fun p : EuclideanSpace ℝ (Fin 4) ↦ p i) :=
+    (euclidProj i).contDiff
+  exact contDiff_vec2
+    (((((hp 0).pow 2).sub ((hp 1).pow 2)).add ((hp 2).pow 2)).sub ((hp 3).pow 2))
+    (((contDiff_const.mul (hp 0)).mul (hp 1)).add ((contDiff_const.mul (hp 2)).mul (hp 3)))
+
+/-- `achiralRealLefschetzMap` is $C^\infty$ smooth as a manifold map `𝓡 4 → 𝓡 2`. -/
+-- tier: T1
+theorem contMDiff_achiralRealLefschetzMap : ContMDiff (𝓡 4) (𝓡 2) ∞ achiralRealLefschetzMap :=
+  contDiff_achiralRealLefschetzMap.contMDiff
+
+/-- Orientation-reversing involution `(p₀, p₁, p₂, p₃) ↦ (p₀, -p₁, p₂, p₃)` conjugating `z₁` in
+`ℂ² = ℝ⁴`. -/
+private noncomputable def conjFirstCoordCLE :
+    EuclideanSpace ℝ (Fin 4) ≃L[ℝ] EuclideanSpace ℝ (Fin 4) where
+  toFun p := vec4 (p 0) (-p 1) (p 2) (p 3)
+  invFun p := vec4 (p 0) (-p 1) (p 2) (p 3)
+  map_add' u v := by refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp [add_comm]
+  map_smul' r v := by refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp
+  left_inv v := by refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp
+  right_inv v := by refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp
+  continuous_toFun :=
+    (contDiff_vec4 (n := ∞) ((euclidProj 0).contDiff) ((euclidProj 1).contDiff.neg)
+      ((euclidProj 2).contDiff) ((euclidProj 3).contDiff)).continuous
+  continuous_invFun :=
+    (contDiff_vec4 (n := ∞) ((euclidProj 0).contDiff) ((euclidProj 1).contDiff.neg)
+      ((euclidProj 2).contDiff) ((euclidProj 3).contDiff)).continuous
+
+private theorem conjFirstCoordCLE_apply (p : EuclideanSpace ℝ (Fin 4)) :
+    conjFirstCoordCLE p = vec4 (p 0) (-p 1) (p 2) (p 3) := rfl
+
+private theorem realLefschetzMap_conjFirstCoordCLE (p : EuclideanSpace ℝ (Fin 4)) :
+    realLefschetzMap (conjFirstCoordCLE p) = achiralRealLefschetzMap p := by
+  refine ext_vec2 ?_ ?_ <;>
+    (simp only [realLefschetzMap, achiralRealLefschetzMap, conjFirstCoordCLE_apply,
+       vec4_zero, vec4_one, vec4_two, vec4_three, vec2_zero, vec2_one];
+     ring)
+
+/-- The achiral model `achiralRealLefschetzMap` (`(z₁, z₂) ↦ z̄₁² + z₂²`) satisfies the unoriented
+local normal-form predicate `IsRealLefschetzAt` at `0` (via complex conjugation in `z₁`). -/
+-- tier: T2
+theorem isRealLefschetzAt_achiralRealLefschetzMap_zero :
+    IsRealLefschetzAt (𝓡 4) (𝓡 2) achiralRealLefschetzMap 0 := by
+  refine ⟨conjFirstCoordCLE.toPartialDiffeomorph,
+    reflPartialDiffeomorph (𝓡 2) EuclideanPlane,
+    by simp [ContinuousLinearEquiv.toPartialDiffeomorph_toPartialEquiv],
+    Set.mem_univ _,
+    ?_, ?_, fun q _ ↦ ⟨Set.mem_univ _, ?_⟩⟩
+  · have hcoe : (conjFirstCoordCLE.toPartialDiffeomorph (n := ∞) :
+        EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 4)) 0 = conjFirstCoordCLE 0 := by
+      simp [ContinuousLinearEquiv.toPartialDiffeomorph_toPartialEquiv]
+    rw [hcoe, map_zero]
+  · refine ext_vec2 ?_ ?_ <;> simp [reflPartialDiffeomorph]
+  · have hcoe1 : (reflPartialDiffeomorph (𝓡 2) EuclideanPlane :
+        EuclideanPlane → EuclideanPlane) (achiralRealLefschetzMap q) =
+        achiralRealLefschetzMap q := rfl
+    have hcoe2 : (conjFirstCoordCLE.toPartialDiffeomorph (n := ∞) :
+        EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 4)) q = conjFirstCoordCLE q := by
+      simp [ContinuousLinearEquiv.toPartialDiffeomorph_toPartialEquiv]
+    rw [hcoe1, hcoe2, realLefschetzMap_conjFirstCoordCLE]
+
+private theorem det_pos_of_isOrientationPreservingAt_euclidean
+    {n : ℕ} {f : EuclideanSpace ℝ (Fin n) → EuclideanSpace ℝ (Fin n)}
+    {x : EuclideanSpace ℝ (Fin n)} (hf_zero : f x = 0)
+    (hor : TauCeti.Manifold.Orientation.IsOrientationPreservingAt
+      (TauCeti.Manifold.Orientation.model (I := 𝓡 n)
+        (EuclideanSpace.basisFun (Fin n) ℝ).toBasis.orientation (by simp))
+      (TauCeti.Manifold.Orientation.model (I := 𝓡 n)
+        (EuclideanSpace.basisFun (Fin n) ℝ).toBasis.orientation (by simp))
+      f x) :
+    ∃ e : EuclideanSpace ℝ (Fin n) ≃L[ℝ] EuclideanSpace ℝ (Fin n),
+      (e : EuclideanSpace ℝ (Fin n) →L[ℝ] EuclideanSpace ℝ (Fin n)) = fderiv ℝ f x ∧
+        0 < LinearMap.det e.toLinearMap := by
+  obtain ⟨eT, heT, hmap⟩ :=
+    (TauCeti.Manifold.Orientation.isOrientationPreservingAt_iff _ _ _ _).mp hor
+  let oE := (EuclideanSpace.basisFun (Fin n) ℝ).toBasis.orientation
+  have hn : Fintype.card (Fin n) = Module.finrank ℝ (EuclideanSpace ℝ (Fin n)) := by simp
+  let e : EuclideanSpace ℝ (Fin n) ≃L[ℝ] EuclideanSpace ℝ (Fin n) :=
+    (NormedSpace.fromTangentSpace x).symm.trans
+      (eT.trans (NormedSpace.fromTangentSpace (f x)))
+  have he : (e : EuclideanSpace ℝ (Fin n) →L[ℝ] EuclideanSpace ℝ (Fin n)) = fderiv ℝ f x := by
+    apply ContinuousLinearMap.ext
+    intro v
+    have h1 := DFunLike.congr_fun heT ((NormedSpace.fromTangentSpace x).symm v)
+    rw [mfderiv_eq_fderiv] at h1
+    have h2 := congrArg (NormedSpace.fromTangentSpace (f x)) h1
+    simpa [e] using h2
+  have hmapE : _root_.Orientation.map (Fin n) e.toLinearEquiv oE = oE := by
+    have hsrc := TauCeti.Manifold.Orientation.map_orientationAt_model oE hn x
+    have htgt := TauCeti.Manifold.Orientation.map_orientationAt_model oE hn (f x)
+    have hsrc' :
+        ((TauCeti.Manifold.Orientation.model (I := 𝓡 n) oE hn).orientationAt x) =
+          _root_.Orientation.map (Fin n)
+            (NormedSpace.fromTangentSpace x).symm.toLinearEquiv oE := by
+      have h3 :=
+        congrArg
+          (_root_.Orientation.map (Fin n) (NormedSpace.fromTangentSpace x).symm.toLinearEquiv) hsrc
+      rw [← _root_.Orientation.map_trans] at h3
+      have hid :
+          (NormedSpace.fromTangentSpace x).toLinearEquiv.trans
+            (NormedSpace.fromTangentSpace x).symm.toLinearEquiv =
+            LinearEquiv.refl ℝ (TangentSpace (𝓡 n) x) :=
+        LinearEquiv.self_trans_symm _
+      rw [hid, _root_.Orientation.map_refl] at h3
+      exact h3
+    calc
+      _root_.Orientation.map (Fin n) e.toLinearEquiv oE
+        = _root_.Orientation.map (Fin n)
+            (NormedSpace.fromTangentSpace (f x)).toLinearEquiv
+            (_root_.Orientation.map (Fin n) eT.toLinearEquiv
+              (_root_.Orientation.map (Fin n)
+                (NormedSpace.fromTangentSpace x).symm.toLinearEquiv oE)) := by
+            simp only [e, ContinuousLinearEquiv.trans_toLinearEquiv, _root_.Orientation.map_trans]
+      _ = _root_.Orientation.map (Fin n)
+            (NormedSpace.fromTangentSpace (f x)).toLinearEquiv
+            ((TauCeti.Manifold.Orientation.model (I := 𝓡 n) oE hn).orientationAt (f x)) := by
+            rw [← hsrc', hmap]
+      _ = oE := htgt
+  have _ := hf_zero
+  exact ⟨e, he, (_root_.Orientation.map_eq_iff_det_pos oE e.toLinearEquiv hn).mp hmapE⟩
+
+private noncomputable def polarRealLefschetz (u w : EuclideanSpace ℝ (Fin 4)) : EuclideanPlane :=
+  (1 / 2 : ℝ) • (realLefschetzMap (u + w) - realLefschetzMap u - realLefschetzMap w)
+
+private noncomputable def polarAchiralLefschetz (u w : EuclideanSpace ℝ (Fin 4)) : EuclideanPlane :=
+  (1 / 2 : ℝ) •
+    (achiralRealLefschetzMap (u + w) - achiralRealLefschetzMap u - achiralRealLefschetzMap w)
+
+private theorem polarRealLefschetz_eq (u w : EuclideanSpace ℝ (Fin 4)) :
+    polarRealLefschetz u w =
+      vec2 (u 0 * w 0 - u 1 * w 1 + u 2 * w 2 - u 3 * w 3)
+        (u 0 * w 1 + u 1 * w 0 + u 2 * w 3 + u 3 * w 2) := by
+  refine ext_vec2 ?_ ?_ <;>
+    (simp only [polarRealLefschetz, realLefschetzMap, PiLp.smul_apply, PiLp.sub_apply,
+       PiLp.add_apply, smul_eq_mul, vec2_zero, vec2_one];
+     ring)
+
+private theorem polarAchiralLefschetz_eq (u w : EuclideanSpace ℝ (Fin 4)) :
+    polarAchiralLefschetz u w =
+      vec2 (u 0 * w 0 - u 1 * w 1 + u 2 * w 2 - u 3 * w 3)
+        (-u 0 * w 1 - u 1 * w 0 + u 2 * w 3 + u 3 * w 2) := by
+  refine ext_vec2 ?_ ?_ <;>
+    (simp only [polarAchiralLefschetz, achiralRealLefschetzMap, PiLp.smul_apply, PiLp.sub_apply,
+       PiLp.add_apply, smul_eq_mul, vec2_zero, vec2_one];
+     ring)
+
+private noncomputable def planeRotJ (z : EuclideanPlane) : EuclideanPlane :=
+  vec2 (z 1) (-z 0)
+
+private noncomputable def chiralRotJ (x : EuclideanSpace ℝ (Fin 4)) : EuclideanSpace ℝ (Fin 4) :=
+  vec4 (x 1) (-x 0) (x 3) (-x 2)
+
+private noncomputable def achiralRotJ (x : EuclideanSpace ℝ (Fin 4)) : EuclideanSpace ℝ (Fin 4) :=
+  vec4 (-x 1) (x 0) (x 3) (-x 2)
+
+private theorem det_nonneg_of_commute_chiralRotJ
+    (M : EuclideanSpace ℝ (Fin 4) →ₗ[ℝ] EuclideanSpace ℝ (Fin 4))
+    (hcomm : ∀ x, M (chiralRotJ x) = chiralRotJ (M x)) :
+    0 ≤ LinearMap.det M := by
+  let b := (EuclideanSpace.basisFun (Fin 4) ℝ).toBasis
+  have hb0 : b 0 = vec4 1 0 0 0 := by
+    refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp [b, EuclideanSpace.basisFun_apply]
+  have hb1 : b 1 = -chiralRotJ (b 0) := by
+    rw [hb0]
+    refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp [b, chiralRotJ, EuclideanSpace.basisFun_apply]
+  have hb2 : b 2 = vec4 0 0 1 0 := by
+    refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp [b, EuclideanSpace.basisFun_apply]
+  have hb3 : b 3 = -chiralRotJ (b 2) := by
+    rw [hb2]
+    refine ext_vec4 ?_ ?_ ?_ ?_ <;> simp [b, chiralRotJ, EuclideanSpace.basisFun_apply]
+  have hM1 : M (b 1) = -chiralRotJ (M (b 0)) := by rw [hb1, map_neg, hcomm]
+  have hM3 : M (b 3) = -chiralRotJ (M (b 2)) := by rw [hb3, map_neg, hcomm]
+  let a := M (b 0)
+  let c := M (b 2)
+  have hrepr (v : EuclideanSpace ℝ (Fin 4)) (i : Fin 4) : b.repr v i = v i := by
+    change ((EuclideanSpace.basisFun (Fin 4) ℝ).repr v) i = v i
+    simp
+  rw [← LinearMap.det_toMatrix b M]
+  let mat := LinearMap.toMatrix b b M
+  have hmat (i j : Fin 4) : mat i j = (M (b j)) i := by
+    simp [mat, LinearMap.toMatrix_apply, hrepr]
+  have hm0 (i : Fin 4) : mat i 0 = a i := hmat i 0
+  have hm2 (i : Fin 4) : mat i 2 = c i := hmat i 2
+  have hm10 : mat 0 1 = -a 1 := by rw [hmat, hM1]; simp [chiralRotJ, a]
+  have hm11 : mat 1 1 = a 0 := by rw [hmat, hM1]; simp [chiralRotJ, a]
+  have hm12 : mat 2 1 = -a 3 := by rw [hmat, hM1]; simp [chiralRotJ, a]
+  have hm13 : mat 3 1 = a 2 := by rw [hmat, hM1]; simp [chiralRotJ, a]
+  have hm30 : mat 0 3 = -c 1 := by rw [hmat, hM3]; simp [chiralRotJ, c]
+  have hm31 : mat 1 3 = c 0 := by rw [hmat, hM3]; simp [chiralRotJ, c]
+  have hm32 : mat 2 3 = -c 3 := by rw [hmat, hM3]; simp [chiralRotJ, c]
+  have hm33 : mat 3 3 = c 2 := by rw [hmat, hM3]; simp [chiralRotJ, c]
+  have hdet_eq :
+      Matrix.det mat =
+        (a 0 * c 2 - a 1 * c 3 - a 2 * c 0 + a 3 * c 1) ^ 2 +
+          (a 0 * c 3 + a 1 * c 2 - a 2 * c 1 - a 3 * c 0) ^ 2 := by
+    rw [Matrix.det_succ_row_zero, Fin.sum_univ_four]
+    simp only [Fin.val_zero, Fin.val_one, Fin.val_two, show (3 : Fin 4).val = 3 from rfl]
+    rw [Matrix.det_succ_row_zero, Matrix.det_succ_row_zero,
+      Matrix.det_succ_row_zero, Matrix.det_succ_row_zero]
+    simp only [Fin.sum_univ_three, Matrix.det_fin_two, Matrix.submatrix_apply,
+      Fin.succ_zero_eq_one, Fin.succ_one_eq_two, Fin.succAbove, Fin.lt_def,
+      Fin.val_zero, Fin.val_one, Fin.val_two]
+    norm_num [Fin.ext_iff]
+    simp only [hm0, hm2, hm10, hm11, hm12, hm13, hm30, hm31, hm32, hm33]
+    ring
+  rw [hdet_eq]
+  positivity
+
+private theorem det_conjFirstCoordCLE :
+    LinearMap.det conjFirstCoordCLE.toLinearMap = -1 := by
+  let b := (EuclideanSpace.basisFun (Fin 4) ℝ).toBasis
+  have hrepr (v : EuclideanSpace ℝ (Fin 4)) (i : Fin 4) : b.repr v i = v i := by
+    change ((EuclideanSpace.basisFun (Fin 4) ℝ).repr v) i = v i
+    simp
+  let mat := LinearMap.toMatrix b b conjFirstCoordCLE.toLinearMap
+  rw [← LinearMap.det_toMatrix b conjFirstCoordCLE.toLinearMap]
+  change Matrix.det mat = -1
+  have hmat (i j : Fin 4) : mat i j = (conjFirstCoordCLE (b j)) i := by
+    simp [mat, LinearMap.toMatrix_apply, hrepr]
+  rw [Matrix.det_succ_row_zero, Fin.sum_univ_four]
+  simp only [Fin.val_zero, Fin.val_one, Fin.val_two, show (3 : Fin 4).val = 3 from rfl]
+  rw [Matrix.det_succ_row_zero, Matrix.det_succ_row_zero,
+    Matrix.det_succ_row_zero, Matrix.det_succ_row_zero]
+  simp only [Fin.sum_univ_three, Matrix.det_fin_two, Matrix.submatrix_apply,
+    Fin.succ_zero_eq_one, Fin.succ_one_eq_two, Fin.succAbove, Fin.lt_def,
+    Fin.val_zero, Fin.val_one, Fin.val_two]
+  norm_num [Fin.ext_iff]
+  simp [hmat, b, conjFirstCoordCLE_apply, EuclideanSpace.basisFun_apply]
+
+/-- No orientation-preserving local diffeomorphisms `(φ, ψ)` (even requiring orientation
+preservation only at `0`) can conjugate `achiralRealLefschetzMap` to `realLefschetzMap` at `0`:
+achiral Lefschetz critical points `(z₁, z₂) ↦ z̄₁² + z₂²` are genuinely orientation-distinct from
+chiral Lefschetz critical points `(z₁, z₂) ↦ z₁² + z₂²`. -/
+-- tier: T2
+theorem not_isChiralRealLefschetzAt_achiralRealLefschetzMap_zero :
+    ¬ IsChiralRealLefschetzAt euclidean4Orientation euclideanPlaneOrientation
+        achiralRealLefschetzMap 0 := by
+  rintro ⟨φ, ψ, h0φ, h0ψ, hφ0, hψ0, hφ_or, hψ_or, hmod⟩
+  have hachir0 : achiralRealLefschetzMap 0 = 0 := by refine ext_vec2 ?_ ?_ <;> simp
+  have hchir0 : realLefschetzMap 0 = 0 := by refine ext_vec2 ?_ ?_ <;> simp
+  have hψ0' : ψ 0 = 0 := by rwa [hachir0, hchir0] at hψ0
+  obtain ⟨A, hA_eq, hdetA⟩ :=
+    det_pos_of_isOrientationPreservingAt_euclidean hφ0 (hφ_or 0 h0φ)
+  obtain ⟨B, hB_eq, hdetB⟩ :=
+    det_pos_of_isOrientationPreservingAt_euclidean hψ0' (hψ_or 0 (hachir0 ▸ h0ψ))
+  have hφ_diff : DifferentiableAt ℝ φ 0 :=
+    mdifferentiableAt_iff_differentiableAt.mp
+      ((φ.contMDiffOn.contMDiffAt (φ.open_source.mem_nhds h0φ)).mdifferentiableAt (by simp))
+  have hψ_diff : DifferentiableAt ℝ ψ 0 :=
+    mdifferentiableAt_iff_differentiableAt.mp
+      ((ψ.contMDiffOn.contMDiffAt
+        (ψ.open_source.mem_nhds (hachir0 ▸ h0ψ))).mdifferentiableAt (by simp))
+  have hφ_fderiv : HasFDerivAt φ (A : EuclideanSpace ℝ (Fin 4) →L[ℝ] EuclideanSpace ℝ (Fin 4)) 0 :=
+    hA_eq ▸ hφ_diff.hasFDerivAt
+  have hψ_fderiv : HasFDerivAt ψ (B : EuclideanPlane →L[ℝ] EuclideanPlane) 0 :=
+    hB_eq ▸ hψ_diff.hasFDerivAt
+  have hquad : ∀ v : EuclideanSpace ℝ (Fin 4),
+      B (achiralRealLefschetzMap v) = realLefschetzMap (A v) := by
+    intro v
+    have hφ_ray : HasDerivAt (fun t : ℝ ↦ φ (t • v)) (A v) 0 := by
+      rw [hasDerivAt_iff_hasFDerivAt]
+      have h0v : (0 : ℝ) • v = 0 := zero_smul _ _
+      have hf := hφ_fderiv
+      rw [← h0v] at hf
+      refine (hf.comp (0 : ℝ) ((hasFDerivAt_id (0 : ℝ)).smul_const v)).congr_fderiv ?_
+      apply ContinuousLinearMap.ext_ring
+      simp [one_smul]
+    have hφ_slope : Filter.Tendsto (fun t : ℝ ↦ t⁻¹ • φ (t • v)) (𝓝[≠] 0) (𝓝 (A v)) := by
+      have hs := hasDerivAt_iff_tendsto_slope_zero.mp hφ_ray
+      simpa [hφ0] using hs
+    have hrhs_lim :
+        Filter.Tendsto (fun t : ℝ ↦ realLefschetzMap (t⁻¹ • φ (t • v)))
+          (𝓝[≠] 0) (𝓝 (realLefschetzMap (A v))) :=
+      contDiff_realLefschetzMap.continuous.continuousAt.tendsto.comp hφ_slope
+    let w := achiralRealLefschetzMap v
+    have hψ_ray : HasDerivAt (fun s : ℝ ↦ ψ (s • w)) (B w) 0 := by
+      rw [hasDerivAt_iff_hasFDerivAt]
+      have h0w : (0 : ℝ) • w = 0 := zero_smul _ _
+      have hf := hψ_fderiv
+      rw [← h0w] at hf
+      refine (hf.comp (0 : ℝ) ((hasFDerivAt_id (0 : ℝ)).smul_const w)).congr_fderiv ?_
+      apply ContinuousLinearMap.ext_ring
+      simp [one_smul]
+    have hψ_slope : Filter.Tendsto (fun s : ℝ ↦ s⁻¹ • ψ (s • w)) (𝓝[≠] 0) (𝓝 (B w)) := by
+      have hs := hasDerivAt_iff_tendsto_slope_zero.mp hψ_ray
+      simpa [hψ0'] using hs
+    have hc_pow : ContinuousAt (fun t : ℝ ↦ t ^ 2) 0 := (continuous_pow 2).continuousAt
+    have hsq_nhds : Filter.Tendsto (fun t : ℝ ↦ t ^ 2) (𝓝[≠] (0 : ℝ)) (𝓝[≠] (0 : ℝ)) :=
+      tendsto_nhdsWithin_iff.mpr
+        ⟨by simpa using hc_pow.tendsto.mono_left nhdsWithin_le_nhds,
+          eventually_nhdsWithin_of_forall fun t ht ↦ pow_ne_zero 2 ht⟩
+    have hlhs_lim :
+        Filter.Tendsto (fun t : ℝ ↦ (t ^ 2)⁻¹ • ψ ((t ^ 2) • w)) (𝓝[≠] 0) (𝓝 (B w)) :=
+      hψ_slope.comp hsq_nhds
+    have hev_src : ∀ᶠ t : ℝ in 𝓝 0, t • v ∈ φ.source := by
+      have hc : Continuous (fun t : ℝ ↦ t • v) := continuous_id.smul continuous_const
+      exact hc.continuousAt.preimage_mem_nhds (by simpa using φ.open_source.mem_nhds h0φ)
+    have hev_eq :
+        (fun t : ℝ ↦ (t ^ 2)⁻¹ • ψ ((t ^ 2) • w)) =ᶠ[𝓝[≠] (0 : ℝ)]
+          (fun t : ℝ ↦ realLefschetzMap (t⁻¹ • φ (t • v))) := by
+      filter_upwards [nhdsWithin_le_nhds hev_src, self_mem_nhdsWithin] with t ht_src ht_ne
+      have hsmul_achir : (t ^ 2) • w = achiralRealLefschetzMap (t • v) := by
+        refine ext_vec2 ?_ ?_ <;>
+          (simp only [w, achiralRealLefschetzMap, PiLp.smul_apply, smul_eq_mul,
+             vec2_zero, vec2_one]; ring)
+      have hsmul_chir :
+          realLefschetzMap (t⁻¹ • φ (t • v)) = (t ^ 2)⁻¹ • realLefschetzMap (φ (t • v)) := by
+        refine ext_vec2 ?_ ?_ <;>
+          (simp only [realLefschetzMap, PiLp.smul_apply, smul_eq_mul, vec2_zero, vec2_one];
+           field_simp [ht_ne])
+      rw [hsmul_achir, (hmod (t • v) ht_src).2, hsmul_chir]
+    exact tendsto_nhds_unique hlhs_lim (hrhs_lim.congr' hev_eq.symm)
+  have hpolar : ∀ u w : EuclideanSpace ℝ (Fin 4),
+      B (polarAchiralLefschetz u w) = polarRealLefschetz (A u) (A w) := by
+    intro u w
+    simp only [polarAchiralLefschetz, polarRealLefschetz, map_smul, map_sub, map_add, hquad]
+  have hpolar_achir_J (u w : EuclideanSpace ℝ (Fin 4)) :
+      polarAchiralLefschetz u (achiralRotJ w) = planeRotJ (polarAchiralLefschetz u w) := by
+    rw [polarAchiralLefschetz_eq, polarAchiralLefschetz_eq]
+    refine ext_vec2 ?_ ?_ <;>
+      (simp only [achiralRotJ, planeRotJ, vec4_zero, vec4_one, vec4_two, vec4_three,
+         vec2_zero, vec2_one]; ring)
+  let T : EuclideanPlane → EuclideanPlane := fun z ↦ B (planeRotJ (B.symm z))
+  let K : EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 4) :=
+    fun x ↦ A (achiralRotJ (A.symm x))
+  have hPK (u x : EuclideanSpace ℝ (Fin 4)) :
+      polarRealLefschetz u (K x) = T (polarRealLefschetz u x) := by
+    calc
+      polarRealLefschetz u (K x)
+        = polarRealLefschetz (A (A.symm u)) (A (achiralRotJ (A.symm x))) := by simp [K]
+      _ = B (polarAchiralLefschetz (A.symm u) (achiralRotJ (A.symm x))) := (hpolar _ _).symm
+      _ = B (planeRotJ (polarAchiralLefschetz (A.symm u) (A.symm x))) := by
+          rw [hpolar_achir_J]
+      _ = B (planeRotJ (B.symm (B (polarAchiralLefschetz (A.symm u) (A.symm x))))) := by simp
+      _ = T (polarRealLefschetz u x) := by simp [T, hpolar]
+  have hK01 (x : EuclideanSpace ℝ (Fin 4)) :
+      vec2 (K x 0) (K x 1) = T (vec2 (x 0) (x 1)) := by
+    have h := hPK (vec4 1 0 0 0) x
+    rw [polarRealLefschetz_eq, polarRealLefschetz_eq] at h
+    convert h using 1
+    · refine ext_vec2 ?_ ?_ <;> simp
+    · congr 1
+      refine ext_vec2 ?_ ?_ <;> simp
+  have hK23 (x : EuclideanSpace ℝ (Fin 4)) :
+      vec2 (K x 2) (K x 3) = T (vec2 (x 2) (x 3)) := by
+    have h := hPK (vec4 0 0 1 0) x
+    rw [polarRealLefschetz_eq, polarRealLefschetz_eq] at h
+    convert h using 1
+    · refine ext_vec2 ?_ ?_ <;> simp
+    · congr 1
+      refine ext_vec2 ?_ ?_ <;> simp
+  have hTj_comm (z : EuclideanPlane) : planeRotJ (T z) = T (planeRotJ z) := by
+    have h := hPK (vec4 0 1 0 0) (vec4 (-z 1) (z 0) 0 0)
+    rw [polarRealLefschetz_eq, polarRealLefschetz_eq] at h
+    simp only [vec4_zero, vec4_one, vec4_two, vec4_three] at h
+    have h1 : vec2 (0 * K (vec4 (-z 1) (z 0) 0 0) 0 - 1 * K (vec4 (-z 1) (z 0) 0 0) 1 +
+        0 * K (vec4 (-z 1) (z 0) 0 0) 2 - 0 * K (vec4 (-z 1) (z 0) 0 0) 3)
+        (0 * K (vec4 (-z 1) (z 0) 0 0) 1 + 1 * K (vec4 (-z 1) (z 0) 0 0) 0 +
+          0 * K (vec4 (-z 1) (z 0) 0 0) 3 + 0 * K (vec4 (-z 1) (z 0) 0 0) 2) =
+        -planeRotJ (vec2 (K (vec4 (-z 1) (z 0) 0 0) 0) (K (vec4 (-z 1) (z 0) 0 0) 1)) := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    have h2 : vec2 (0 * -z 1 - 1 * z 0 + 0 * 0 - 0 * 0)
+        (0 * z 0 + 1 * -z 1 + 0 * 0 + 0 * 0) = -z := by
+      refine ext_vec2 ?_ ?_ <;> simp
+    rw [h1, h2, hK01] at h
+    have hT_neg (y : EuclideanPlane) : T (-y) = -T y := by
+      dsimp only [T]
+      have hj_neg (u : EuclideanPlane) : planeRotJ (-u) = -planeRotJ u := by
+        refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+      rw [map_neg, hj_neg, map_neg]
+    have hv : vec2 (vec4 (-z 1) (z 0) 0 0 0) (vec4 (-z 1) (z 0) 0 0 1) = -planeRotJ z := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    rw [hv, hT_neg] at h
+    have hplane_neg (u : EuclideanPlane) : -planeRotJ (-u) = planeRotJ u := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    rw [hplane_neg] at h
+    rw [hT_neg] at h
+    have h' := congrArg planeRotJ h
+    refine ext_vec2 ?_ ?_
+    · have h0 := congrArg (fun u : EuclideanPlane ↦ u 0) h'
+      simp only [planeRotJ, vec2_zero, vec2_one, PiLp.neg_apply] at h0 ⊢
+      linarith
+    · have h1' := congrArg (fun u : EuclideanPlane ↦ u 1) h'
+      simp only [planeRotJ, vec2_zero, vec2_one, PiLp.neg_apply] at h1' ⊢
+      linarith
+  have hT_sq (z : EuclideanPlane) : T (T z) = -z := by
+    dsimp only [T]
+    rw [B.symm_apply_apply]
+    have hj2 : planeRotJ (planeRotJ (B.symm z)) = -B.symm z := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    rw [hj2, map_neg, B.apply_symm_apply]
+  have hT_lin_add (y z : EuclideanPlane) : T (y + z) = T y + T z := by
+    dsimp only [T]
+    have hj_add (u v : EuclideanPlane) : planeRotJ (u + v) = planeRotJ u + planeRotJ v := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ, add_comm]
+    rw [map_add, hj_add, map_add]
+  have hT_lin_smul (r : ℝ) (z : EuclideanPlane) : T (r • z) = r • T z := by
+    dsimp only [T]
+    have hj_smul (a : ℝ) (u : EuclideanPlane) : planeRotJ (a • u) = a • planeRotJ u := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    rw [map_smul, hj_smul, map_smul]
+  let α : ℝ := T (vec2 1 0) 0
+  let β : ℝ := -T (vec2 1 0) 1
+  have hT_e0 : T (vec2 1 0) = vec2 α (-β) := by
+    refine ext_vec2 rfl ?_; simp [β]
+  have hT_e1 : T (vec2 0 1) = vec2 β α := by
+    have he1 : vec2 0 1 = -planeRotJ (vec2 1 0) := by
+      refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+    have hneg1 := hT_lin_smul (-1) (planeRotJ (vec2 1 0))
+    rw [neg_one_smul, neg_one_smul] at hneg1
+    rw [he1, hneg1, ← hTj_comm, hT_e0]
+    refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+  have hT_formula (z : EuclideanPlane) :
+      T z = vec2 (α * z 0 + β * z 1) (-β * z 0 + α * z 1) := by
+    have hz : z = z 0 • vec2 1 0 + z 1 • vec2 0 1 := by
+      refine ext_vec2 ?_ ?_ <;> simp
+    conv_lhs => rw [hz]
+    rw [hT_lin_add, hT_lin_smul, hT_lin_smul, hT_e0, hT_e1]
+    refine ext_vec2 ?_ ?_ <;>
+      (simp only [vec2_zero, vec2_one, PiLp.add_apply, PiLp.smul_apply, smul_eq_mul]; ring)
+  have hsq_e0 := hT_sq (vec2 1 0)
+  rw [hT_e0, hT_formula] at hsq_e0
+  have hαβ1 : α ^ 2 - β ^ 2 = -1 := by
+    have h0 := congrArg (fun z : EuclideanPlane ↦ z 0) hsq_e0
+    simp only [vec2_zero, vec2_one, PiLp.neg_apply] at h0
+    nlinarith
+  have hαβ2 : -2 * α * β = 0 := by
+    have h1 := congrArg (fun z : EuclideanPlane ↦ z 1) hsq_e0
+    simp only [vec2_zero, vec2_one, PiLp.neg_apply] at h1
+    nlinarith
+  have hα0 : α = 0 := by
+    rcases mul_eq_zero.mp (show (-2 * α) * β = 0 by linarith) with h2a | hb0
+    · linarith
+    · exfalso; rw [hb0] at hαβ1; nlinarith [sq_nonneg α]
+  have hβ_sq : β ^ 2 = 1 := by rw [hα0] at hαβ1; linarith
+  have hβ_one : β = 1 := by
+    rcases sq_eq_one_iff.mp hβ_sq with hβ | hβ
+    · exact hβ
+    · exfalso
+      have hBj (z : EuclideanPlane) : B (planeRotJ z) = -planeRotJ (B z) := by
+        have ht : T (B z) = B (planeRotJ z) := by simp [T]
+        rw [← ht, hT_formula, hα0, hβ]
+        refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+      let b₂ := (EuclideanSpace.basisFun (Fin 2) ℝ).toBasis
+      have hb2_repr (v : EuclideanPlane) (i : Fin 2) : b₂.repr v i = v i := by
+        change ((EuclideanSpace.basisFun (Fin 2) ℝ).repr v) i = v i
+        simp
+      have hdetB_eq :
+          LinearMap.det B.toLinearMap =
+            (B (vec2 1 0) 0) * (B (vec2 0 1) 1) - (B (vec2 0 1) 0) * (B (vec2 1 0) 1) := by
+        rw [← LinearMap.det_toMatrix b₂ B.toLinearMap, Matrix.det_fin_two]
+        have hb20 : b₂ 0 = vec2 1 0 := by
+          refine ext_vec2 ?_ ?_ <;> simp [b₂, EuclideanSpace.basisFun_apply]
+        have hb21 : b₂ 1 = vec2 0 1 := by
+          refine ext_vec2 ?_ ?_ <;> simp [b₂, EuclideanSpace.basisFun_apply]
+        simp [LinearMap.toMatrix_apply, hb2_repr, hb20, hb21]
+      have hBe1 : B (vec2 0 1) = planeRotJ (B (vec2 1 0)) := by
+        have hj0 : planeRotJ (vec2 1 0) = -vec2 0 1 := by
+          refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+        have h := hBj (vec2 1 0)
+        rw [hj0, map_neg] at h
+        exact neg_inj.mp h
+      rw [hBe1] at hdetB_eq
+      simp only [planeRotJ, vec2_zero, vec2_one] at hdetB_eq
+      nlinarith [sq_nonneg (B (vec2 1 0) 0), sq_nonneg (B (vec2 1 0) 1)]
+  have hT_eq_j (z : EuclideanPlane) : T z = planeRotJ z := by
+    rw [hT_formula, hα0, hβ_one]
+    refine ext_vec2 ?_ ?_ <;> simp [planeRotJ]
+  have hK_eq_chir (x : EuclideanSpace ℝ (Fin 4)) : K x = chiralRotJ x := by
+    have h01 := hK01 x
+    have h23 := hK23 x
+    rw [hT_eq_j] at h01 h23
+    refine ext_vec4 ?_ ?_ ?_ ?_
+    · simpa [planeRotJ, chiralRotJ] using congrArg (fun z : EuclideanPlane ↦ z 0) h01
+    · simpa [planeRotJ, chiralRotJ] using congrArg (fun z : EuclideanPlane ↦ z 1) h01
+    · simpa [planeRotJ, chiralRotJ] using congrArg (fun z : EuclideanPlane ↦ z 0) h23
+    · simpa [planeRotJ, chiralRotJ] using congrArg (fun z : EuclideanPlane ↦ z 1) h23
+  let M : EuclideanSpace ℝ (Fin 4) →ₗ[ℝ] EuclideanSpace ℝ (Fin 4) :=
+    A.toLinearMap.comp conjFirstCoordCLE.toLinearMap
+  have hM_comm (x : EuclideanSpace ℝ (Fin 4)) : M (chiralRotJ x) = chiralRotJ (M x) := by
+    have hconj_J : conjFirstCoordCLE (chiralRotJ x) = achiralRotJ (conjFirstCoordCLE x) := by
+      refine ext_vec4 ?_ ?_ ?_ ?_ <;>
+        simp [conjFirstCoordCLE_apply, chiralRotJ, achiralRotJ]
+    change A (conjFirstCoordCLE (chiralRotJ x)) = chiralRotJ (A (conjFirstCoordCLE x))
+    rw [hconj_J, ← hK_eq_chir (A (conjFirstCoordCLE x))]
+    simp [K]
+  have hM_det_nn : 0 ≤ LinearMap.det M := det_nonneg_of_commute_chiralRotJ M hM_comm
+  have hM_det_neg : LinearMap.det M < 0 := by
+    rw [LinearMap.det_comp, det_conjFirstCoordCLE]
+    linarith
+  linarith
+
+end ChiralLefschetz
 
 /-! ## 5. Global `WrinkledFibration` and `BrokenLefschetzFibration` Structures -/
 
@@ -1178,9 +1886,15 @@ noncomputable def baseCenter : W.baseRegion :=
 
 end WrinkledFibration
 
-/-- A **broken Lefschetz fibration** (`ADK05`, `GSV15`, `BV21`) is a `WrinkledFibration` whose
-critical points are all locally modeled on isolated real Lefschetz points (`IsRealLefschetzAt`) or
-1-dimensional circles of indefinite quadratic folds (`IsIndefiniteFoldAt`). -/
+/-- A **broken Lefschetz fibration** (`ADK05`, `GK07`, `Lekili 2009`, `GSV15`, `BV21`) is a
+`WrinkledFibration` whose critical points are all locally modeled on isolated real Lefschetz points
+(`IsRealLefschetzAt`) or 1-dimensional circles of indefinite quadratic folds (`IsIndefiniteFoldAt`).
+
+Because `IsRealLefschetzAt` does not restrict coordinate-chart orientations (compare
+`IsChiralRealLefschetzAt` and `isRealLefschetzAt_achiralRealLefschetzMap_zero`), this structure
+directly covers **achiral** broken Lefschetz fibrations (`(z₁, z₂) ↦ z̄₁² + z₂²`), which exist on
+every closed oriented smooth 4-manifold by Gay–Kirby (`Geom. Topol.` 11, 2007) and deform to purely
+wrinkled fibrations via `BrokenLefschetzFibration.exists_purelyWrinkledFibration`. -/
 structure BrokenLefschetzFibration
     {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     (I_M : ModelWithCorners ℝ E_M H_M) (M : Type u)
