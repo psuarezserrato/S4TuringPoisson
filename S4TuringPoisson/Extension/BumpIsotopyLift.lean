@@ -19,7 +19,7 @@ public import TauCeti.Geometry.Manifold.DifferentialForm.Wedge.Smooth.Basic
 
 This module implements Milestone M4.2 of `S4TuringPoisson` (`S4TCdiffeo-Aug-2026.tex`, §4):
 
-Given any smooth `4`-manifold `M` admitting `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`
+Given any smooth `4`-manifold `M` admitting `[A : AdmitsRegularDiskFibration M]`
 (with an unconditional instance on `Sphere4`):
 
 1. **Concentric Base Bump `bumpProfile` (`ρ : Sphere2 → ℝ`)**:
@@ -619,7 +619,7 @@ section BumpLiftGeneral
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
 
 /-- Smooth base bump `ρ : Sphere2 → ℝ` (`0 ≤ ρ ≤ 1`, `ρ ≡ 1` on `baseCoreOpen M`,
 `tsupport ρ ⊆ baseInnerOpen M`). -/
@@ -706,7 +706,7 @@ noncomputable def trivBumpDiffeomorphOfIsotopy {r₀ : ℝ}
   letI := A.instNonemptyFiber
   letI := A.instMeasurableSpaceFiber
   letI := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let param : A.fibration.baseRegion × A.Fiber → ℝ × A.Fiber :=
     fun bz ↦ (bumpProfile M bz.1.1, bz.2)
   have hparam : ContMDiff ((𝓡 2).prod (𝓡 2)) (𝓘(ℝ, ℝ).prod (𝓡 2)) ∞ param :=
@@ -742,7 +742,7 @@ theorem coe_trivBumpDiffeomorphOfIsotopy {r₀ : ℝ}
     letI := A.instBorelSpaceFiber
     ⇑(trivBumpDiffeomorphOfIsotopy M I_disk) =
       fun bz : A.fibration.baseRegion × A.Fiber ↦
-        (bz.1, (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).liftThroughChart
+        (bz.1, (AdmitsRegularDiskFibration.fiberDiskChart M).liftThroughChart
           I_disk.d (bumpProfile M bz.1.1, bz.2)) :=
   rfl
 
@@ -793,7 +793,7 @@ theorem preimageBumpDiffeomorphOfIsotopy_eq_self_of_bump_zero {r₀ : ℝ}
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let bz := A.fibration.trivialization u
   have hb_eq : bz.1.1 = A.fibration u.1 :=
     congrArg Subtype.val (A.fibration.trivialization_fst u)
@@ -1011,7 +1011,7 @@ theorem leafwiseBumpDiffeomorphOfIsotopy_embed {r₀ : ℝ}
     letI := A.instBorelSpaceFiber
     leafwiseBumpDiffeomorphOfIsotopy M I_disk (A.fibration.embed (b, z)) =
       A.fibration.embed
-        (b, (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).liftIsotopyDiffeomorph
+        (b, (AdmitsRegularDiskFibration.fiberDiskChart M).liftIsotopyDiffeomorph
           I_disk (bumpProfile M b.1) z) := by
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
@@ -1217,7 +1217,7 @@ private noncomputable def trivFiberMap {r₀ : ℝ}
   letI := A.instMeasurableSpaceFiber
   letI := A.instBorelSpaceFiber
   exact fun bz ↦
-    (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).liftThroughChart
+    (AdmitsRegularDiskFibration.fiberDiskChart M).liftThroughChart
       I_disk.d (bumpProfile M bz.1.1, bz.2)
 
 private theorem contMDiff_trivFiberMap {r₀ : ℝ}
@@ -1237,7 +1237,7 @@ private theorem contMDiff_trivFiberMap {r₀ : ℝ}
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  exact ((AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).contMDiff_liftThroughChart
+  exact ((AdmitsRegularDiskFibration.fiberDiskChart M).contMDiff_liftThroughChart
     I_disk.contDiff_d (fun s _ hw ↦ I_disk.mem_unitDisk2 s hw)
     I_disk.r₀_lt_one I_disk.eq_self_of_notMem_ball).comp
     (((contMDiff_bumpProfile M).comp (contMDiff_subtype_val.comp contMDiff_fst)).prodMk
@@ -1266,7 +1266,7 @@ private theorem mpullback_trivFiberMap_slice {r₀ : ℝ}
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
   intro b
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   have hfun :
       (fun y ↦ trivFiberMap M I_disk (b, y)) =
         ⇑(C.liftIsotopyDiffeomorph I_disk (bumpProfile M b.1)) := rfl
@@ -1490,7 +1490,7 @@ section CompactInvariance
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
 
 /-- **Global Measure Preservation (`MeasurePreserving ⇑d_bar μ_Ω μ_Ω`)**:
 On compact `M`, `leafwiseBumpDiffeomorphOfIsotopy M I_disk` preserves the induced positive finite
@@ -1592,7 +1592,7 @@ set_option linter.concreteInstances false
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
   [H : HasTuringCompleteAreaPreservingDiskIsotopy]
 
 /-- **Headline Leafwise Bump Diffeomorphism `d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M`** lifting
@@ -1657,7 +1657,7 @@ theorem leafwiseBumpDiffeomorph_embed
     letI := A.instBorelSpaceFiber
     leafwiseBumpDiffeomorph M (A.fibration.embed (b, z)) =
       A.fibration.embed
-        (b, (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).liftSliceDiffeomorph
+        (b, (AdmitsRegularDiskFibration.fiberDiskChart M).liftSliceDiffeomorph
           (bumpProfile M b.1) z) :=
   leafwiseBumpDiffeomorphOfIsotopy_embed M AreaPreservingDiskIsotopy.ofTypeclass b z
 
@@ -1703,9 +1703,9 @@ theorem leafwiseBumpDiffeomorph_baseDiskProductEmbed_of_mem_baseCoreOpen
     letI := A.instT2SpaceFiber
     letI := A.instCompactSpaceFiber
     letI := A.instNonemptyFiber
-    leafwiseBumpDiffeomorph M (AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M
+    leafwiseBumpDiffeomorph M (AdmitsRegularDiskFibration.baseDiskProductEmbed M
         (b, y)) =
-      AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M
+      AdmitsRegularDiskFibration.baseDiskProductEmbed M
         (b, HasTuringCompleteAreaPreservingDiskIsotopy.diskTimeOneMap y) := by
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
@@ -1715,7 +1715,7 @@ theorem leafwiseBumpDiffeomorph_baseDiskProductEmbed_of_mem_baseCoreOpen
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   change leafwiseBumpDiffeomorph M (A.fibration.embed (b, C.embed y)) =
     A.fibration.embed (b, C.embed (HasTuringCompleteAreaPreservingDiskIsotopy.diskTimeOneMap y))
   rw [leafwiseBumpDiffeomorph_embed M b (C.embed y),
@@ -1733,8 +1733,8 @@ theorem isTuringComplete_leafwiseBumpDiffeomorph :
   let _ := A.instCompactSpaceFiber
   let _ := A.instNonemptyFiber
   have hΨ : Topology.IsOpenEmbedding
-      (AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M) :=
-    (AdmitsWrinkledOrBrokenLefschetzFibration.isOpenEmbedding_baseDiskProductEmbed M).2.1
+      (AdmitsRegularDiskFibration.baseDiskProductEmbed M) :=
+    (AdmitsRegularDiskFibration.isOpenEmbedding_baseDiskProductEmbed M).2.1
   let B₀_reg : Set A.fibration.baseRegion := Subtype.val ⁻¹' (baseCoreOpen M).1
   have hB₀_open : IsOpen B₀_reg := (baseCoreOpen M).2.preimage continuous_subtype_val
   have hc_mem : A.fibration.baseCenter ∈ B₀_reg := baseCenter_mem_baseCoreOpen M

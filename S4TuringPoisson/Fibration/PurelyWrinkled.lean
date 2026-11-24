@@ -18,8 +18,9 @@ public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
 This file implements Deliverable `L-R1` of `MISSION_DIRECTIVE_LEKILI.md` and the Gate G5.1
 anti-vacuity definite-fold exclusion proof on `s4Fibration`:
 
-1. **`PurelyWrinkledFibration` (`Lekili 2009`, `Suárez-Serrato–Torres 2016`)**:
-   - Extends `WrinkledFibration I_M M I_B Base Fiber` with the constraint that every critical
+1. **`PurelyWrinkledFibration` (`Lekili 2009`, `Suárez-Serrato–Torres Orozco 2016`,
+   *Bol. Soc. Mat. Mex.* 22(1) (2016), 263–280)**:
+   - Extends `RegularDiskFibration I_M M I_B Base Fiber` with the constraint that every critical
      point `p ∈ criticalPoints I_M I_B toFun` is locally modeled either on an indefinite
      quadratic fold (`IsIndefiniteFoldAt`) or on a wrinkled cusp (`IsWrinkledCuspAt`).
    - Provides `BrokenLefschetzFibration.toPurelyWrinkledOfIndefiniteFolds` converting any
@@ -53,8 +54,8 @@ section PurelyWrinkledStructure
 
 universe u v w
 
-/-- A **purely wrinkled fibration** (`Lekili 2009`, `ST16`) is a `WrinkledFibration` every one of
-whose critical points is locally modeled either on an indefinite quadratic fold
+/-- A **purely wrinkled fibration** (`Lekili 2009`, `ST16`) is a `RegularDiskFibration` every one
+of whose critical points is locally modeled either on an indefinite quadratic fold
 (`IsIndefiniteFoldAt`) or on a wrinkled cusp singularity (`IsWrinkledCuspAt`), with zero real
 Lefschetz points and zero definite folds. -/
 structure PurelyWrinkledFibration
@@ -67,7 +68,7 @@ structure PurelyWrinkledFibration
     (Fiber : Type w) [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber] :
     Type (max u v w)
-    extends WrinkledFibration I_M M I_B Base Fiber where
+    extends RegularDiskFibration I_M M I_B Base Fiber where
   /-- Every critical point is an indefinite quadratic fold or a wrinkled cusp. -/
   singularities_purely_wrinkled :
     ∀ p ∈ criticalPoints I_M I_B toFun,
@@ -85,6 +86,22 @@ instance instCoeFunPurelyWrinkledFibration
     CoeFun (PurelyWrinkledFibration I_M M I_B Base Fiber) (fun _ ↦ M → Base) :=
   ⟨fun P ↦ P.toFun⟩
 
+/-- The regular locus of every `PurelyWrinkledFibration` is dense in `M`. -/
+-- tier: T1
+theorem PurelyWrinkledFibration.dense_regularPoints
+    {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M} {M : Type u}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
+    {E_B H_B : Type*} [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B} {Base : Type v}
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
+    {Fiber : Type w} [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
+    [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber]
+    (P : PurelyWrinkledFibration I_M M I_B Base Fiber) :
+    Dense {x : M | x ∉ criticalPoints I_M I_B P.toFun} :=
+  dense_regularPoints_of_wrinkled_or_lefschetz P.contMDiff_toFun fun p hp ↦
+    (P.singularities_purely_wrinkled p hp).elim Or.inl (fun h ↦ Or.inr (Or.inl h))
+
 /-- Convert a `BrokenLefschetzFibration` having no real Lefschetz critical points (only
 indefinite folds) directly into a `PurelyWrinkledFibration`. -/
 noncomputable def BrokenLefschetzFibration.toPurelyWrinkledOfIndefiniteFolds
@@ -100,7 +117,7 @@ noncomputable def BrokenLefschetzFibration.toPurelyWrinkledOfIndefiniteFolds
     (hfold : ∀ p ∈ criticalPoints I_M I_B B_fib.toFun,
       IsIndefiniteFoldAt I_M I_B B_fib.toFun p) :
     PurelyWrinkledFibration I_M M I_B Base F where
-  toWrinkledFibration := B_fib.toWrinkledFibration
+  toRegularDiskFibration := B_fib.toRegularDiskFibration
   singularities_purely_wrinkled p hp := Or.inl (hfold p hp)
 
 /-- Construct `AdmitsWrinkledOrBrokenLefschetzFibration M` from a positively co-oriented
@@ -116,7 +133,7 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled
     [MeasurableSpace F] [BorelSpace F]
     (P_fib : PurelyWrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 F)
     (V_F : PositiveVolumeForm (𝓡 2) F)
-    (hpos : ∀ u : P_fib.toWrinkledFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
+    (hpos : ∀ u : P_fib.toRegularDiskFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
       (TauCeti.SmoothForm.mpullback P_fib.trivialization P_fib.trivialization.contMDiff
           (TauCeti.SmoothForm.wedge
             (TauCeti.SmoothForm.mpullback Prod.snd contMDiff_snd V_F.Ω)
@@ -134,9 +151,11 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled
   instNonemptyFiber := inferInstance
   instMeasurableSpaceFiber := inferInstance
   instBorelSpaceFiber := inferInstance
-  fibration := P_fib.toWrinkledFibration
+  fibration := P_fib.toRegularDiskFibration
   fiberVolume := V_F
   trivialization_pos_cooriented := hpos
+  singularities_wrinkled_or_lefschetz p hp :=
+    (P_fib.singularities_purely_wrinkled p hp).elim Or.inl (fun h ↦ Or.inr (Or.inl h))
 
 end PurelyWrinkledStructure
 

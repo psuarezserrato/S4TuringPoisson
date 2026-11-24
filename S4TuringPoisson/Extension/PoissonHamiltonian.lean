@@ -132,7 +132,7 @@ by multiplying `bumpProfile M ∘ A.fibration` with `fiberHamiltonianOfPlanar` o
 noncomputable def liftPlanarHamiltonianRaw
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) (x : M) : ℝ :=
   letI := A.instTopologicalSpaceFiber
   letI := A.instChartedSpaceFiber
@@ -145,7 +145,7 @@ noncomputable def liftPlanarHamiltonianRaw
   letI := Classical.dec (x ∈ A.fibration.preimageOpen.1)
   if hx : x ∈ A.fibration.preimageOpen.1 then
     bumpProfile M (A.fibration x) *
-      fiberHamiltonianOfPlanar (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M) P
+      fiberHamiltonianOfPlanar (AdmitsRegularDiskFibration.fiberDiskChart M) P
         (A.fibration.trivialization ⟨x, hx⟩).2
   else
     0
@@ -155,7 +155,7 @@ noncomputable def liftPlanarHamiltonianRaw
 theorem contMDiff_liftPlanarHamiltonianRaw
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) :
     ContMDiff (𝓡 4) 𝓘(ℝ) ∞ (liftPlanarHamiltonianRaw M P) := by
   let _ := A.instTopologicalSpaceFiber
@@ -166,7 +166,7 @@ theorem contMDiff_liftPlanarHamiltonianRaw
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let K : Set M := A.fibration ⁻¹' tsupport (bumpProfile M)
   have hK_closed : IsClosed K :=
     (isClosed_tsupport (bumpProfile M)).preimage A.fibration.contMDiff_toFun.continuous
@@ -203,13 +203,13 @@ theorem contMDiff_liftPlanarHamiltonianRaw
       exact dite_eq_right hy_pre
 
 /-- Lift an autonomous `CompactlySupportedPlanarHamiltonian r₀` to a smooth global Hamiltonian
-`H̃ : C^∞⟮𝓡 4, M; ℝ⟯` on any 4-manifold `M` with `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`,
+`H̃ : C^∞⟮𝓡 4, M; ℝ⟯` on any 4-manifold `M` with `[A : AdmitsRegularDiskFibration M]`,
 defined on `Φ⁻¹(b, C.embed y)` by `(bumpProfile M b * C.areaScale) * P.H (0, y)` and extended
 smoothly by `0` outside `f ⁻¹' baseRegion` and `C.sourceOpen`. -/
 noncomputable def liftPlanarHamiltonianTo4Manifold
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) :
     C^∞⟮𝓡 4, M; ℝ⟯ :=
   ⟨liftPlanarHamiltonianRaw M P, contMDiff_liftPlanarHamiltonianRaw M P⟩
@@ -222,7 +222,7 @@ noncomputable def liftPlanarHamiltonianTo4Manifold
 theorem isComplete_hamiltonianVectorField_adaptedJacobianPoisson
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (H : C^∞⟮𝓡 4, M; ℝ⟯) :
     TauCeti.IsCompleteVectorField
       (TauCeti.timeDependentSuspensionField fun _ : ℝ ↦
@@ -239,7 +239,7 @@ field `(adaptedJacobianPoisson M).hamiltonianVectorField H` on a compact Hausdor
 noncomputable def poissonHamiltonianTimeOneDiffeomorph
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (H : C^∞⟮𝓡 4, M; ℝ⟯) :
     M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M :=
   TauCeti.timeDependentFlowDiffeomorph
@@ -253,7 +253,7 @@ list of smooth Hamiltonians `Hs : List C^∞⟮𝓡 4, M; ℝ⟯`. -/
 noncomputable def composePoissonHamiltonianTimeOneFlows
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     List C^∞⟮𝓡 4, M; ℝ⟯ → (M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M)
   | [] => Diffeomorph.refl (𝓡 4) M ∞
   | H :: Hs => (composePoissonHamiltonianTimeOneFlows M Hs).trans
@@ -303,7 +303,7 @@ noncomputable def composePoissonStructureTimeOneFlows
 theorem composePoissonStructureTimeOneFlows_adaptedJacobianPoisson
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] (Hs : List C^∞⟮𝓡 4, M; ℝ⟯) :
+    [A : AdmitsRegularDiskFibration M] (Hs : List C^∞⟮𝓡 4, M; ℝ⟯) :
     composePoissonStructureTimeOneFlows M (adaptedJacobianPoisson M) Hs =
       composePoissonHamiltonianTimeOneFlows M Hs := by
   induction Hs with
@@ -358,7 +358,7 @@ theorem fiberHamiltonianOfPlanar_embed
 theorem coe_liftPlanarHamiltonianTo4Manifold
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) :
     ⇑(liftPlanarHamiltonianTo4Manifold M P) = liftPlanarHamiltonianRaw M P :=
   by
@@ -374,7 +374,7 @@ theorem coe_liftPlanarHamiltonianTo4Manifold
 theorem poissonHamiltonianTimeOneDiffeomorph_apply
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (H : C^∞⟮𝓡 4, M; ℝ⟯) (x : M) :
     poissonHamiltonianTimeOneDiffeomorph M H x =
       TauCeti.timeDependentFlowOf
@@ -389,7 +389,7 @@ flow from `t = 1` to `t = 0`. -/
 theorem poissonHamiltonianTimeOneDiffeomorph_symm_apply
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (H : C^∞⟮𝓡 4, M; ℝ⟯) (x : M) :
     (poissonHamiltonianTimeOneDiffeomorph M H).symm x =
       TauCeti.timeDependentFlowOf
@@ -402,7 +402,7 @@ theorem poissonHamiltonianTimeOneDiffeomorph_symm_apply
 theorem composePoissonHamiltonianTimeOneFlows_nil
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     composePoissonHamiltonianTimeOneFlows M [] = Diffeomorph.refl (𝓡 4) M ∞ :=
   by
   rfl
@@ -414,7 +414,7 @@ followed by `poissonHamiltonianTimeOneDiffeomorph M H`. -/
 theorem composePoissonHamiltonianTimeOneFlows_cons
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (H : C^∞⟮𝓡 4, M; ℝ⟯) (Hs : List C^∞⟮𝓡 4, M; ℝ⟯) :
     composePoissonHamiltonianTimeOneFlows M (H :: Hs) =
       (composePoissonHamiltonianTimeOneFlows M Hs).trans
@@ -429,7 +429,7 @@ theorem composePoissonHamiltonianTimeOneFlows_cons
 theorem liftPlanarHamiltonianTo4Manifold_embed
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -451,7 +451,7 @@ theorem liftPlanarHamiltonianTo4Manifold_embed
     liftPlanarHamiltonianTo4Manifold M P (A.fibration.embed (b, z)) =
       bumpProfile M b.1 *
         fiberHamiltonianOfPlanar
-          (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M) P z := by
+          (AdmitsRegularDiskFibration.fiberDiskChart M) P z := by
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
   let _ := A.instIsManifoldFiber
@@ -476,7 +476,7 @@ numerator (`docs/cmpp/geometry_spec.md` §4.1). -/
 theorem liftPlanarHamiltonianTo4Manifold_embed_disk
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -495,7 +495,7 @@ theorem liftPlanarHamiltonianTo4Manifold_embed_disk
     letI := A.instNonemptyFiber
     letI := A.instMeasurableSpaceFiber
     letI := A.instBorelSpaceFiber
-    let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    let C := AdmitsRegularDiskFibration.fiberDiskChart M
     liftPlanarHamiltonianTo4Manifold M P (A.fibration.embed (b, C.embed y)) =
       (bumpProfile M b.1 * C.areaScale) * P.H (0, y.1) := by
   let _ := A.instTopologicalSpaceFiber
@@ -554,7 +554,7 @@ yields `Diffeomorph.refl (𝓡 4) M ∞`. -/
 theorem leafwiseBumpDiffeomorphOfIsotopy_refl
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (hr₀ : r₀ ∈ Set.Ioo (0 : ℝ) 1) :
     leafwiseBumpDiffeomorphOfIsotopy M (AreaPreservingDiskIsotopy.refl hr₀) =
       Diffeomorph.refl (𝓡 4) M ∞ := by
@@ -585,7 +585,7 @@ theorem leafwiseBumpDiffeomorphOfIsotopy_refl
 theorem leafwiseBumpDiffeomorphOfIsotopy_compSame
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (I₂ I₁ : AreaPreservingDiskIsotopy r₀) :
     leafwiseBumpDiffeomorphOfIsotopy M (I₂.compSame I₁) =
       (leafwiseBumpDiffeomorphOfIsotopy M I₁).trans
@@ -623,7 +623,7 @@ theorem leafwiseBumpDiffeomorphOfIsotopy_compSame
 theorem leafwiseBumpDiffeomorphOfIsotopy_ne_refl_of_diskTimeOneMap_ne_id
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} {I_disk : AreaPreservingDiskIsotopy r₀}
     (hne : I_disk.diskTimeOneMap ≠ id) :
     leafwiseBumpDiffeomorphOfIsotopy M I_disk ≠ Diffeomorph.refl (𝓡 4) M ∞ := by
@@ -638,7 +638,7 @@ theorem leafwiseBumpDiffeomorphOfIsotopy_ne_refl_of_diskTimeOneMap_ne_id
   intro hrefl
   apply hne
   funext y
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let b₀ := A.fibration.baseCenter
   have hb₀ : b₀.1 ∈ (baseCoreOpen M).1 := baseCenter_mem_baseCoreOpen M
   have hρ1 : bumpProfile M b₀.1 = 1 := bumpProfile_eq_one_of_mem_baseCoreOpen M hb₀
@@ -818,7 +818,7 @@ Hamiltonian vector field vanishes at `x`. -/
 theorem hamiltonianVectorField_adaptedJacobianPoisson_eq_zero_of_eventuallyEq
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {H : C^∞⟮𝓡 4, M; ℝ⟯} {x : M}
     (hev : (⇑H : M → ℝ) =ᶠ[𝓝 x] fun _ ↦ (0 : ℝ)) :
     (adaptedJacobianPoisson M).hamiltonianVectorField H x = 0 := by
@@ -832,7 +832,7 @@ vanishes at every point `x : M` with `A.fibration x ∉ tsupport (bumpProfile M)
 theorem hamiltonianVectorField_liftPlanarHamiltonian_eq_zero_of_notMem_tsupport_base
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) {x : M}
     (hx :
       letI := A.instTopologicalSpaceFiber
@@ -872,7 +872,7 @@ vanishes at `A.fibration.embed (b, z)` whenever `z ∉ C.sourceOpen.1`. -/
 theorem hamiltonianVectorField_liftPlanarHamiltonian_embed_of_notMem_sourceOpen
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -889,7 +889,7 @@ theorem hamiltonianVectorField_liftPlanarHamiltonian_embed_of_notMem_sourceOpen
       letI := A.instIsManifoldFiber
       letI := A.instMeasurableSpaceFiber
       letI := A.instBorelSpaceFiber
-      z ∉ (AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M).sourceOpen.1) :
+      z ∉ (AdmitsRegularDiskFibration.fiberDiskChart M).sourceOpen.1) :
     letI := A.instTopologicalSpaceFiber
     letI := A.instChartedSpaceFiber
     letI := A.instIsManifoldFiber
@@ -906,7 +906,7 @@ theorem hamiltonianVectorField_liftPlanarHamiltonian_embed_of_notMem_sourceOpen
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let S_fib : Set A.Fiber := C.supportSet P.r₀_mem_Ioo.2
   have hS_closed : IsClosed S_fib := (C.isCompact_supportSet P.r₀_mem_Ioo.2).isClosed
   have hz_notS : z ∉ S_fib := fun hm ↦ hz (C.supportSet_subset_sourceOpen P.r₀_mem_Ioo.2 hm)
@@ -927,7 +927,7 @@ theorem hamiltonianVectorField_liftPlanarHamiltonian_embed_of_notMem_sourceOpen
 theorem productTargetForm_apply_eq
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     (q :
       letI := A.instTopologicalSpaceFiber
       letI := A.instChartedSpaceFiber
@@ -998,7 +998,7 @@ derivative `α₁`. -/
 theorem mvfderiv_liftPlanarHamiltonian_embed
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -1025,7 +1025,7 @@ theorem mvfderiv_liftPlanarHamiltonian_embed
     letI := A.instNonemptyFiber
     letI := A.instMeasurableSpaceFiber
     letI := A.instBorelSpaceFiber
-    let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    let C := AdmitsRegularDiskFibration.fiberDiskChart M
     let L_base : TangentSpace ((𝓡 2).prod (𝓡 2)) (b, z) →L[ℝ] TangentSpace (𝓡 2) b.1 :=
       (mfderiv (𝓡 2) (𝓡 2) (Subtype.val : A.fibration.baseRegion → Sphere2) b).comp
         (ContinuousLinearMap.fst ℝ (TangentSpace (𝓡 2) b) (TangentSpace (𝓡 2) z))
@@ -1080,7 +1080,7 @@ theorem mvfderiv_liftPlanarHamiltonian_embed
 theorem alignedVolumeForm_embed_apply_vertical
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -1101,7 +1101,7 @@ theorem alignedVolumeForm_embed_apply_vertical
       letI := A.instNonemptyFiber
       letI := A.instMeasurableSpaceFiber
       letI := A.instBorelSpaceFiber
-      let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+      let C := AdmitsRegularDiskFibration.fiberDiskChart M
       Fin 3 → TangentSpace (𝓡 4) (A.fibration.embed (b, C.embed y)))
     (w_prod :
       letI := A.instTopologicalSpaceFiber
@@ -1112,7 +1112,7 @@ theorem alignedVolumeForm_embed_apply_vertical
       letI := A.instNonemptyFiber
       letI := A.instMeasurableSpaceFiber
       letI := A.instBorelSpaceFiber
-      let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+      let C := AdmitsRegularDiskFibration.fiberDiskChart M
       Fin 3 → TangentSpace ((𝓡 2).prod (𝓡 2)) (b, C.embed y))
     (hw_prod :
       letI := A.instTopologicalSpaceFiber
@@ -1123,7 +1123,7 @@ theorem alignedVolumeForm_embed_apply_vertical
       letI := A.instNonemptyFiber
       letI := A.instMeasurableSpaceFiber
       letI := A.instBorelSpaceFiber
-      let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+      let C := AdmitsRegularDiskFibration.fiberDiskChart M
       ∀ j : Fin 3,
         mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 4) A.fibration.embed (b, C.embed y) (w_prod j) = w j) :
     letI := A.instTopologicalSpaceFiber
@@ -1134,7 +1134,7 @@ theorem alignedVolumeForm_embed_apply_vertical
     letI := A.instNonemptyFiber
     letI := A.instMeasurableSpaceFiber
     letI := A.instBorelSpaceFiber
-    let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    let C := AdmitsRegularDiskFibration.fiberDiskChart M
     let z := C.embed y
     let Ψ_b : diskOpen → M := fun w' ↦ A.fibration.embed (b, C.embed w')
     let v_disk : TangentSpace (𝓡 2) y :=
@@ -1277,7 +1277,7 @@ annihilating the `d(bumpProfile M)` term via `wedge_one_two_plane_eq_zero`
 theorem etaForm_liftPlanarHamiltonian_embed_apply
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -1321,7 +1321,7 @@ theorem etaForm_liftPlanarHamiltonian_embed_apply
     letI := A.instNonemptyFiber
     letI := A.instMeasurableSpaceFiber
     letI := A.instBorelSpaceFiber
-    let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    let C := AdmitsRegularDiskFibration.fiberDiskChart M
     let H_lift := liftPlanarHamiltonianTo4Manifold M P
     let η_form := TauCeti.SmoothForm.wedge (SmoothBivector.diffOneForm H_lift)
       (TauCeti.SmoothForm.mpullback A.fibration A.fibration.contMDiff_toFun S2VolumeForm)
@@ -1478,7 +1478,7 @@ On `Ψ_b y := A.fibration.embed (b, C.embed y)`, the Hamiltonian vector field of
 theorem hamiltonianVectorField_liftPlanarHamiltonian_embed
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀)
     (b :
       letI := A.instTopologicalSpaceFiber
@@ -1497,7 +1497,7 @@ theorem hamiltonianVectorField_liftPlanarHamiltonian_embed
     letI := A.instNonemptyFiber
     letI := A.instMeasurableSpaceFiber
     letI := A.instBorelSpaceFiber
-    let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    let C := AdmitsRegularDiskFibration.fiberDiskChart M
     let Ψ_b : diskOpen → M := fun w ↦ A.fibration.embed (b, C.embed w)
     let v_disk : TangentSpace (𝓡 2) y :=
       (TauCeti.Manifold.tangentSpaceOpenEquiv (I := 𝓡 2) y).symm (P.vectorField 0 y.1)
@@ -1559,7 +1559,7 @@ of `(adaptedJacobianPoisson M).hamiltonianVectorField (liftPlanarHamiltonianTo4M
 theorem poissonHamiltonianTimeOneDiffeomorph_liftPlanarHamiltonian_eq
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (P : CompactlySupportedPlanarHamiltonian r₀) (hP : P.IsAutonomous) :
     poissonHamiltonianTimeOneDiffeomorph M (liftPlanarHamiltonianTo4Manifold M P) =
       leafwiseBumpDiffeomorphOfIsotopy M P.toDiskIsotopy := by
@@ -1571,7 +1571,7 @@ theorem poissonHamiltonianTimeOneDiffeomorph_liftPlanarHamiltonian_eq
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let H_lift := liftPlanarHamiltonianTo4Manifold M P
   let X₄ : (w : M) → TangentSpace (𝓡 4) w :=
     (adaptedJacobianPoisson M).hamiltonianVectorField H_lift
@@ -1694,7 +1694,7 @@ equals `leafwiseBumpDiffeomorphOfIsotopy M (listToDiskIsotopy hr₀ Ps)`. -/
 theorem composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+    [A : AdmitsRegularDiskFibration M]
     {r₀ : ℝ} (hr₀ : r₀ ∈ Set.Ioo (0 : ℝ) 1)
     {Ps : List (CompactlySupportedPlanarHamiltonian r₀)}
     (hPs : ∀ P ∈ Ps, P.IsAutonomous) :
@@ -1718,8 +1718,8 @@ theorem composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq
 /-! ## 6. Deliverable R5: Unconditional Poisson–Hamiltonian Realization & Gate G5 Sanity -/
 
 /-- **General 4-Manifold Poisson–Hamiltonian Realization**:
-Every compact Hausdorff smooth 4-manifold `M` admitting a positively co-oriented wrinkled or broken
-Lefschetz fibration `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]` carries a finite list of
+Every compact Hausdorff smooth 4-manifold `M` admitting a positively co-oriented regular-disk
+fibration `[A : AdmitsRegularDiskFibration M]` carries a finite list of
 smooth Hamiltonians `Hs : List C^∞⟮𝓡 4, M; ℝ⟯` whose composed time-`1` Poisson–Hamiltonian flow
 `d_bar` preserves `A.fibration`, `(alignedPositiveVolume M).Ω`, `(alignedPositiveVolume M).μ`, and
 `adaptedJacobianPoisson M`, and satisfies `IsTuringComplete ⇑d_bar` (`≠ id`). -/
@@ -1727,7 +1727,7 @@ smooth Hamiltonians `Hs : List C^∞⟮𝓡 4, M; ℝ⟯` whose composed time-`1
 theorem exists_poisson_hamiltonian_realization_fourManifold
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     letI := A.instTopologicalSpaceFiber
     letI := A.instChartedSpaceFiber
     letI := A.instIsManifoldFiber
@@ -1819,9 +1819,9 @@ theorem exists_poisson_hamiltonian_realization_closedFourManifold
       MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
       (⇑d_bar : M → M) ≠ id := by
-  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm V_M
-  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let A : AdmitsRegularDiskFibration M :=
+    AdmitsRegularDiskFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsRegularDiskFibration M := A
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
   let _ := A.instIsManifoldFiber

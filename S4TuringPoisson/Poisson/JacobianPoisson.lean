@@ -15,6 +15,7 @@ public import TauCeti.Geometry.Manifold.DifferentialForm.Naturality
 public import TauCeti.Geometry.Manifold.DifferentialForm.Pullback.Smooth
 public import TauCeti.Geometry.Manifold.DifferentialForm.Wedge.Smooth.Assoc
 public import TauCeti.Geometry.Manifold.DifferentialForm.Wedge.Smooth.Basic
+public import TauCeti.Geometry.Manifold.RegularValue.Open
 public import Mathlib.LinearAlgebra.Alternating.Uncurry.Fin
 public import Mathlib.LinearAlgebra.Dimension.RankNullity
 
@@ -63,6 +64,16 @@ open Bundle Filter Function Module Set TauCeti TopologicalSpace
 open scoped ContDiff Manifold Topology
 
 namespace S4TuringPoisson
+
+/-- A smooth Poisson structure `π` on `M` is **generically rank `2`** if its rank-`2` regular
+symplectic locus `{x : M | π.rankAt x = 2}` is both open and dense in `M`
+(`S4TCdiffeo-Aug-2026.tex`, Proposition 1 & Corollary 2). -/
+-- tier: T2
+def PoissonStructure.IsGenericallyRankTwo
+    {E H M : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [TopologicalSpace H]
+    {I : ModelWithCorners ℝ E H} [TopologicalSpace M] [ChartedSpace H M] [IsManifold I ∞ M]
+    (P : PoissonStructure I M) : Prop :=
+  IsOpen {x : M | P.rankAt x = 2} ∧ Dense {x : M | P.rankAt x = 2}
 
 /-! ## 1. Wedge Evaluation Helpers in Degrees `1 ∧ 2` and `1 ∧ 3` -/
 
@@ -1211,6 +1222,131 @@ theorem rankAt_jacobianPoisson_of_notMem_criticalSet (Ω : SmoothForm I_M M ℝ 
   rw [hdf_range, hfinM] at hrn
   change Module.finrank ℝ (LinearMap.ker dfL) = 2
   omega
+
+/-- At every critical point `x ∈ criticalSet I_M I_N f` of a smooth map `f : M → N` from a
+`4`-manifold `M` to a `2`-manifold `N`, the pullback `f^* μ_N` vanishes at `x`, so
+`jacobianAnchor` vanishes and `jacobianPoisson` has rank `0`. -/
+-- tier: T2
+theorem rankAt_jacobianPoisson_of_mem_criticalSet (Ω : SmoothForm I_M M ℝ 4)
+    (hΩ : ∀ z : M, Ω.1 z ≠ 0) (μ_N : SmoothForm I_N N ℝ 2) (f : M → N)
+    (hf : ContMDiff I_M I_N ∞ f) {x : M} (hcrit : x ∈ criticalSet I_M I_N f) :
+    (jacobianPoisson Ω hΩ μ_N f hf).rankAt x = 0 := by
+  let bN : Module.Basis (Fin 2) ℝ (TangentSpace I_N (f x)) :=
+    (trivializationAt E_N (TangentSpace I_N) (f x)).basisAt
+      (Module.finBasisOfFinrankEq ℝ E_N hdim_N.finrank_eq)
+      (FiberBundle.mem_baseSet_trivializationAt' (f x))
+  let L := mfderiv I_M I_N f x
+  have hdet_zero (w₀ w₁ : TangentSpace I_M x) :
+      bN.repr (L w₀) 0 * bN.repr (L w₁) 1 - bN.repr (L w₀) 1 * bN.repr (L w₁) 0 = 0 := by
+    by_contra hdet
+    apply hcrit
+    intro u
+    let a₀ := bN.repr (L w₀) 0
+    let a₁ := bN.repr (L w₀) 1
+    let c₀ := bN.repr (L w₁) 0
+    let c₁ := bN.repr (L w₁) 1
+    let p₀ := bN.repr u 0
+    let p₁ := bN.repr u 1
+    let d := a₀ * c₁ - a₁ * c₀
+    have hd : d ≠ 0 := hdet
+    let t₀ := (c₁ * p₀ - c₀ * p₁) / d
+    let t₁ := (-a₁ * p₀ + a₀ * p₁) / d
+    refine ⟨t₀ • w₀ + t₁ • w₁, ?_⟩
+    have hw₀ : L w₀ = a₀ • bN 0 + a₁ • bN 1 := by
+      conv_lhs => rw [← bN.sum_repr (L w₀), Fin.sum_univ_two]
+    have hw₁ : L w₁ = c₀ • bN 0 + c₁ • bN 1 := by
+      conv_lhs => rw [← bN.sum_repr (L w₁), Fin.sum_univ_two]
+    have hu : u = p₀ • bN 0 + p₁ • bN 1 := by
+      conv_lhs => rw [← bN.sum_repr u, Fin.sum_univ_two]
+    rw [map_add, map_smul, map_smul, hw₀, hw₁, hu, smul_add, smul_add, smul_smul, smul_smul,
+      smul_smul, smul_smul]
+    have hcoeff0 : t₀ * a₀ + t₁ * c₀ = p₀ := by
+      dsimp only [t₀, t₁]
+      rw [div_mul_eq_mul_div, div_mul_eq_mul_div, ← add_div, div_eq_iff hd]
+      dsimp only [d]
+      ring
+    have hcoeff1 : t₀ * a₁ + t₁ * c₁ = p₁ := by
+      dsimp only [t₀, t₁]
+      rw [div_mul_eq_mul_div, div_mul_eq_mul_div, ← add_div, div_eq_iff hd]
+      dsimp only [d]
+      ring
+    rw [← hcoeff0, ← hcoeff1, add_smul, add_smul]
+    abel
+  have hpul0 : (SmoothForm.mpullback f hf μ_N).1 x = 0 := by
+    ext w
+    rw [SmoothForm.mpullback_apply,
+      ContinuousAlternatingMap.apply_eq_det_mul (μ_N.1 (f x)) bN (fun i ↦ L (w i))]
+    have hdet_eq :
+        bN.det (fun i ↦ L (w i)) =
+          bN.repr (L (w 0)) 0 * bN.repr (L (w 1)) 1 -
+            bN.repr (L (w 0)) 1 * bN.repr (L (w 1)) 0 := by
+      rw [Module.Basis.det_apply, Matrix.det_fin_two]
+      simp only [Module.Basis.toMatrix_apply]
+      ring
+    rw [hdet_eq, hdet_zero (w 0) (w 1), zero_mul]
+    rfl
+  have hanch0 : (jacobianPoisson Ω hΩ μ_N f hf).anchor x = 0 := by
+    ext α : 1
+    change jacobianAnchor Ω μ_N f hf x α = 0
+    rw [jacobianAnchor_eq_subTopDualVector, hpul0,
+      ContinuousAlternatingMap.pairedWedge_zero_right, neg_zero]
+    simp [subTopDualVector]
+  simp [SmoothBivector.rankAt, hanch0]
+
+/-- When `μ_N` vanishes nowhere on `N`, the rank-`2` locus of `jacobianPoisson Ω hΩ μ_N f hf`
+coincides with the regular-point locus `{x : M | x ∉ criticalSet I_M I_N f}`. -/
+-- tier: T2
+theorem setOf_rankAt_jacobianPoisson_eq_two (Ω : SmoothForm I_M M ℝ 4)
+    (hΩ : ∀ z : M, Ω.1 z ≠ 0) (μ_N : SmoothForm I_N N ℝ 2) (hμ : ∀ y : N, μ_N.1 y ≠ 0)
+    (f : M → N) (hf : ContMDiff I_M I_N ∞ f) :
+    {x : M | (jacobianPoisson Ω hΩ μ_N f hf).rankAt x = 2} =
+      {x : M | x ∉ criticalSet I_M I_N f} := by
+  ext x
+  simp only [Set.mem_ofPred_eq]
+  by_cases hx : x ∈ criticalSet I_M I_N f
+  · rw [rankAt_jacobianPoisson_of_mem_criticalSet Ω hΩ μ_N f hf hx]
+    exact ⟨by omega, fun h ↦ absurd hx h⟩
+  · rw [rankAt_jacobianPoisson_of_notMem_criticalSet Ω hΩ μ_N f hf hx (hμ (f x))]
+    exact ⟨fun _ ↦ hx, fun _ ↦ rfl⟩
+
+/-- When `μ_N` vanishes nowhere on `N`, the rank-`2` locus of `jacobianPoisson Ω hΩ μ_N f hf`
+is open in `M`. -/
+-- tier: T2
+theorem isOpen_setOf_rankAt_jacobianPoisson_eq_two (Ω : SmoothForm I_M M ℝ 4)
+    (hΩ : ∀ z : M, Ω.1 z ≠ 0) (μ_N : SmoothForm I_N N ℝ 2) (hμ : ∀ y : N, μ_N.1 y ≠ 0)
+    (f : M → N) (hf : ContMDiff I_M I_N ∞ f) :
+    IsOpen {x : M | (jacobianPoisson Ω hΩ μ_N f hf).rankAt x = 2} := by
+  rw [setOf_rankAt_jacobianPoisson_eq_two Ω hΩ μ_N hμ f hf]
+  have heq :
+      {x : M | x ∉ criticalSet I_M I_N f} = {x : M | TauCeti.IsRegularPoint I_M I_N f x} := by
+    ext x
+    simp only [Set.mem_ofPred_eq, mem_criticalSet_iff, not_not, TauCeti.isRegularPoint_iff]
+  rw [heq]
+  exact TauCeti.isOpen_setOf_isRegularPoint hf (by simp)
+
+/-- When `μ_N` vanishes nowhere on `N`, `jacobianPoisson Ω hΩ μ_N f hf` is generically rank `2`
+if and only if the regular locus `{x : M | x ∉ criticalSet I_M I_N f}` is dense in `M`. -/
+-- tier: T2
+theorem isGenericallyRankTwo_jacobianPoisson_iff (Ω : SmoothForm I_M M ℝ 4)
+    (hΩ : ∀ z : M, Ω.1 z ≠ 0) (μ_N : SmoothForm I_N N ℝ 2) (hμ : ∀ y : N, μ_N.1 y ≠ 0)
+    (f : M → N) (hf : ContMDiff I_M I_N ∞ f) :
+    (jacobianPoisson Ω hΩ μ_N f hf).IsGenericallyRankTwo ↔
+      Dense {x : M | x ∉ criticalSet I_M I_N f} := by
+  unfold PoissonStructure.IsGenericallyRankTwo
+  refine ⟨fun h ↦ ?_, fun hd ↦ ⟨isOpen_setOf_rankAt_jacobianPoisson_eq_two Ω hΩ μ_N hμ f hf, ?_⟩⟩
+  · rw [← setOf_rankAt_jacobianPoisson_eq_two Ω hΩ μ_N hμ f hf]
+    exact h.2
+  · rwa [setOf_rankAt_jacobianPoisson_eq_two Ω hΩ μ_N hμ f hf]
+
+/-- `jacobianPoissonOfPositiveVolume V μ_N f hf` is generically rank `2` if and only if
+`{x : M | x ∉ criticalSet I_M I_N f}` is dense in `M`. -/
+-- tier: T2
+theorem isGenericallyRankTwo_jacobianPoissonOfPositiveVolume_iff [MeasurableSpace M] [BorelSpace M]
+    (V : PositiveVolumeForm I_M M) (μ_N : SmoothForm I_N N ℝ 2) (hμ : ∀ y : N, μ_N.1 y ≠ 0)
+    (f : M → N) (hf : ContMDiff I_M I_N ∞ f) :
+    (jacobianPoissonOfPositiveVolume V μ_N f hf).IsGenericallyRankTwo ↔
+      Dense {x : M | x ∉ criticalSet I_M I_N f} :=
+  isGenericallyRankTwo_jacobianPoisson_iff V.Ω V.Ω_ne_zero μ_N hμ f hf
 
 end JacobianGeneral
 

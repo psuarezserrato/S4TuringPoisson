@@ -36,7 +36,7 @@ disk `s4BaseRegion ⊂ Sphere2` is **strictly positively co-oriented** with `S4P
    - Over `s4BaseRegion = southPoleStereoInv '' Metric.ball 0 (1 / 2)`, `s4Fibration ⁻¹' B` equals
      `{x ∈ S⁴ | ‖(x₀, x₁)‖ < 1 / 2}` and trivializes smoothly onto `s4BaseRegion × Sphere2` via
      fiber normalization `(x₂, x₃, x₄) / √(1 - x₀² - x₁²) ∈ Sphere2`, packaged as
-     `s4WrinkledFibration : WrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2`.
+     `s4RegularDiskFibration : RegularDiskFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2`.
 4. **Strict Positive Co-Orientation (`s4Trivialization_pos_cooriented`)**:
    - Proves `s4PlaneEmbed^* S4VolumeForm = √(1 - ‖w‖²) • (p_F^* S2VolumeForm ∧ p_B^* planeAreaForm)`
      and deduces that `s4Trivialization^* (p_F^* S2VolumeForm ∧ p_B^* S2VolumeForm|_B)` equals a
@@ -45,7 +45,7 @@ disk `s4BaseRegion ⊂ Sphere2` is **strictly positively co-oriented** with `S4P
 
 @[expose] public section
 
-open Function Metric Module Set TopologicalSpace
+open Filter Function Metric Module Set TopologicalSpace
 open scoped ContDiff InnerProductSpace Manifold Topology
 
 namespace S4TuringPoisson
@@ -710,6 +710,85 @@ theorem criticalPoints_s4Fibration_nonempty :
     (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty :=
   ⟨s4CriticalPoint, s4CriticalPoint_mem_criticalPoints⟩
 
+/-- Density of the regular locus `{x : Sphere4 | x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration}` in
+`Sphere4` (its equatorial critical circle `{x₂ = x₃ = x₄ = 0}` has empty interior). -/
+-- tier: T2
+theorem dense_regularPoints_s4Fibration :
+    Dense {x : Sphere4 | x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration} := by
+  refine dense_iff_inter_open.mpr fun U hU hne ↦ ?_
+  obtain ⟨p, hpU⟩ := hne
+  by_cases hp : p ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration
+  · rw [criticalPoints_s4Fibration, Set.mem_ofPred_eq] at hp
+    have hp2 : p.1 2 = 0 := by simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 0) hp
+    have hp3 : p.1 3 = 0 := by simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 1) hp
+    have hp4 : p.1 4 = 0 := by simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 2) hp
+    have hp_plane : p.1 0 ^ 2 + p.1 1 ^ 2 = 1 := by
+      have hsplit := norm_sq_s4_split p
+      rw [hp, norm_zero, zero_pow two_ne_zero, add_zero, norm_sq_plane] at hsplit
+      simpa only [s4ProjPlane_apply, vec2_zero, vec2_one] using hsplit
+    let γ_raw : ℝ → EuclideanSpace ℝ (Fin 5) := fun t ↦
+      vec5 (p.1 0 * (1 - t ^ 2) / (1 + t ^ 2)) (p.1 1 * (1 - t ^ 2) / (1 + t ^ 2))
+        (2 * t / (1 + t ^ 2)) 0 0
+    have hγ_mem (t : ℝ) : γ_raw t ∈ Metric.sphere (0 : EuclideanSpace ℝ (Fin 5)) 1 := by
+      rw [mem_sphere_zero_iff_norm]
+      have hden : 1 + t ^ 2 ≠ 0 := by positivity
+      have hsq : ‖γ_raw t‖ ^ 2 = 1 := by
+        rw [norm_sq_vec5]
+        simp only [γ_raw, vec5_zero, vec5_one, vec5_two, vec5_three, vec5_four]
+        field_simp [hden]
+        linear_combination (1 - t ^ 2) ^ 2 * hp_plane
+      nlinarith [norm_nonneg (γ_raw t)]
+    let γ : ℝ → Sphere4 := fun t ↦ ⟨γ_raw t, hγ_mem t⟩
+    have hγ_cont : Continuous γ := by
+      refine Continuous.subtype_mk ?_ _
+      have hden_cont : Continuous (fun t : ℝ ↦ 1 + t ^ 2) :=
+        continuous_const.add (continuous_pow 2)
+      have hden_ne : ∀ t : ℝ, 1 + t ^ 2 ≠ 0 := fun t ↦ by positivity
+      have hc0 : Continuous (fun t : ℝ ↦ p.1 0 * (1 - t ^ 2) / (1 + t ^ 2)) :=
+        (continuous_const.mul (continuous_const.sub (continuous_pow 2))).div hden_cont hden_ne
+      have hc1 : Continuous (fun t : ℝ ↦ p.1 1 * (1 - t ^ 2) / (1 + t ^ 2)) :=
+        (continuous_const.mul (continuous_const.sub (continuous_pow 2))).div hden_cont hden_ne
+      have hc2 : Continuous (fun t : ℝ ↦ 2 * t / (1 + t ^ 2)) :=
+        (continuous_const.mul continuous_id).div hden_cont hden_ne
+      have hpi : Continuous (fun t : ℝ ↦
+          ![p.1 0 * (1 - t ^ 2) / (1 + t ^ 2), p.1 1 * (1 - t ^ 2) / (1 + t ^ 2),
+            2 * t / (1 + t ^ 2), 0, 0]) := by
+        refine continuous_pi fun i ↦ ?_
+        fin_cases i
+        · exact hc0
+        · exact hc1
+        · exact hc2
+        · exact continuous_const
+        · exact continuous_const
+      exact (EuclideanSpace.equiv (Fin 5) ℝ).symm.continuous.comp hpi
+    have hγ0 : γ 0 = p := by
+      apply Subtype.ext
+      change γ_raw 0 = p.1
+      refine ext_vec5 ?_ ?_ ?_ hp3.symm hp4.symm <;> simp [γ_raw, hp2]
+    have hev : ∀ᶠ t : ℝ in 𝓝 0, γ t ∈ U :=
+      hγ_cont.continuousAt.eventually (hγ0 ▸ hU.mem_nhds hpU)
+    obtain ⟨ε, hε_pos, hε⟩ := Metric.eventually_nhds_iff.mp hev
+    have ht_dist : dist (ε / 2) 0 < ε := by
+      rw [Real.dist_eq, sub_zero, abs_of_pos (half_pos hε_pos)]
+      linarith
+    refine ⟨γ (ε / 2), hε ht_dist, ?_⟩
+    rw [Set.mem_ofPred_eq, criticalPoints_s4Fibration, Set.mem_ofPred_eq]
+    intro h0
+    have hc : (s4ProjFiber (γ (ε / 2)).1) 0 = 0 :=
+      by simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 0) h0
+    have hpos : 0 < 2 * (ε / 2) / (1 + (ε / 2) ^ 2) := by positivity
+    exact hpos.ne' (by simpa [γ, γ_raw, s4ProjFiber_apply] using hc)
+  · exact ⟨p, hpU, hp⟩
+
+/-- The equatorial critical locus of `s4Fibration` has empty interior in `Sphere4`. -/
+-- tier: T1
+theorem interior_criticalPoints_s4Fibration_eq_empty :
+    interior (criticalPoints (𝓡 4) (𝓡 2) s4Fibration) = ∅ := by
+  refine Set.eq_empty_iff_forall_notMem.mpr fun x hx ↦ ?_
+  obtain ⟨y, hy_int, hy_reg⟩ :=
+    dense_regularPoints_s4Fibration.inter_open_nonempty _ isOpen_interior ⟨x, hx⟩
+  exact hy_reg (interior_subset hy_int)
+
 end S4SingularFibration
 
 /-! ## 4. Open Regular Base Region `s4BaseRegion` and Smooth Trivialization `s4Trivialization` -/
@@ -1028,10 +1107,10 @@ theorem coe_s4Trivialization_symm_plane (wz : s4PlaneDisk × Sphere2) :
   rw [hsymm]
   rfl
 
-/-- `s4Fibration` packaged as a global `WrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2`
+/-- `s4Fibration` packaged as a global `RegularDiskFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2`
 with regular `Sphere2` fiber. -/
-noncomputable def s4WrinkledFibration :
-    WrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2 where
+noncomputable def s4RegularDiskFibration :
+    RegularDiskFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2 where
   toFun := s4Fibration
   contMDiff_toFun := contMDiff_s4Fibration
   baseRegion := s4BaseRegion

@@ -75,6 +75,13 @@ adapted to `s4Fibration : Sphere4 → Sphere2` and `s4AlignedPositiveVolume`. -/
 noncomputable def s4AdaptedPoisson : PoissonStructure (𝓡 4) Sphere4 :=
   adaptedJacobianPoisson Sphere4
 
+/-- `s4AdaptedPoisson` is generically rank `2` on `Sphere4` (`IsOpen` and `Dense` rank-`2` locus).
+-/
+-- tier: T1
+theorem isGenericallyRankTwo_s4AdaptedPoisson :
+    s4AdaptedPoisson.IsGenericallyRankTwo :=
+  (isGenericallyRankTwo_adaptedJacobianPoisson_iff Sphere4).mpr dense_regularPoints_s4Fibration
+
 /-- Antipodal point `-p ∈ Sphere4` of `p ∈ Sphere4`, used to witness non-atomic upper volume
 bounds (`μ_Ω (ball p (1/2)) < μ_Ω univ`). -/
 def s4Antipode (p : Sphere4) : Sphere4 :=
@@ -124,24 +131,24 @@ theorem s4UnconditionalPoissonDiffeomorph_ne_id :
   apply hdisk_ne
   funext y
   let C : SymplecticDiskChart Sphere2 S2VolumeForm :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart Sphere4
-  let b₀ := s4WrinkledFibration.baseCenter
+    AdmitsRegularDiskFibration.fiberDiskChart Sphere4
+  let b₀ := s4RegularDiskFibration.baseCenter
   have hb₀ : b₀.1 ∈ (baseCoreOpen Sphere4).1 := baseCenter_mem_baseCoreOpen Sphere4
   have hρ1 : bumpProfile Sphere4 b₀.1 = 1 :=
     bumpProfile_eq_one_of_mem_baseCoreOpen Sphere4 hb₀
-  let x₀ : Sphere4 := s4WrinkledFibration.embed (b₀, C.embed ⟨y.1, y.2⟩)
+  let x₀ : Sphere4 := s4RegularDiskFibration.embed (b₀, C.embed ⟨y.1, y.2⟩)
   have hx₀ : s4UnconditionalPoissonDiffeomorph x₀ = x₀ := congrFun hid x₀
   dsimp only [s4UnconditionalPoissonDiffeomorph, x₀] at hx₀
   have hemb_step :
       leafwiseBumpDiffeomorphOfIsotopy Sphere4 s4SectorSwapDiskIsotopy
-          (s4WrinkledFibration.embed (b₀, C.embed ⟨y.1, y.2⟩)) =
-        s4WrinkledFibration.embed
+          (s4RegularDiskFibration.embed (b₀, C.embed ⟨y.1, y.2⟩)) =
+        s4RegularDiskFibration.embed
           (b₀, C.liftIsotopyDiffeomorph s4SectorSwapDiskIsotopy (bumpProfile Sphere4 b₀.1)
             (C.embed ⟨y.1, y.2⟩)) :=
     leafwiseBumpDiffeomorphOfIsotopy_embed Sphere4 s4SectorSwapDiskIsotopy b₀
       (C.embed ⟨y.1, y.2⟩)
   rw [hemb_step, hρ1, C.liftIsotopyDiffeomorph_embed s4SectorSwapDiskIsotopy 1 ⟨y.1, y.2⟩] at hx₀
-  have hinj_emb := s4WrinkledFibration.isOpenEmbedding_embed.injective hx₀
+  have hinj_emb := s4RegularDiskFibration.isOpenEmbedding_embed.injective hx₀
   have hinj_C := C.injective_embed (Prod.mk.inj hinj_emb).2
   exact Subtype.ext (congrArg Subtype.val hinj_C)
 
@@ -185,6 +192,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_
       π_f = jacobianPoissonOfPositiveVolume V S2VolumeForm s4Fibration contMDiff_s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 2) ∧
       (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 0) ∧
@@ -194,7 +202,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_
       (∀ b : s4BaseRegion,
         ∃ d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2,
           (∀ z : Sphere2,
-            d_bar (s4WrinkledFibration.embed (b, z)) = s4WrinkledFibration.embed (b, d_b z)) ∧
+            d_bar (s4RegularDiskFibration.embed (b, z)) = s4RegularDiskFibration.embed (b, d_b z)) ∧
           TauCeti.SmoothForm.mpullback d_b d_b.contMDiff S2VolumeForm = S2VolumeForm ∧
           MeasurePreserving ⇑d_b S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ) ∧
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
@@ -205,6 +213,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_
     rfl,
     isUnimodularWithVolume_adaptedJacobianPoisson Sphere4,
     isUnimodularPoisson_adaptedJacobianPoisson Sphere4,
+    isGenericallyRankTwo_s4AdaptedPoisson,
     fun x hx ↦ rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints Sphere4 hx,
     criticalPoints_s4Fibration_nonempty,
     fun x hx ↦ rankAt_adaptedJacobianPoisson_of_mem_criticalPoints Sphere4 hx,
@@ -216,7 +225,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_
     isTuringComplete_leafwiseBumpDiffeomorph Sphere4,
     leafwiseBumpDiffeomorph_ne_id Sphere4⟩
   let C : SymplecticDiskChart Sphere2 S2VolumeForm :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart Sphere4
+    AdmitsRegularDiskFibration.fiberDiskChart Sphere4
   let d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 :=
     C.liftSliceDiffeomorph (bumpProfile Sphere4 b.1)
   exact ⟨d_b, fun z ↦ leafwiseBumpDiffeomorph_embed Sphere4 b z,
@@ -263,6 +272,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourMa
         A.fibration.contMDiff_toFun ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 2) ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 0) ∧
       ⇑A.fibration ∘ ⇑d_bar = ⇑A.fibration ∧
@@ -290,6 +300,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourMa
     rfl,
     isUnimodularWithVolume_adaptedJacobianPoisson M,
     isUnimodularPoisson_adaptedJacobianPoisson M,
+    isGenericallyRankTwo_adaptedJacobianPoisson M,
     fun x hx ↦ rankAt_adaptedJacobianPoisson_of_notMem_criticalPoints M hx,
     fun x hx ↦ rankAt_adaptedJacobianPoisson_of_mem_criticalPoints M hx,
     fibration_comp_leafwiseBumpDiffeomorph M,
@@ -299,7 +310,7 @@ private theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourMa
     measurePreserving_leafwiseBumpDiffeomorph M,
     isTuringComplete_leafwiseBumpDiffeomorph M,
     leafwiseBumpDiffeomorph_ne_id M⟩
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   let d_b := C.liftSliceDiffeomorph (bumpProfile M b.1)
   exact ⟨d_b, fun z ↦ leafwiseBumpDiffeomorph_embed M b z,
     C.mpullback_liftSliceDiffeomorph_eq (bumpProfile M b.1),
@@ -389,6 +400,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4 :
       π_f = jacobianPoissonOfPositiveVolume V S2VolumeForm s4Fibration contMDiff_s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 2) ∧
       (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 0) ∧
@@ -398,7 +410,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4 :
       (∀ b : s4BaseRegion,
         ∃ d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2,
           (∀ z : Sphere2,
-            d_bar (s4WrinkledFibration.embed (b, z)) = s4WrinkledFibration.embed (b, d_b z)) ∧
+            d_bar (s4RegularDiskFibration.embed (b, z)) = s4RegularDiskFibration.embed (b, d_b z)) ∧
           TauCeti.SmoothForm.mpullback d_b d_b.contMDiff S2VolumeForm = S2VolumeForm ∧
           MeasurePreserving ⇑d_b S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ) ∧
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
@@ -447,6 +459,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
         A.fibration.contMDiff_toFun ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 2) ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 0) ∧
       ⇑A.fibration ∘ ⇑d_bar = ⇑A.fibration ∧
@@ -516,14 +529,17 @@ theorem undecidable_orbit_reachability_S4 :
 
 section UnconditionalClosedFourManifold
 
-/-- **Corollary 2 (Unconditional on General Closed Oriented 4-Manifolds, `L-R3`)**:
+/-- **Corollary 2 (Unconditional Local Coordinate-Ball Realization on Closed Oriented
+4-Manifolds, `L-R3` / Track B)**:
 Every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a positive volume 4-form
 `V_M : PositiveVolumeForm (𝓡 4) M` (with zero `[AdmitsWrinkledOrBrokenLefschetzFibration M]` or
 disk-isotopy assumptions) carries an aligned positive volume 4-form `V` strictly positively
-co-oriented with `V_M`, a smooth map `f : M → Sphere2`, a compatible generically rank-`2`
-unimodular Jacobian–Poisson structure `π_f`, and a $C^\infty$ diffeomorphism
-`d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M` preserving `f`, `π_f`, regular `S²` leaf areas, `V.Ω`, and `V.μ` that
-is Turing complete (`IsTuringComplete ⇑d_bar`, `≠ id`). -/
+co-oriented with `V_M`, a smooth regular-disk map `f : M → Sphere2` (constant outside one oriented
+coordinate ball; see `not_isGenericallyRankTwo_closedManifoldLocal` in `ClosedManifoldLocal.lean`),
+a compatible globally unimodular Jacobian–Poisson structure `π_f` (rank `2` off `Crit(f)`, rank `0`
+on `Crit(f)`), and a $C^\infty$ diffeomorphism `d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M` preserving `f`, `π_f`,
+regular `S²` leaf areas over `s4BaseRegion`, `V.Ω`, and `V.μ` that is Turing complete
+(`IsTuringComplete ⇑d_bar`, `≠ id`). -/
 -- tier: T2
 theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
@@ -553,9 +569,9 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourMani
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
       (⇑d_bar : M → M) ≠ id := by
-  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm V_M
-  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let A : AdmitsRegularDiskFibration M :=
+    AdmitsRegularDiskFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsRegularDiskFibration M := A
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
   let _ := A.instIsManifoldFiber
@@ -565,7 +581,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourMani
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
   let C : SymplecticDiskChart Sphere2 S2VolumeForm :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+    AdmitsRegularDiskFibration.fiberDiskChart M
   refine ⟨alignedPositiveVolume M, adaptedJacobianPoisson M,
     ⇑A.fibration, A.fibration.contMDiff_toFun, leafwiseBumpDiffeomorph M,
     rfl,
@@ -653,9 +669,9 @@ theorem undecidable_orbit_reachability_closedFourManifold
           Computable dec ∧
           ∀ c : Nat.Partrec.Code,
             dec c = true ↔ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U := by
-  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
-    AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm V_M
-  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let A : AdmitsRegularDiskFibration M :=
+    AdmitsRegularDiskFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsRegularDiskFibration M := A
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
   let _ := A.instIsManifoldFiber
@@ -701,6 +717,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_cmpp :
       π_f = jacobianPoissonOfPositiveVolume V S2VolumeForm s4Fibration contMDiff_s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 2) ∧
       (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 0) ∧
@@ -710,7 +727,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_cmpp :
       (∀ b : s4BaseRegion,
         ∃ d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2,
           (∀ z : Sphere2,
-            d_bar (s4WrinkledFibration.embed (b, z)) = s4WrinkledFibration.embed (b, d_b z)) ∧
+            d_bar (s4RegularDiskFibration.embed (b, z)) = s4RegularDiskFibration.embed (b, d_b z)) ∧
           TauCeti.SmoothForm.mpullback d_b d_b.contMDiff S2VolumeForm = S2VolumeForm ∧
           MeasurePreserving ⇑d_b S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ) ∧
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
@@ -755,6 +772,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_o
         A.fibration.contMDiff_toFun ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 2) ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) A.fibration, π_f.rankAt x = 0) ∧
       ⇑A.fibration ∘ ⇑d_bar = ⇑A.fibration ∧

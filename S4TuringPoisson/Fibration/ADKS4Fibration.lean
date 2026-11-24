@@ -12,6 +12,11 @@ module
 public import S4TuringPoisson.Fibration.PurelyWrinkled
 public import S4TuringPoisson.Main
 public import S4TuringPoisson.Extension.PoissonHamiltonian
+public import TauCeti.Geometry.Manifold.RegularValue.ManifoldLevel
+public import TauCeti.Geometry.Manifold.ModelTransport.Boundaryless
+public import TauCeti.Geometry.Manifold.ModelTransport.Diffeomorph
+public import TauCeti.Geometry.Manifold.PullbackGroupoid
+import Mathlib.Geometry.Manifold.Immersion
 import TauCeti.Geometry.Manifold.LocalDiffeomorph.Injective
 import TauCeti.Geometry.Manifold.LocalDiffeomorph.OpenSubset
 import TauCeti.Geometry.Manifold.LocalDiffeomorph.Constructions
@@ -24,13 +29,14 @@ This file formalizes Option A (`LW4`) by constructing the explicit polynomial
 Auroux–Donaldson–Katzarkov (ADK) broken Lefschetz fibration `s4ADKFibration : Sphere4 → Sphere2`
 directly on the unit 4-sphere `Sphere4 ⊂ ℝ⁵` (with coordinates `(x₀, x₁, x₂, x₃, x₄)`):
 
-1. **Global Map & $S^2$ vs. $T^2$ Fiber Witnesses (`Section 1`)**:
+1. **Global Map & $S^2$ vs. $T^2$ Fiber Witnesses (`Section 1` & `Section 2`)**:
    - Defines `s4ADKRaw x = (Z₀, Z₁, H)` where `Z = (x₀ + i x₁) * ((x₂² + x₃² - 1 / 2) + i x₄)`
      and `H = 1 / 4 - (x₀² + x₁²)`, proves `s4ADKRaw x.1 ≠ 0` on `Sphere4`, and normalizes to
      `s4ADKFibration : Sphere4 → Sphere2`.
-   - Exhibits an explicit `Sphere2` regular fiber over `s2NorthPole` (`x₀ = x₁ = 0`) and an
-     explicit Clifford torus `S¹ × S¹` fiber over `s2SouthPole` (`x₀² + x₁² = x₂² + x₃² = 1 / 2`,
-     `x₄ = 0`).
+   - Exhibits explicit smooth ($C^\infty$) regular-fiber diffeomorphisms
+     `s4ADKNorthFiberDiffeomorph` from `Sphere2` onto
+     `{x : Sphere4 // s4ADKFibration x = s2NorthPole}` and `s4ADKTorusFiberDiffeomorph` from
+     `Torus2` onto the Clifford torus fiber `{x : Sphere4 // s4ADKFibration x = s2SouthPole}`.
    - Proves `SO(2)_{01}` rotational equivariance (`s4Rot01`, `s2Rot01`).
 
 2. **Exact Equatorial Critical Circle (`Section 2`)**:
@@ -38,7 +44,8 @@ directly on the unit 4-sphere `Sphere4 ⊂ ℝ⁵` (with coordinates `(x₀, x�
      via explicit tangent-pair `3 × 3` determinant lower bounds across all cases.
 
 3. **Indefinite Fold Local Normal Form (`Section 3`)** & **ADK Headline Theorems (`Section 4`)**:
-   - Formalizes `IsIndefiniteFoldAt`, `s4BrokenLefschetzFibration`, `s4PurelyWrinkledFibration`,
+   - Formalizes `IsIndefiniteFoldAt`, `s4BrokenLefschetzFibration` ($S^2$ chamber),
+     `s4ADKTorusBrokenLefschetzFibration` ($T^2$ chamber), `s4PurelyWrinkledFibration`,
      and exports `exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK` and
      `exists_poisson_hamiltonian_realization_S4_ADK`.
 -/
@@ -691,7 +698,7 @@ private theorem s4ADKRawDerivCLM_apply (x v : EuclideanSpace ℝ (Fin 5)) :
         (-2 * x 0 * v 0 - 2 * x 1 * v 1) := by
   simp only [s4ADKRawDerivCLM, clmVec3_apply, add_apply, sub_apply, smul_apply, smul_eq_mul,
     euclidProj_apply]
-  refine ext_vec3 ?_ ?_ ?_ <;> ring
+  refine ext_vec3 ?_ ?_ ?_ <;> ring_nf
 
 private theorem hasFDerivAt_s4ADKRaw (x : EuclideanSpace ℝ (Fin 5)) :
     HasFDerivAt s4ADKRaw (s4ADKRawDerivCLM x) x := by
@@ -1290,6 +1297,441 @@ theorem criticalPoints_s4ADKFibration :
       rw [← hrot]
       exact surjective_mfderiv_of_s4Rot01_conj (by nlinarith) hsurj
     exact s4ADKCritBase_mem_criticalPoints hsurj0
+
+/-- `s2NorthPole` is not in the critical-value image of `s4ADKFibration`. -/
+theorem s2NorthPole_notMem_image_criticalPoints_s4ADKFibration :
+    s2NorthPole ∉ s4ADKFibration '' criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration := by
+  rintro ⟨x, hx_crit, hfx⟩
+  rw [criticalPoints_s4ADKFibration] at hx_crit
+  rcases hx_crit with ⟨hx2, hx3, hx4⟩
+  obtain ⟨hx0, hx1⟩ := (s4ADKFibration_eq_northPole_iff x).mp hfx
+  have hx := mem_sphere_zero_iff_norm.mp x.2
+  have hsq : ‖x.1‖ ^ 2 = 1 := by rw [hx]; norm_num
+  rw [norm_sq_vec5, hx0, hx1, hx2, hx3, hx4] at hsq
+  norm_num at hsq
+
+/-- `s2NorthPole` is a regular value of `s4ADKFibration`. -/
+theorem isRegularValue_s4ADKFibration_northPole :
+    TauCeti.IsRegularValue (𝓡 4) (𝓡 2) s4ADKFibration s2NorthPole := by
+  rw [TauCeti.isRegularValue_iff_notMem_image]
+  simp_rw [TauCeti.isRegularPoint_iff]
+  exact s2NorthPole_notMem_image_criticalPoints_s4ADKFibration
+
+/-- `s2SouthPole` is not in the critical-value image of `s4ADKFibration`. -/
+theorem s2SouthPole_notMem_image_criticalPoints_s4ADKFibration :
+    s2SouthPole ∉ s4ADKFibration '' criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration := by
+  rintro ⟨x, hx_crit, hfx⟩
+  rw [criticalPoints_s4ADKFibration] at hx_crit
+  rcases hx_crit with ⟨hx2, hx3, -⟩
+  obtain ⟨-, hu, -⟩ := (s4ADKFibration_eq_southPole_iff x).mp hfx
+  rw [hx2, hx3] at hu
+  norm_num at hu
+
+/-- `s2SouthPole` is a regular value of `s4ADKFibration`. -/
+theorem isRegularValue_s4ADKFibration_southPole :
+    TauCeti.IsRegularValue (𝓡 4) (𝓡 2) s4ADKFibration s2SouthPole := by
+  rw [TauCeti.isRegularValue_iff_notMem_image]
+  simp_rw [TauCeti.isRegularPoint_iff]
+  exact s2SouthPole_notMem_image_criticalPoints_s4ADKFibration
+
+/-- Model space `Fin (finrank ℝ ℝ⁴ - finrank ℝ ℝ²) → ℝ` for `TauCeti.regularFiberChartedSpace`
+of `s4ADKFibration : Sphere4 → Sphere2`. -/
+noncomputable abbrev ADKRegularFiberSpace : Type :=
+  Fin (Module.finrank ℝ (EuclideanSpace ℝ (Fin 4)) - Module.finrank ℝ EuclideanPlane) → ℝ
+
+/-- Boundaryless model with corners on `ADKRegularFiberSpace`. -/
+noncomputable abbrev ADKRegularFiberModel :
+    ModelWithCorners ℝ ADKRegularFiberSpace ADKRegularFiberSpace :=
+  𝓘(ℝ, ADKRegularFiberSpace)
+
+/-- Embedded regular-fiber `ChartedSpace` instance on `{x : Sphere4 // s4ADKFibration x =
+s2NorthPole}` via `TauCeti.regularFiberChartedSpace`. -/
+noncomputable instance instChartedSpaceS4ADKNorthFiber :
+    ChartedSpace ADKRegularFiberSpace {x : Sphere4 // s4ADKFibration x = s2NorthPole} :=
+  TauCeti.regularFiberChartedSpace (by simp : (1 : ℕ∞ω) ≤ ∞) contMDiff_s4ADKFibration
+    BoundarylessManifold.isInteriorPoint isRegularValue_s4ADKFibration_northPole
+
+/-- Smooth manifold instance on `{x : Sphere4 // s4ADKFibration x = s2NorthPole}` via
+`TauCeti.isManifold_regularFiber`. -/
+instance instIsManifoldS4ADKNorthFiber :
+    IsManifold ADKRegularFiberModel ∞ {x : Sphere4 // s4ADKFibration x = s2NorthPole} :=
+  TauCeti.isManifold_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞) contMDiff_s4ADKFibration
+    BoundarylessManifold.isInteriorPoint isRegularValue_s4ADKFibration_northPole
+
+/-- Embedded regular-fiber `ChartedSpace` instance on `{x : Sphere4 // s4ADKFibration x =
+s2SouthPole}` via `TauCeti.regularFiberChartedSpace`. -/
+noncomputable instance instChartedSpaceS4ADKTorusFiber :
+    ChartedSpace ADKRegularFiberSpace {x : Sphere4 // s4ADKFibration x = s2SouthPole} :=
+  TauCeti.regularFiberChartedSpace (by simp : (1 : ℕ∞ω) ≤ ∞) contMDiff_s4ADKFibration
+    BoundarylessManifold.isInteriorPoint isRegularValue_s4ADKFibration_southPole
+
+/-- Smooth manifold instance on `{x : Sphere4 // s4ADKFibration x = s2SouthPole}` via
+`TauCeti.isManifold_regularFiber`. -/
+instance instIsManifoldS4ADKTorusFiber :
+    IsManifold ADKRegularFiberModel ∞ {x : Sphere4 // s4ADKFibration x = s2SouthPole} :=
+  TauCeti.isManifold_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞) contMDiff_s4ADKFibration
+    BoundarylessManifold.isInteriorPoint isRegularValue_s4ADKFibration_southPole
+
+/-- Explicit $C^\infty$ diffeomorphism from `Sphere2` onto the embedded regular fiber
+`{x : Sphere4 // s4ADKFibration x = s2NorthPole}` (`SC-R6b` smooth $S^2$ fiber witness). -/
+-- tier: T2
+noncomputable def s4ADKNorthFiberDiffeomorph :
+    Sphere2 ≃ₘ⟮𝓡 2, ADKRegularFiberModel⟯ {x : Sphere4 // s4ADKFibration x = s2NorthPole} where
+  toEquiv := s4ADKNorthFiberHomeomorph.toEquiv
+  contMDiff_toFun := by
+    have himm :=
+      (TauCeti.isSmoothEmbedding_coe_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞)
+        contMDiff_s4ADKFibration BoundarylessManifold.isInteriorPoint
+        isRegularValue_s4ADKFibration_northPole).isImmersion
+    rw [ContMDiff.iff_comp_isImmersion himm]
+    refine ⟨s4ADKNorthFiberHomeomorph.continuous_toFun, ?_⟩
+    have hraw : ContMDiff (𝓡 2) 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+        (fun y : Sphere2 ↦ vec5 0 0 (y.1 0) (y.1 1) (y.1 2)) :=
+      (contDiff_vec5 contDiff_const contDiff_const (euclidProj 0).contDiff
+        (euclidProj 1).contDiff (euclidProj 2).contDiff).contMDiff.comp contMDiff_coe_sphere
+    exact hraw.codRestrict_sphere _
+  contMDiff_invFun := by
+    have hcoe : ContMDiff ADKRegularFiberModel 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2NorthPole} ↦ x.1.1) :=
+      contMDiff_coe_sphere.comp
+        (TauCeti.isSmoothEmbedding_coe_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞)
+          contMDiff_s4ADKFibration BoundarylessManifold.isInteriorPoint
+          isRegularValue_s4ADKFibration_northPole).contMDiff
+    have hraw : ContMDiff ADKRegularFiberModel 𝓘(ℝ, EuclideanSpace ℝ (Fin 3)) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2NorthPole} ↦
+          vec3 (x.1.1 2) (x.1.1 3) (x.1.1 4)) :=
+      (contDiff_vec3 (euclidProj 2).contDiff (euclidProj 3).contDiff
+        (euclidProj 4).contDiff).contMDiff.comp hcoe
+    exact hraw.codRestrict_sphere _
+
+/-- Explicit $C^\infty$ diffeomorphism from `S¹ × S¹` (`Metric.sphere 0 1 × Metric.sphere 0 1`)
+onto the embedded Clifford torus regular fiber `{x : Sphere4 // s4ADKFibration x = s2SouthPole}`.
+-/
+-- tier: T2
+noncomputable def s4ADKTorusProdFiberDiffeomorph :
+    (Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1)
+      ≃ₘ⟮(𝓡 1).prod (𝓡 1), ADKRegularFiberModel⟯
+      {x : Sphere4 // s4ADKFibration x = s2SouthPole} where
+  toEquiv := s4ADKTorusFiberHomeomorph.toEquiv
+  contMDiff_toFun := by
+    have himm :=
+      (TauCeti.isSmoothEmbedding_coe_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞)
+        contMDiff_s4ADKFibration BoundarylessManifold.isInteriorPoint
+        isRegularValue_s4ADKFibration_southPole).isImmersion
+    rw [ContMDiff.iff_comp_isImmersion himm]
+    refine ⟨s4ADKTorusFiberHomeomorph.continuous_toFun, ?_⟩
+    have hc1 : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, EuclideanPlane) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          uv.1.1) :=
+      contMDiff_coe_sphere.comp contMDiff_fst
+    have hc2 : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, EuclideanPlane) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          uv.2.1) :=
+      contMDiff_coe_sphere.comp contMDiff_snd
+    have hp1 (k : Fin 2) : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, ℝ) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          (Real.sqrt 2)⁻¹ * uv.1.1 k) :=
+      (contDiff_const.mul (euclidProj k).contDiff).contMDiff.comp hc1
+    have hp2 (k : Fin 2) : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, ℝ) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          (Real.sqrt 2)⁻¹ * uv.2.1 k) :=
+      (contDiff_const.mul (euclidProj k).contDiff).contMDiff.comp hc2
+    have hpi : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, Fin 5 → ℝ) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          ![(Real.sqrt 2)⁻¹ * uv.1.1 0, (Real.sqrt 2)⁻¹ * uv.1.1 1,
+            (Real.sqrt 2)⁻¹ * uv.2.1 0, (Real.sqrt 2)⁻¹ * uv.2.1 1, 0]) := by
+      refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+      fin_cases i
+      · exact hp1 0
+      · exact hp1 1
+      · exact hp2 0
+      · exact hp2 1
+      · exact contMDiff_const
+    have hraw : ContMDiff ((𝓡 1).prod (𝓡 1)) 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+        (fun uv : Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1 ↦
+          vec5 ((Real.sqrt 2)⁻¹ * uv.1.1 0) ((Real.sqrt 2)⁻¹ * uv.1.1 1)
+            ((Real.sqrt 2)⁻¹ * uv.2.1 0) ((Real.sqrt 2)⁻¹ * uv.2.1 1) 0) :=
+      (EuclideanSpace.equiv (Fin 5) ℝ).symm.contDiff.contMDiff.comp hpi
+    exact hraw.codRestrict_sphere _
+  contMDiff_invFun := by
+    have hcoe : ContMDiff ADKRegularFiberModel 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦ x.1.1) :=
+      contMDiff_coe_sphere.comp
+        (TauCeti.isSmoothEmbedding_coe_regularFiber (by simp : (1 : ℕ∞ω) ≤ ∞)
+          contMDiff_s4ADKFibration BoundarylessManifold.isInteriorPoint
+          isRegularValue_s4ADKFibration_southPole).contMDiff
+    have hx (k : Fin 5) : ContMDiff ADKRegularFiberModel 𝓘(ℝ, ℝ) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦ Real.sqrt 2 * x.1.1 k) :=
+      (contDiff_const.mul (euclidProj k).contDiff).contMDiff.comp hcoe
+    have h1_pi : ContMDiff ADKRegularFiberModel 𝓘(ℝ, Fin 2 → ℝ) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦
+          ![Real.sqrt 2 * x.1.1 0, Real.sqrt 2 * x.1.1 1]) := by
+      refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+      fin_cases i <;> [exact hx 0; exact hx 1]
+    have h2_pi : ContMDiff ADKRegularFiberModel 𝓘(ℝ, Fin 2 → ℝ) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦
+          ![Real.sqrt 2 * x.1.1 2, Real.sqrt 2 * x.1.1 3]) := by
+      refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+      fin_cases i <;> [exact hx 2; exact hx 3]
+    have h1_raw : ContMDiff ADKRegularFiberModel 𝓘(ℝ, EuclideanPlane) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦
+          vec2 (Real.sqrt 2 * x.1.1 0) (Real.sqrt 2 * x.1.1 1)) :=
+      (EuclideanSpace.equiv (Fin 2) ℝ).symm.contDiff.contMDiff.comp h1_pi
+    have h2_raw : ContMDiff ADKRegularFiberModel 𝓘(ℝ, EuclideanPlane) ∞
+        (fun x : {x : Sphere4 // s4ADKFibration x = s2SouthPole} ↦
+          vec2 (Real.sqrt 2 * x.1.1 2) (Real.sqrt 2 * x.1.1 3)) :=
+      (EuclideanSpace.equiv (Fin 2) ℝ).symm.contDiff.contMDiff.comp h2_pi
+    exact (h1_raw.codRestrict_sphere _).prodMk (h2_raw.codRestrict_sphere _)
+
+/-- Smooth 2-torus `S¹ × S¹` (`Metric.sphere 0 1 × Metric.sphere 0 1`) equipped with a
+`ChartedSpace EuclideanPlane` and `IsManifold (𝓡 2) ∞` structure so it can serve directly as the
+`Fiber` manifold of `BrokenLefschetzFibration`. -/
+@[ext]
+structure Torus2 where
+  /-- First unit circle factor `S¹ ⊂ ℝ²`. -/
+  fst : Metric.sphere (0 : EuclideanPlane) 1
+  /-- Second unit circle factor `S¹ ⊂ ℝ²`. -/
+  snd : Metric.sphere (0 : EuclideanPlane) 1
+
+/-- Canonical bijection `Torus2 ≃ S¹ × S¹`. -/
+def Torus2.toProdEquiv :
+    Torus2 ≃ (Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1) where
+  toFun t := (t.fst, t.snd)
+  invFun uv := ⟨uv.1, uv.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+instance instTopologicalSpaceTorus2 : TopologicalSpace Torus2 :=
+  TopologicalSpace.induced Torus2.toProdEquiv inferInstance
+
+/-- Canonical homeomorphism `Torus2 ≃ₜ S¹ × S¹`. -/
+def Torus2.toProdHomeomorph :
+    Torus2 ≃ₜ (Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1) where
+  toEquiv := Torus2.toProdEquiv
+  continuous_toFun := continuous_induced_dom
+  continuous_invFun :=
+    continuous_induced_rng.mpr
+      (continuous_id :
+        Continuous (@id (Metric.sphere (0 : EuclideanPlane) 1 ×
+          Metric.sphere (0 : EuclideanPlane) 1)))
+
+instance instT2SpaceTorus2 : T2Space Torus2 :=
+  Torus2.toProdHomeomorph.isEmbedding.t2Space
+
+instance instCompactSpaceTorus2 : CompactSpace Torus2 :=
+  Torus2.toProdHomeomorph.symm.compactSpace
+
+instance instNonemptyTorus2 : Nonempty Torus2 :=
+  have hc : vec2 1 0 ∈ Metric.sphere (0 : EuclideanPlane) 1 := by
+    rw [mem_sphere_zero_iff_norm]
+    have hsq : ‖vec2 1 0‖ ^ 2 = 1 := by rw [norm_sq_plane]; norm_num
+    nlinarith [norm_nonneg (vec2 1 0)]
+  ⟨⟨⟨vec2 1 0, hc⟩, ⟨vec2 1 0, hc⟩⟩⟩
+
+/-- Product circle type `S¹ × S¹` underlying `Torus2`. -/
+abbrev Torus1Prod : Type :=
+  Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1
+
+/-- Vector-space model `ℝ¹ × ℝ¹` of `(𝓡 1).prod (𝓡 1)`. -/
+abbrev Torus1ModelVec : Type :=
+  EuclideanSpace ℝ (Fin 1) × EuclideanSpace ℝ (Fin 1)
+
+/-- Vector-space-charted copy of `S¹ × S¹` via `TauCeti.BoundarylessModel`. -/
+abbrev Torus1Boundaryless : Type :=
+  TauCeti.BoundarylessModel ((𝓡 1).prod (𝓡 1)) Torus1Prod
+
+/-- Smoothness of `(pq : ℝ¹ × ℝ¹) ↦ vec2 (pq.1 0) (pq.2 0)`. -/
+theorem contDiff_torusModelVecToPlane :
+    ContDiff ℝ ∞ (fun pq : Torus1ModelVec ↦ vec2 (pq.1 0) (pq.2 0)) :=
+  contDiff_vec2
+    ((euclidProj (0 : Fin 1)).contDiff.comp contDiff_fst)
+    ((euclidProj (0 : Fin 1)).contDiff.comp contDiff_snd)
+
+/-- Smoothness of the inverse linear map `ℝ² → ℝ¹ × ℝ¹`. -/
+theorem contDiff_planeToTorusModelVec :
+    ContDiff ℝ ∞ (fun w : EuclideanPlane ↦
+      (((EuclideanSpace.equiv (Fin 1) ℝ).symm (fun _ ↦ w 0),
+        (EuclideanSpace.equiv (Fin 1) ℝ).symm (fun _ ↦ w 1)) : Torus1ModelVec)) :=
+  ((EuclideanSpace.equiv (Fin 1) ℝ).symm.contDiff.comp
+      (contDiff_pi.mpr fun _ ↦ (euclidProj (0 : Fin 2)).contDiff)).prodMk
+    ((EuclideanSpace.equiv (Fin 1) ℝ).symm.contDiff.comp
+      (contDiff_pi.mpr fun _ ↦ (euclidProj (1 : Fin 2)).contDiff))
+
+/-- Smooth linear model diffeomorphism `ℝ¹ × ℝ¹ ≃ₘ ℝ²` for recharting `Torus2`. -/
+noncomputable def torusModelVecDiffeomorph :
+    Torus1ModelVec ≃ₘ⟮𝓘(ℝ, Torus1ModelVec), 𝓡 2⟯ EuclideanPlane where
+  toFun pq := vec2 (pq.1 0) (pq.2 0)
+  invFun w :=
+    ((EuclideanSpace.equiv (Fin 1) ℝ).symm (fun _ ↦ w 0),
+      (EuclideanSpace.equiv (Fin 1) ℝ).symm (fun _ ↦ w 1))
+  left_inv pq :=
+    Prod.ext (PiLp.ext fun i ↦ by fin_cases i; rfl) (PiLp.ext fun i ↦ by fin_cases i; rfl)
+  right_inv w := ext_vec2 rfl rfl
+  contMDiff_toFun := contDiff_torusModelVecToPlane.contMDiff
+  contMDiff_invFun := contDiff_planeToTorusModelVec.contMDiff
+
+/-- Canonical homeomorphism `Torus2 ≃ₜ Torus1Boundaryless`. -/
+noncomputable def Torus2.toBoundarylessHomeomorph : Torus2 ≃ₜ Torus1Boundaryless :=
+  Torus2.toProdHomeomorph.trans
+    (TauCeti.BoundarylessModel.homeomorph ((𝓡 1).prod (𝓡 1)) Torus1Prod)
+
+/-- Auxiliary `EuclideanPlane`-valued `ChartedSpace` on `Torus1Boundaryless`. -/
+@[instance_reducible]
+noncomputable def torus1BoundarylessPlaneChartedSpace :
+    ChartedSpace EuclideanPlane Torus1Boundaryless :=
+  letI : ChartedSpace EuclideanPlane Torus1ModelVec :=
+    torusModelVecDiffeomorph.toHomeomorph.toOpenPartialHomeomorph.singletonChartedSpace (by simp)
+  ChartedSpace.comp EuclideanPlane Torus1ModelVec Torus1Boundaryless
+
+noncomputable instance instChartedSpaceTorus2 : ChartedSpace EuclideanPlane Torus2 :=
+  letI := torus1BoundarylessPlaneChartedSpace
+  Torus2.toBoundarylessHomeomorph.pullbackChartedSpace
+
+instance instIsManifoldTorus2 : IsManifold (𝓡 2) ∞ Torus2 := by
+  let _ : ChartedSpace EuclideanPlane Torus1Boundaryless := torus1BoundarylessPlaneChartedSpace
+  have _ : IsManifold (𝓡 2) ∞ Torus1Boundaryless :=
+    torusModelVecDiffeomorph.isManifold_chartedSpaceComp Torus1Boundaryless
+  exact Torus2.toBoundarylessHomeomorph.pullback_isManifold (𝓡 2) ∞
+
+private theorem chartAt_torus2 (t : Torus2) :
+    chartAt EuclideanPlane t =
+      Torus2.toBoundarylessHomeomorph.transOpenPartialHomeomorph
+        (chartAt Torus1ModelVec (Torus2.toBoundarylessHomeomorph t) ≫ₕ
+          torusModelVecDiffeomorph.toHomeomorph.toOpenPartialHomeomorph) := by
+  let c₀ : OpenPartialHomeomorph Torus1Boundaryless Torus1ModelVec :=
+    chartAt Torus1ModelVec (Torus2.toBoundarylessHomeomorph t)
+  let eL := torusModelVecDiffeomorph.toHomeomorph.toOpenPartialHomeomorph
+  let _ : ChartedSpace EuclideanPlane Torus1ModelVec := eL.singletonChartedSpace (by simp [eL])
+  let _ : ChartedSpace EuclideanPlane Torus1Boundaryless :=
+    ChartedSpace.comp EuclideanPlane Torus1ModelVec Torus1Boundaryless
+  change Torus2.toBoundarylessHomeomorph.transOpenPartialHomeomorph
+      (chartAt EuclideanPlane (Torus2.toBoundarylessHomeomorph t)) =
+    Torus2.toBoundarylessHomeomorph.transOpenPartialHomeomorph (c₀ ≫ₕ eL)
+  congr 1
+
+/-- Smooth diffeomorphism `Torus2 ≃ₘ Torus1Boundaryless`. -/
+noncomputable def torus2ToBoundarylessDiffeomorph :
+    Torus2 ≃ₘ⟮𝓡 2, 𝓘(ℝ, Torus1ModelVec)⟯ Torus1Boundaryless where
+  toEquiv := Torus2.toBoundarylessHomeomorph.toEquiv
+  contMDiff_toFun t := by
+    rw [contMDiffAt_iff]
+    refine ⟨Torus2.toBoundarylessHomeomorph.continuous.continuousAt, ?_⟩
+    let b : Torus1Boundaryless := Torus2.toBoundarylessHomeomorph t
+    let c : OpenPartialHomeomorph Torus1Boundaryless Torus1ModelVec :=
+      chartAt Torus1ModelVec b
+    have heq : ∀ w ∈ (extChartAt (𝓡 2) t).target,
+        (extChartAt 𝓘(ℝ, Torus1ModelVec) b ∘ Torus2.toBoundarylessHomeomorph ∘
+            (extChartAt (𝓡 2) t).symm) w =
+          torusModelVecDiffeomorph.symm w := by
+      intro w hw
+      have hw' : torusModelVecDiffeomorph.symm w ∈ c.target := by
+        simp only [extChartAt, OpenPartialHomeomorph.extend, chartAt_torus2,
+          modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl,
+          Homeomorph.transOpenPartialHomeomorph_target, OpenPartialHomeomorph.trans_target,
+          Homeomorph.toOpenPartialHomeomorph_target, univ_inter, mem_preimage,
+          Homeomorph.toOpenPartialHomeomorph_symm_apply] at hw
+        exact hw
+      simp only [Function.comp_apply, extChartAt, OpenPartialHomeomorph.extend, chartAt_torus2,
+        modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl,
+        OpenPartialHomeomorph.coe_toPartialEquiv, OpenPartialHomeomorph.coe_toPartialEquiv_symm,
+        Homeomorph.transOpenPartialHomeomorph_symm_apply, Homeomorph.apply_symm_apply,
+        OpenPartialHomeomorph.coe_trans_symm, Homeomorph.toOpenPartialHomeomorph_symm_apply]
+      exact c.right_inv hw'
+    exact (contDiff_planeToTorusModelVec.contDiffAt.congr_of_eventuallyEq
+      (Filter.eventuallyEq_of_mem (extChartAt_target_mem_nhds t) heq)).contDiffWithinAt
+  contMDiff_invFun b := by
+    rw [contMDiffAt_iff]
+    refine ⟨Torus2.toBoundarylessHomeomorph.symm.continuous.continuousAt, ?_⟩
+    let t : Torus2 := Torus2.toBoundarylessHomeomorph.symm b
+    have htb : Torus2.toBoundarylessHomeomorph t = b :=
+      Torus2.toBoundarylessHomeomorph.apply_symm_apply b
+    let c : OpenPartialHomeomorph Torus1Boundaryless Torus1ModelVec :=
+      chartAt Torus1ModelVec b
+    have heq : ∀ pq ∈ (extChartAt 𝓘(ℝ, Torus1ModelVec) b).target,
+        (extChartAt (𝓡 2) t ∘ Torus2.toBoundarylessHomeomorph.symm ∘
+            (extChartAt 𝓘(ℝ, Torus1ModelVec) b).symm) pq =
+          torusModelVecDiffeomorph pq := by
+      intro pq hpq
+      have hpq' : pq ∈ c.target := by
+        simpa only [extChartAt, OpenPartialHomeomorph.extend,
+          modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl] using hpq
+      have hchart_t :
+          chartAt EuclideanPlane t =
+            Torus2.toBoundarylessHomeomorph.transOpenPartialHomeomorph
+              (c ≫ₕ torusModelVecDiffeomorph.toHomeomorph.toOpenPartialHomeomorph) := by
+        simpa only [c, htb] using chartAt_torus2 t
+      simp only [Function.comp_apply, extChartAt, OpenPartialHomeomorph.extend, hchart_t,
+        modelWithCornersSelf_partialEquiv, PartialEquiv.trans_refl,
+        OpenPartialHomeomorph.coe_toPartialEquiv, OpenPartialHomeomorph.coe_toPartialEquiv_symm,
+        Homeomorph.transOpenPartialHomeomorph_apply, Homeomorph.apply_symm_apply,
+        OpenPartialHomeomorph.coe_trans, Homeomorph.toOpenPartialHomeomorph_apply]
+      exact congrArg torusModelVecDiffeomorph (c.right_inv hpq')
+    exact (contDiff_torusModelVecToPlane.contDiffAt.congr_of_eventuallyEq
+      (Filter.eventuallyEq_of_mem (extChartAt_target_mem_nhds b) heq)).contDiffWithinAt
+
+@[simp]
+private theorem coe_torus2ToBoundarylessDiffeomorph (t : Torus2) :
+    torus2ToBoundarylessDiffeomorph t = Torus2.toBoundarylessHomeomorph t := rfl
+
+@[simp]
+private theorem coe_torus2ToBoundarylessDiffeomorph_symm (b : Torus1Boundaryless) :
+    torus2ToBoundarylessDiffeomorph.symm b = Torus2.toBoundarylessHomeomorph.symm b := rfl
+
+/-- Canonical $C^\infty$ diffeomorphism `Torus2 ≃ₘ S¹ × S¹` between `Torus2` (modeled on `𝓡 2`)
+and the product of unit circles (modeled on `(𝓡 1).prod (𝓡 1)`). -/
+-- tier: T2
+noncomputable def Torus2.toProdDiffeomorph :
+    Torus2 ≃ₘ⟮𝓡 2, (𝓡 1).prod (𝓡 1)⟯ Torus1Prod :=
+  torus2ToBoundarylessDiffeomorph.trans
+    (TauCeti.BoundarylessModel.diffeomorph ((𝓡 1).prod (𝓡 1)) (M := Torus1Prod) ∞).symm
+
+@[simp]
+private theorem coe_torus2_toProdDiffeomorph (t : Torus2) :
+    Torus2.toProdDiffeomorph t = (t.fst, t.snd) := by
+  change (TauCeti.BoundarylessModel.diffeomorph ((𝓡 1).prod (𝓡 1)) (M := Torus1Prod) ∞).symm
+      (torus2ToBoundarylessDiffeomorph t) =
+    (t.fst, t.snd)
+  rw [TauCeti.BoundarylessModel.coe_diffeomorph_symm, coe_torus2ToBoundarylessDiffeomorph]
+  change (TauCeti.BoundarylessModel.homeomorph ((𝓡 1).prod (𝓡 1)) Torus1Prod).symm
+      ((TauCeti.BoundarylessModel.homeomorph ((𝓡 1).prod (𝓡 1)) Torus1Prod)
+        (Torus2.toProdHomeomorph t)) =
+    (t.fst, t.snd)
+  rw [Homeomorph.symm_apply_apply]
+  rfl
+
+@[simp]
+private theorem coe_torus2_toProdDiffeomorph_symm (uv : Torus1Prod) :
+    Torus2.toProdDiffeomorph.symm uv = ⟨uv.1, uv.2⟩ := by
+  change torus2ToBoundarylessDiffeomorph.symm
+      (TauCeti.BoundarylessModel.diffeomorph ((𝓡 1).prod (𝓡 1)) (M := Torus1Prod) ∞ uv) =
+    ⟨uv.1, uv.2⟩
+  rw [TauCeti.BoundarylessModel.coe_diffeomorph, coe_torus2ToBoundarylessDiffeomorph_symm]
+  change Torus2.toProdHomeomorph.symm
+      ((TauCeti.BoundarylessModel.homeomorph ((𝓡 1).prod (𝓡 1)) Torus1Prod).symm
+        ((TauCeti.BoundarylessModel.homeomorph ((𝓡 1).prod (𝓡 1)) Torus1Prod) uv)) =
+    ⟨uv.1, uv.2⟩
+  rw [Homeomorph.symm_apply_apply]
+  rfl
+
+/-- Smoothness of `(t : Torus2) ↦ (t.fst : EuclideanPlane)`. -/
+theorem Torus2.contMDiff_coe_fst :
+    ContMDiff (𝓡 2) 𝓘(ℝ, EuclideanPlane) ∞ (fun t : Torus2 ↦ (t.fst : EuclideanPlane)) := by
+  have h := (contMDiff_coe_sphere.comp contMDiff_fst).comp Torus2.toProdDiffeomorph.contMDiff
+  exact h.congr fun t ↦ by simp
+
+/-- Smoothness of `(t : Torus2) ↦ (t.snd : EuclideanPlane)`. -/
+theorem Torus2.contMDiff_coe_snd :
+    ContMDiff (𝓡 2) 𝓘(ℝ, EuclideanPlane) ∞ (fun t : Torus2 ↦ (t.snd : EuclideanPlane)) := by
+  have h := (contMDiff_coe_sphere.comp contMDiff_snd).comp Torus2.toProdDiffeomorph.contMDiff
+  exact h.congr fun t ↦ by simp
+
+/-- Explicit $C^\infty$ diffeomorphism from `Torus2` (`S¹ × S¹` modeled on `𝓡 2`) onto the embedded
+Clifford torus regular fiber `{x : Sphere4 // s4ADKFibration x = s2SouthPole}` (`SC-R6b` smooth
+$T^2$ fiber witness). -/
+-- tier: T2
+noncomputable def s4ADKTorusFiberDiffeomorph :
+    Torus2 ≃ₘ⟮𝓡 2, ADKRegularFiberModel⟯ {x : Sphere4 // s4ADKFibration x = s2SouthPole} :=
+  Torus2.toProdDiffeomorph.trans s4ADKTorusProdFiberDiffeomorph
 
 end CriticalPoints
 
@@ -3687,10 +4129,10 @@ theorem s4ADKTrivialization_pos_cooriented (u : s4ADKPreimageOpen) :
   rw [TauCeti.SmoothForm.mpullback_apply, ContinuousAlternatingMap.smul_apply,
     TauCeti.SmoothForm.mpullback_apply, hc_eq, ContinuousAlternatingMap.smul_apply]
 
-/-- Global ADK fibration `s4ADKFibration` packaged as a `WrinkledFibration` with regular `Sphere2`
-fiber over `s4ADKBaseRegion`. -/
-noncomputable def s4ADKWrinkledFibration :
-    WrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2 where
+/-- Global ADK fibration `s4ADKFibration` packaged as a `RegularDiskFibration` with regular
+`Sphere2` fiber over `s4ADKBaseRegion`. -/
+noncomputable def s4ADKRegularDiskFibration :
+    RegularDiskFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2 where
   toFun := s4ADKFibration
   contMDiff_toFun := contMDiff_s4ADKFibration
   baseRegion := s4ADKBaseRegion
@@ -3702,12 +4144,13 @@ noncomputable def s4ADKWrinkledFibration :
   trivialization := s4ADKTrivialization
   trivialization_fst := s4ADKTrivialization_fst
 
-/-- **Global ADK Broken Lefschetz Fibration on $S^4$**: every critical point of `s4ADKFibration`
-is an indefinite quadratic fold (`IsIndefiniteFoldAt`), with zero real Lefschetz points. -/
+/-- **Global ADK Broken Lefschetz Fibration on $S^4$ ($S^2$ Chamber)**: every critical point of
+`s4ADKFibration` is an indefinite quadratic fold (`IsIndefiniteFoldAt`), with zero real Lefschetz
+points, trivialized over the north-hemisphere $S^2$ chamber `s4ADKBaseRegion`. -/
 -- tier: T2
 noncomputable def s4BrokenLefschetzFibration :
     BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2 where
-  toWrinkledFibration := s4ADKWrinkledFibration
+  toRegularDiskFibration := s4ADKRegularDiskFibration
   singularities_broken_lefschetz _ hp := Or.inr (isIndefiniteFoldAt_s4ADKFibration hp)
 
 /-- **Purely Wrinkled ADK Fibration on $S^4$**: every critical point of `s4ADKFibration` is an
@@ -3718,9 +4161,1340 @@ noncomputable def s4PurelyWrinkledFibration :
   s4BrokenLefschetzFibration.toPurelyWrinkledOfIndefiniteFolds
     fun _ hp ↦ isIndefiniteFoldAt_s4ADKFibration hp
 
+/-! ### South-Hemisphere $T^2$ Chamber Trivialization (`SC-R6b`) -/
+
+attribute [local instance] TauCeti.finrank_euclideanSpace_fin_succ_fact
+
+/-- Smooth antipodal involution `z ↦ -z` on `Sphere2`. -/
+noncomputable def s2Antipodal : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2 where
+  toFun z := ⟨-z.1, by
+    rw [mem_sphere_zero_iff_norm, norm_neg]; exact mem_sphere_zero_iff_norm.mp z.2⟩
+  invFun z := ⟨-z.1, by
+    rw [mem_sphere_zero_iff_norm, norm_neg]; exact mem_sphere_zero_iff_norm.mp z.2⟩
+  left_inv z := Subtype.ext (neg_neg z.1)
+  right_inv z := Subtype.ext (neg_neg z.1)
+  contMDiff_toFun :=
+    (contDiff_neg.contMDiff.comp contMDiff_coe_sphere).codRestrict_sphere fun z ↦ by
+      dsimp only [Function.comp_apply]
+      rw [mem_sphere_zero_iff_norm, norm_neg]; exact mem_sphere_zero_iff_norm.mp z.2
+  contMDiff_invFun :=
+    (contDiff_neg.contMDiff.comp contMDiff_coe_sphere).codRestrict_sphere fun z ↦ by
+      dsimp only [Function.comp_apply]
+      rw [mem_sphere_zero_iff_norm, norm_neg]; exact mem_sphere_zero_iff_norm.mp z.2
+
+@[simp]
+private theorem coe_s2Antipodal (z : Sphere2) :
+    (s2Antipodal z : EuclideanSpace ℝ (Fin 3)) = -z.1 := rfl
+
+@[simp]
+private theorem s2Antipodal_involutive (z : Sphere2) :
+    s2Antipodal (s2Antipodal z) = z :=
+  Subtype.ext (neg_neg z.1)
+
+@[simp]
+private theorem s2Antipodal_northPole : s2Antipodal s2NorthPole = s2SouthPole := by
+  apply Subtype.ext
+  refine ext_vec3 ?_ ?_ ?_ <;> simp [s2NorthPole, s2SouthPole]
+
+@[simp]
+private theorem s2Antipodal_southPole : s2Antipodal s2SouthPole = s2NorthPole := by
+  apply Subtype.ext
+  refine ext_vec3 ?_ ?_ ?_ <;> simp [s2NorthPole, s2SouthPole]
+
+/-- If `z ≠ s2NorthPole`, its antipode `s2Antipodal z` differs from `s2SouthPole`. -/
+theorem s2Antipodal_ne_southPole_of_ne_northPole {z : Sphere2} (hz : z ≠ s2NorthPole) :
+    s2Antipodal z ≠ s2SouthPole := by
+  intro h
+  apply hz
+  have h2 := congrArg s2Antipodal h
+  simpa using h2
+
+/-- North-pole inverse stereographic parameterization `ℝ² → Sphere2` centered at `s2SouthPole`. -/
+noncomputable def northPoleStereoInv (w : EuclideanPlane) : Sphere2 :=
+  s2Antipodal (southPoleStereoInv w)
+
+/-- Smoothness of `northPoleStereoInv`. -/
+theorem contMDiff_northPoleStereoInv : ContMDiff (𝓡 2) (𝓡 2) ∞ northPoleStereoInv :=
+  s2Antipodal.contMDiff.comp contMDiff_southPoleStereoInv
+
+/-- `northPoleStereoInv 0 = s2SouthPole`. -/
+@[simp]
+theorem northPoleStereoInv_zero : northPoleStereoInv 0 = s2SouthPole := by
+  simp [northPoleStereoInv]
+
+/-- `northPoleStereoInv` never hits `s2NorthPole`. -/
+theorem northPoleStereoInv_ne_northPole (w : EuclideanPlane) :
+    northPoleStereoInv w ≠ s2NorthPole := by
+  intro h
+  have h2 := congrArg s2Antipodal h
+  simp only [northPoleStereoInv, s2Antipodal_involutive, s2Antipodal_northPole] at h2
+  exact southPoleStereoInv_ne_southPole w h2
+
+/-- Injectivity of `northPoleStereoInv`. -/
+theorem injective_northPoleStereoInv : Function.Injective northPoleStereoInv :=
+  s2Antipodal.injective.comp injective_southPoleStereoInv
+
+/-- Open embedding property of `northPoleStereoInv`. -/
+theorem isOpenEmbedding_northPoleStereoInv : Topology.IsOpenEmbedding northPoleStereoInv :=
+  s2Antipodal.toHomeomorph.isOpenEmbedding.comp isOpenEmbedding_southPoleStereoInv
+
+/-- Forward north-pole stereographic coordinate chart centered at `s2SouthPole`. -/
+noncomputable def northPoleStereoChart (z : Sphere2) : EuclideanPlane :=
+  southPoleStereoChart (s2Antipodal z)
+
+/-- Left-inverse identity `northPoleStereoChart (northPoleStereoInv w) = w`. -/
+@[simp]
+theorem northPoleStereoChart_inv (w : EuclideanPlane) :
+    northPoleStereoChart (northPoleStereoInv w) = w := by
+  simp [northPoleStereoChart, northPoleStereoInv]
+
+/-- Right-inverse identity `northPoleStereoInv (northPoleStereoChart z) = z` off `s2NorthPole`. -/
+theorem northPoleStereoInv_chart {z : Sphere2} (hz : z ≠ s2NorthPole) :
+    northPoleStereoInv (northPoleStereoChart z) = z := by
+  simp only [northPoleStereoInv, northPoleStereoChart]
+  rw [southPoleStereoInv_chart (s2Antipodal_ne_southPole_of_ne_northPole hz),
+    s2Antipodal_involutive]
+
+/-- Radius `1 / 6` for the normal coordinate disk of the Clifford torus tubular neighborhood. -/
+noncomputable def s4TorusDiskRadius : ℝ := 1 / 6
+
+/-- Positivity `0 < s4TorusDiskRadius`. -/
+theorem s4TorusDiskRadius_pos : 0 < s4TorusDiskRadius := by
+  norm_num [s4TorusDiskRadius]
+
+/-- Open planar normal disk `Metric.ball 0 (1 / 6)` for the Clifford torus neighborhood. -/
+noncomputable abbrev s4TorusDisk : Opens EuclideanPlane :=
+  ⟨Metric.ball (0 : EuclideanPlane) s4TorusDiskRadius, Metric.isOpen_ball⟩
+
+/-- Origin `(0 : ℝ²)` in `s4TorusDisk`. -/
+noncomputable def s4TorusDiskZero : s4TorusDisk :=
+  ⟨0, Metric.mem_ball_self s4TorusDiskRadius_pos⟩
+
+@[simp]
+private theorem coe_s4TorusDiskZero : (s4TorusDiskZero : EuclideanPlane) = 0 := rfl
+
+private theorem s4TorusDisk_bounds {w : EuclideanPlane} (hw : w ∈ s4TorusDisk.1) :
+    -1 / 6 < w 0 ∧ w 0 < 1 / 6 ∧ w 1 ^ 2 < 1 / 36 := by
+  have hn : ‖w‖ < 1 / 6 := by simpa [s4TorusDisk, s4TorusDiskRadius, dist_zero_right] using hw
+  have hsq : ‖w‖ ^ 2 < (1 / 6) ^ 2 := by nlinarith [norm_nonneg w]
+  rw [norm_sq_plane] at hsq
+  have hw0_sq : w 0 ^ 2 < (1 / 6) ^ 2 := by nlinarith [sq_nonneg (w 1)]
+  have hw0_abs : |w 0| < 1 / 6 := by
+    simpa [abs_of_pos (by norm_num : (0 : ℝ) < 1 / 6)] using sq_lt_sq.mp hw0_sq
+  rw [abs_lt] at hw0_abs
+  refine ⟨by linarith, hw0_abs.2, ?_⟩
+  nlinarith [sq_nonneg (w 0)]
+
+private theorem torusRad1Sq_pos {w : EuclideanPlane} (hw : w ∈ s4TorusDisk.1) :
+    0 < 1 / 2 - w 0 - w 1 ^ 2 := by
+  obtain ⟨-, hw0_hi, hw1_sq⟩ := s4TorusDisk_bounds hw
+  linarith
+
+private theorem torusRad2Sq_pos {w : EuclideanPlane} (hw : w ∈ s4TorusDisk.1) :
+    0 < 1 / 2 + w 0 := by
+  obtain ⟨hw0_lo, -, -⟩ := s4TorusDisk_bounds hw
+  linarith
+
+/-- Ambient Euclidean formula for the Clifford torus tubular embedding `ℝ² × Torus2 → ℝ⁵`. -/
+noncomputable def s4TorusEmbedRaw (w : EuclideanPlane) (t : Torus2) :
+    EuclideanSpace ℝ (Fin 5) :=
+  let r₁ := Real.sqrt (1 / 2 - w 0 - w 1 ^ 2)
+  let r₂ := Real.sqrt (1 / 2 + w 0)
+  vec5 (r₁ * t.fst.1 0) (r₁ * t.fst.1 1) (r₂ * t.snd.1 0) (r₂ * t.snd.1 1) (w 1)
+
+/-- `s4TorusEmbedRaw` maps `s4TorusDisk × Torus2` into the unit 4-sphere. -/
+theorem s4TorusEmbedRaw_mem_sphere (wt : s4TorusDisk × Torus2) :
+    s4TorusEmbedRaw wt.1.1 wt.2 ∈ Metric.sphere (0 : EuclideanSpace ℝ (Fin 5)) 1 := by
+  rw [mem_sphere_zero_iff_norm]
+  have hr1 := torusRad1Sq_pos wt.1.2
+  have hr2 := torusRad2Sq_pos wt.1.2
+  have hu1 : wt.2.fst.1 0 ^ 2 + wt.2.fst.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp wt.2.fst.2, one_pow]
+  have hu2 : wt.2.snd.1 0 ^ 2 + wt.2.snd.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp wt.2.snd.2, one_pow]
+  have hsq : ‖s4TorusEmbedRaw wt.1.1 wt.2‖ ^ 2 = 1 := by
+    rw [norm_sq_vec5]
+    dsimp only [s4TorusEmbedRaw]
+    simp only [vec5_zero, vec5_one, vec5_two, vec5_three, vec5_four]
+    calc
+      (Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 0) ^ 2 +
+          (Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 1) ^ 2 +
+          (Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 0) ^ 2 +
+          (Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 1) ^ 2 + wt.1.1 1 ^ 2
+        = Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) ^ 2 *
+            (wt.2.fst.1 0 ^ 2 + wt.2.fst.1 1 ^ 2) +
+          Real.sqrt (1 / 2 + wt.1.1 0) ^ 2 *
+            (wt.2.snd.1 0 ^ 2 + wt.2.snd.1 1 ^ 2) + wt.1.1 1 ^ 2 := by ring
+      _ = 1 := by rw [Real.sq_sqrt hr1.le, Real.sq_sqrt hr2.le, hu1, hu2]; ring
+  nlinarith [norm_nonneg (s4TorusEmbedRaw wt.1.1 wt.2)]
+
+/-- Smooth tubular embedding `s4TorusDisk × Torus2 → Sphere4` around the Clifford torus. -/
+noncomputable def s4TorusEmbed (wt : s4TorusDisk × Torus2) : Sphere4 :=
+  ⟨s4TorusEmbedRaw wt.1.1 wt.2, s4TorusEmbedRaw_mem_sphere wt⟩
+
+/-- Smoothness of `s4TorusEmbed`. -/
+-- tier: T2
+theorem contMDiff_s4TorusEmbed :
+    ContMDiff ((𝓡 2).prod (𝓡 2)) (𝓡 4) ∞ s4TorusEmbed := by
+  have hw_val : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, EuclideanPlane) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ wt.1.1) :=
+    contMDiff_subtype_val.comp contMDiff_fst
+  have hw (i : Fin 2) : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ wt.1.1 i) :=
+    (euclidProj i).contDiff.contMDiff.comp hw_val
+  have hrad1 : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ 1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) :=
+    ((contDiff_const.sub (euclidProj (0 : Fin 2)).contDiff).sub
+      ((euclidProj (1 : Fin 2)).contDiff.pow 2)).contMDiff.comp hw_val
+  have hrad2 : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ 1 / 2 + wt.1.1 0) :=
+    (contDiff_const.add (euclidProj (0 : Fin 2)).contDiff).contMDiff.comp hw_val
+  have hr1 : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2)) :=
+    fun wt ↦ (Real.contDiffAt_sqrt (torusRad1Sq_pos wt.1.2).ne').contMDiffAt.comp wt (hrad1 wt)
+  have hr2 : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ Real.sqrt (1 / 2 + wt.1.1 0)) :=
+    fun wt ↦ (Real.contDiffAt_sqrt (torusRad2Sq_pos wt.1.2).ne').contMDiffAt.comp wt (hrad2 wt)
+  have hc1 (k : Fin 2) : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ wt.2.fst.1 k) :=
+    (euclidProj k).contDiff.contMDiff.comp (Torus2.contMDiff_coe_fst.comp contMDiff_snd)
+  have hc2 (k : Fin 2) : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ wt.2.snd.1 k) :=
+    (euclidProj k).contDiff.contMDiff.comp (Torus2.contMDiff_coe_snd.comp contMDiff_snd)
+  have hmul : ContDiff ℝ ∞ (fun q : ℝ × ℝ ↦ q.1 * q.2) := contDiff_fst.mul contDiff_snd
+  have hpi : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, Fin 5 → ℝ) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦
+        ![Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 0,
+          Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 1,
+          Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 0,
+          Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 1,
+          wt.1.1 1]) := by
+    refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+    fin_cases i
+    · exact hmul.contMDiff.comp (hr1.prodMk_space (hc1 0))
+    · exact hmul.contMDiff.comp (hr1.prodMk_space (hc1 1))
+    · exact hmul.contMDiff.comp (hr2.prodMk_space (hc2 0))
+    · exact hmul.contMDiff.comp (hr2.prodMk_space (hc2 1))
+    · exact hw 1
+  have hraw : ContMDiff ((𝓡 2).prod (𝓡 2)) 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+      (fun wt : s4TorusDisk × Torus2 ↦ s4TorusEmbedRaw wt.1.1 wt.2) :=
+    (EuclideanSpace.equiv (Fin 5) ℝ).symm.contDiff.contMDiff.comp hpi
+  exact hraw.codRestrict_sphere _
+
+/-- Normal coordinate map `x ↦ (x₂² + x₃² - 1 / 2, x₄)` for the Clifford torus neighborhood. -/
+noncomputable def torusNormalCoord (x : Sphere4) : EuclideanPlane :=
+  vec2 (x.1 2 ^ 2 + x.1 3 ^ 2 - 1 / 2) (x.1 4)
+
+/-- Smoothness of `torusNormalCoord`. -/
+theorem contMDiff_torusNormalCoord :
+    ContMDiff (𝓡 4) 𝓘(ℝ, EuclideanPlane) ∞ torusNormalCoord :=
+  (contDiff_vec2
+    ((((euclidProj (2 : Fin 5)).contDiff.pow 2).add
+      ((euclidProj (3 : Fin 5)).contDiff.pow 2)).sub contDiff_const)
+    (euclidProj (4 : Fin 5)).contDiff).contMDiff.comp contMDiff_coe_sphere
+
+private theorem torusNormalCoord_s4TorusEmbed (wt : s4TorusDisk × Torus2) :
+    torusNormalCoord (s4TorusEmbed wt) = wt.1.1 := by
+  have hr2 := torusRad2Sq_pos wt.1.2
+  have hu2 : wt.2.snd.1 0 ^ 2 + wt.2.snd.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp wt.2.snd.2, one_pow]
+  refine ext_vec2 ?_ ?_
+  · simp only [torusNormalCoord, s4TorusEmbed, s4TorusEmbedRaw, vec2_zero, vec5_two, vec5_three]
+    calc
+      (Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 0) ^ 2 +
+          (Real.sqrt (1 / 2 + wt.1.1 0) * wt.2.snd.1 1) ^ 2 - 1 / 2
+        = Real.sqrt (1 / 2 + wt.1.1 0) ^ 2 * (wt.2.snd.1 0 ^ 2 + wt.2.snd.1 1 ^ 2) - 1 / 2 := by
+          ring
+      _ = wt.1.1 0 := by rw [Real.sq_sqrt hr2.le, hu2]; ring
+  · simp [torusNormalCoord, s4TorusEmbed, s4TorusEmbedRaw]
+
+/-- Open tubular neighborhood of the Clifford torus in `Sphere4`. -/
+noncomputable abbrev s4TorusTubularOpen : Opens Sphere4 :=
+  ⟨{x : Sphere4 | torusNormalCoord x ∈ s4TorusDisk.1},
+    s4TorusDisk.2.preimage contMDiff_torusNormalCoord.continuous⟩
+
+/-- Image containment `s4TorusEmbed wt ∈ s4TorusTubularOpen`. -/
+theorem s4TorusEmbed_mem_tubularOpen (wt : s4TorusDisk × Torus2) :
+    s4TorusEmbed wt ∈ s4TorusTubularOpen.1 := by
+  show torusNormalCoord (s4TorusEmbed wt) ∈ s4TorusDisk.1
+  rw [torusNormalCoord_s4TorusEmbed]
+  exact wt.1.2
+
+private theorem s4TorusTubular_pair01_pos (u : s4TorusTubularOpen) :
+    0 < u.1.1 0 ^ 2 + u.1.1 1 ^ 2 := by
+  have hx : u.1.1 0 ^ 2 + u.1.1 1 ^ 2 + u.1.1 2 ^ 2 + u.1.1 3 ^ 2 + u.1.1 4 ^ 2 = 1 := by
+    rw [← norm_sq_vec5, mem_sphere_zero_iff_norm.mp u.1.2, one_pow]
+  have h1 := torusRad1Sq_pos u.2
+  have hc0 : (torusNormalCoord u.1) 0 = u.1.1 2 ^ 2 + u.1.1 3 ^ 2 - 1 / 2 := vec2_zero _ _
+  have hc1 : (torusNormalCoord u.1) 1 = u.1.1 4 := vec2_one _ _
+  rw [hc0, hc1] at h1
+  linarith
+
+private theorem s4TorusTubular_pair23_pos (u : s4TorusTubularOpen) :
+    0 < u.1.1 2 ^ 2 + u.1.1 3 ^ 2 := by
+  have h2 := torusRad2Sq_pos u.2
+  have hc0 : (torusNormalCoord u.1) 0 = u.1.1 2 ^ 2 + u.1.1 3 ^ 2 - 1 / 2 := vec2_zero _ _
+  rw [hc0] at h2
+  linarith
+
+/-- First unit-circle factor projection on `s4TorusTubularOpen`. -/
+noncomputable def torusTubularCircle1Raw (u : s4TorusTubularOpen) : EuclideanPlane :=
+  let r₁ := Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2)
+  vec2 (r₁⁻¹ * u.1.1 0) (r₁⁻¹ * u.1.1 1)
+
+/-- `torusTubularCircle1Raw u` lies on the unit circle `S¹ ⊂ ℝ²`. -/
+theorem torusTubularCircle1Raw_mem_sphere (u : s4TorusTubularOpen) :
+    torusTubularCircle1Raw u ∈ Metric.sphere (0 : EuclideanPlane) 1 := by
+  rw [mem_sphere_zero_iff_norm]
+  have hp := s4TorusTubular_pair01_pos u
+  have hsq : ‖torusTubularCircle1Raw u‖ ^ 2 = 1 := by
+    rw [norm_sq_plane]
+    dsimp only [torusTubularCircle1Raw]
+    simp only [vec2_zero, vec2_one]
+    calc
+      ((Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2))⁻¹ * u.1.1 0) ^ 2 +
+          ((Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2))⁻¹ * u.1.1 1) ^ 2
+        = (Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2) ^ 2)⁻¹ * (u.1.1 0 ^ 2 + u.1.1 1 ^ 2) := by ring
+      _ = 1 := by rw [Real.sq_sqrt hp.le, inv_mul_cancel₀ hp.ne']
+  nlinarith [norm_nonneg (torusTubularCircle1Raw u)]
+
+/-- Second unit-circle factor projection on `s4TorusTubularOpen`. -/
+noncomputable def torusTubularCircle2Raw (u : s4TorusTubularOpen) : EuclideanPlane :=
+  let r₂ := Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2)
+  vec2 (r₂⁻¹ * u.1.1 2) (r₂⁻¹ * u.1.1 3)
+
+/-- `torusTubularCircle2Raw u` lies on the unit circle `S¹ ⊂ ℝ²`. -/
+theorem torusTubularCircle2Raw_mem_sphere (u : s4TorusTubularOpen) :
+    torusTubularCircle2Raw u ∈ Metric.sphere (0 : EuclideanPlane) 1 := by
+  rw [mem_sphere_zero_iff_norm]
+  have hp := s4TorusTubular_pair23_pos u
+  have hsq : ‖torusTubularCircle2Raw u‖ ^ 2 = 1 := by
+    rw [norm_sq_plane]
+    dsimp only [torusTubularCircle2Raw]
+    simp only [vec2_zero, vec2_one]
+    calc
+      ((Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2))⁻¹ * u.1.1 2) ^ 2 +
+          ((Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2))⁻¹ * u.1.1 3) ^ 2
+        = (Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2) ^ 2)⁻¹ * (u.1.1 2 ^ 2 + u.1.1 3 ^ 2) := by ring
+      _ = 1 := by rw [Real.sq_sqrt hp.le, inv_mul_cancel₀ hp.ne']
+  nlinarith [norm_nonneg (torusTubularCircle2Raw u)]
+
+/-- Smooth diffeomorphism `s4TorusTubularOpen ≃ₘ s4TorusDisk × Torus2`. -/
+-- tier: T2
+noncomputable def s4TorusTubularTrivialization :
+    s4TorusTubularOpen ≃ₘ⟮𝓡 4, (𝓡 2).prod (𝓡 2)⟯ (s4TorusDisk × Torus2) where
+  toFun u :=
+    (⟨torusNormalCoord u.1, u.2⟩,
+      Torus2.toProdDiffeomorph.symm
+        (Set.codRestrict torusTubularCircle1Raw _ torusTubularCircle1Raw_mem_sphere u,
+          Set.codRestrict torusTubularCircle2Raw _ torusTubularCircle2Raw_mem_sphere u))
+  invFun wt := ⟨s4TorusEmbed wt, s4TorusEmbed_mem_tubularOpen wt⟩
+  left_inv u := by
+    apply Subtype.ext
+    apply Subtype.ext
+    have hx : u.1.1 0 ^ 2 + u.1.1 1 ^ 2 + u.1.1 2 ^ 2 + u.1.1 3 ^ 2 + u.1.1 4 ^ 2 = 1 := by
+      rw [← norm_sq_vec5, mem_sphere_zero_iff_norm.mp u.1.2, one_pow]
+    have hp1 := s4TorusTubular_pair01_pos u
+    have hp2 := s4TorusTubular_pair23_pos u
+    have hr1_ne : Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2) ≠ 0 := (Real.sqrt_pos.mpr hp1).ne'
+    have hr2_ne : Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2) ≠ 0 := (Real.sqrt_pos.mpr hp2).ne'
+    have hrad1_eq : 1 / 2 - (torusNormalCoord u.1) 0 - (torusNormalCoord u.1) 1 ^ 2 =
+        u.1.1 0 ^ 2 + u.1.1 1 ^ 2 := by
+      simp only [torusNormalCoord, vec2_zero, vec2_one]
+      linarith
+    have hrad2_eq : 1 / 2 + (torusNormalCoord u.1) 0 = u.1.1 2 ^ 2 + u.1.1 3 ^ 2 := by
+      simp only [torusNormalCoord, vec2_zero]
+      ring
+    refine ext_vec5 ?_ ?_ ?_ ?_ ?_
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_torus2_toProdDiffeomorph_symm, vec5_zero, hrad1_eq]
+      dsimp only [Set.codRestrict, torusTubularCircle1Raw]
+      simp only [vec2_zero]
+      exact mul_inv_cancel_left₀ hr1_ne _
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_torus2_toProdDiffeomorph_symm, vec5_one, hrad1_eq]
+      dsimp only [Set.codRestrict, torusTubularCircle1Raw]
+      simp only [vec2_one]
+      exact mul_inv_cancel_left₀ hr1_ne _
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_torus2_toProdDiffeomorph_symm, vec5_two, hrad2_eq]
+      dsimp only [Set.codRestrict, torusTubularCircle2Raw]
+      simp only [vec2_zero]
+      exact mul_inv_cancel_left₀ hr2_ne _
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_torus2_toProdDiffeomorph_symm, vec5_three, hrad2_eq]
+      dsimp only [Set.codRestrict, torusTubularCircle2Raw]
+      simp only [vec2_one]
+      exact mul_inv_cancel_left₀ hr2_ne _
+    · simp [s4TorusEmbed, s4TorusEmbedRaw, torusNormalCoord]
+  right_inv := by
+    rintro ⟨w, t⟩
+    have hw_eq := torusNormalCoord_s4TorusEmbed (w, t)
+    have hr1_pos : 0 < Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) :=
+      Real.sqrt_pos.mpr (torusRad1Sq_pos w.2)
+    have hr2_pos : 0 < Real.sqrt (1 / 2 + w.1 0) :=
+      Real.sqrt_pos.mpr (torusRad2Sq_pos w.2)
+    have hu1 : t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2 = 1 := by
+      rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.fst.2, one_pow]
+    have hu2 : t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2 = 1 := by
+      rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.snd.2, one_pow]
+    have hsq1 : (s4TorusEmbed (w, t)).1 0 ^ 2 + (s4TorusEmbed (w, t)).1 1 ^ 2 =
+        Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) ^ 2 := by
+      dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [vec5_zero, vec5_one]
+      calc
+        (Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) * t.fst.1 0) ^ 2 +
+            (Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) * t.fst.1 1) ^ 2
+          = Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) ^ 2 * (t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2) := by ring
+        _ = Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) ^ 2 := by rw [hu1, mul_one]
+    have hsq2 : (s4TorusEmbed (w, t)).1 2 ^ 2 + (s4TorusEmbed (w, t)).1 3 ^ 2 =
+        Real.sqrt (1 / 2 + w.1 0) ^ 2 := by
+      dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [vec5_two, vec5_three]
+      calc
+        (Real.sqrt (1 / 2 + w.1 0) * t.snd.1 0) ^ 2 +
+            (Real.sqrt (1 / 2 + w.1 0) * t.snd.1 1) ^ 2
+          = Real.sqrt (1 / 2 + w.1 0) ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) := by ring
+        _ = Real.sqrt (1 / 2 + w.1 0) ^ 2 := by rw [hu2, mul_one]
+    refine Prod.ext (Subtype.ext hw_eq) ?_
+    ext1
+    · apply Subtype.ext
+      refine ext_vec2 ?_ ?_
+      · simp only [coe_torus2_toProdDiffeomorph_symm]
+        dsimp only [Set.codRestrict, torusTubularCircle1Raw]
+        rw [hsq1, Real.sqrt_sq hr1_pos.le]
+        dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+        simp only [vec2_zero, vec5_zero]
+        exact inv_mul_cancel_left₀ hr1_pos.ne' _
+      · simp only [coe_torus2_toProdDiffeomorph_symm]
+        dsimp only [Set.codRestrict, torusTubularCircle1Raw]
+        rw [hsq1, Real.sqrt_sq hr1_pos.le]
+        dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+        simp only [vec2_one, vec5_one]
+        exact inv_mul_cancel_left₀ hr1_pos.ne' _
+    · apply Subtype.ext
+      refine ext_vec2 ?_ ?_
+      · simp only [coe_torus2_toProdDiffeomorph_symm]
+        dsimp only [Set.codRestrict, torusTubularCircle2Raw]
+        rw [hsq2, Real.sqrt_sq hr2_pos.le]
+        dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+        simp only [vec2_zero, vec5_two]
+        exact inv_mul_cancel_left₀ hr2_pos.ne' _
+      · simp only [coe_torus2_toProdDiffeomorph_symm]
+        dsimp only [Set.codRestrict, torusTubularCircle2Raw]
+        rw [hsq2, Real.sqrt_sq hr2_pos.le]
+        dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+        simp only [vec2_one, vec5_three]
+        exact inv_mul_cancel_left₀ hr2_pos.ne' _
+  contMDiff_toFun := by
+    have hfst : ContMDiff (𝓡 4) (𝓡 2) ∞
+        (fun u : s4TorusTubularOpen ↦ (⟨torusNormalCoord u.1, u.2⟩ : s4TorusDisk)) :=
+      (TauCeti.ContMDiff.subtypeVal_comp_iff s4TorusDisk _).mp
+        (contMDiff_torusNormalCoord.comp contMDiff_subtype_val)
+    have hcoe : ContMDiff (𝓡 4) 𝓘(ℝ, EuclideanSpace ℝ (Fin 5)) ∞
+        (fun u : s4TorusTubularOpen ↦ u.1.1) :=
+      contMDiff_coe_sphere.comp contMDiff_subtype_val
+    have hx (k : Fin 5) : ContMDiff (𝓡 4) 𝓘(ℝ, ℝ) ∞ (fun u : s4TorusTubularOpen ↦ u.1.1 k) :=
+      (euclidProj k).contDiff.contMDiff.comp hcoe
+    have hsum1 : ContMDiff (𝓡 4) 𝓘(ℝ, ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦ u.1.1 0 ^ 2 + u.1.1 1 ^ 2) :=
+      (((euclidProj (0 : Fin 5)).contDiff.pow 2).add
+        ((euclidProj (1 : Fin 5)).contDiff.pow 2)).contMDiff.comp hcoe
+    have hsum2 : ContMDiff (𝓡 4) 𝓘(ℝ, ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦ u.1.1 2 ^ 2 + u.1.1 3 ^ 2) :=
+      (((euclidProj (2 : Fin 5)).contDiff.pow 2).add
+        ((euclidProj (3 : Fin 5)).contDiff.pow 2)).contMDiff.comp hcoe
+    have hinv1 : ContMDiff (𝓡 4) 𝓘(ℝ, ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦ (Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2))⁻¹) := fun u ↦ by
+      have hp := s4TorusTubular_pair01_pos u
+      exact (contDiffAt_inv ℝ (Real.sqrt_pos.mpr hp).ne').contMDiffAt.comp u
+        ((Real.contDiffAt_sqrt hp.ne').contMDiffAt.comp u (hsum1 u))
+    have hinv2 : ContMDiff (𝓡 4) 𝓘(ℝ, ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦ (Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2))⁻¹) := fun u ↦ by
+      have hp := s4TorusTubular_pair23_pos u
+      exact (contDiffAt_inv ℝ (Real.sqrt_pos.mpr hp).ne').contMDiffAt.comp u
+        ((Real.contDiffAt_sqrt hp.ne').contMDiffAt.comp u (hsum2 u))
+    have hmul : ContDiff ℝ ∞ (fun q : ℝ × ℝ ↦ q.1 * q.2) := contDiff_fst.mul contDiff_snd
+    have hpi1 : ContMDiff (𝓡 4) 𝓘(ℝ, Fin 2 → ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦
+          ![(Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2))⁻¹ * u.1.1 0,
+            (Real.sqrt (u.1.1 0 ^ 2 + u.1.1 1 ^ 2))⁻¹ * u.1.1 1]) := by
+      refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+      fin_cases i
+      · exact hmul.contMDiff.comp (hinv1.prodMk_space (hx 0))
+      · exact hmul.contMDiff.comp (hinv1.prodMk_space (hx 1))
+    have hpi2 : ContMDiff (𝓡 4) 𝓘(ℝ, Fin 2 → ℝ) ∞
+        (fun u : s4TorusTubularOpen ↦
+          ![(Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2))⁻¹ * u.1.1 2,
+            (Real.sqrt (u.1.1 2 ^ 2 + u.1.1 3 ^ 2))⁻¹ * u.1.1 3]) := by
+      refine contMDiff_pi_module_iff.mpr fun i ↦ ?_
+      fin_cases i
+      · exact hmul.contMDiff.comp (hinv2.prodMk_space (hx 2))
+      · exact hmul.contMDiff.comp (hinv2.prodMk_space (hx 3))
+    have hraw1 : ContMDiff (𝓡 4) 𝓘(ℝ, EuclideanPlane) ∞ torusTubularCircle1Raw :=
+      (EuclideanSpace.equiv (Fin 2) ℝ).symm.contDiff.contMDiff.comp hpi1
+    have hraw2 : ContMDiff (𝓡 4) 𝓘(ℝ, EuclideanPlane) ∞ torusTubularCircle2Raw :=
+      (EuclideanSpace.equiv (Fin 2) ℝ).symm.contDiff.contMDiff.comp hpi2
+    have hc1 : ContMDiff (𝓡 4) (𝓡 1) ∞
+        (Set.codRestrict torusTubularCircle1Raw _ torusTubularCircle1Raw_mem_sphere) :=
+      hraw1.codRestrict_sphere torusTubularCircle1Raw_mem_sphere
+    have hc2 : ContMDiff (𝓡 4) (𝓡 1) ∞
+        (Set.codRestrict torusTubularCircle2Raw _ torusTubularCircle2Raw_mem_sphere) :=
+      hraw2.codRestrict_sphere torusTubularCircle2Raw_mem_sphere
+    exact hfst.prodMk (Torus2.toProdDiffeomorph.symm.contMDiff.comp (hc1.prodMk hc2))
+  contMDiff_invFun :=
+    (TauCeti.ContMDiff.subtypeVal_comp_iff s4TorusTubularOpen _).mp contMDiff_s4TorusEmbed
+
+private theorem s4ADKRaw_s4TorusEmbed_coord2_neg (wt : s4TorusDisk × Torus2) :
+    s4ADKRaw (s4TorusEmbed wt).1 2 < 0 := by
+  have hr1 := torusRad1Sq_pos wt.1.2
+  have hu1 : wt.2.fst.1 0 ^ 2 + wt.2.fst.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp wt.2.fst.2, one_pow]
+  obtain ⟨-, hw0_hi, hw1_sq⟩ := s4TorusDisk_bounds wt.1.2
+  have h2 : s4ADKRaw (s4TorusEmbed wt).1 2 = -1 / 4 + wt.1.1 0 + wt.1.1 1 ^ 2 := by
+    dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+    simp only [s4ADKRaw_two, vec5_zero, vec5_one]
+    calc
+      1 / 4 - ((Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 0) ^ 2 +
+          (Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) * wt.2.fst.1 1) ^ 2)
+        = 1 / 4 - Real.sqrt (1 / 2 - wt.1.1 0 - wt.1.1 1 ^ 2) ^ 2 *
+            (wt.2.fst.1 0 ^ 2 + wt.2.fst.1 1 ^ 2) := by ring
+      _ = -1 / 4 + wt.1.1 0 + wt.1.1 1 ^ 2 := by rw [Real.sq_sqrt hr1.le, hu1]; ring
+  linarith
+
+private theorem s4ADKFibration_s4TorusEmbed_ne_northPole (wt : s4TorusDisk × Torus2) :
+    s4ADKFibration (s4TorusEmbed wt) ≠ s2NorthPole := by
+  intro h
+  have hc := congrArg (fun z : Sphere2 ↦ z.1 2) h
+  rw [coe_s4ADKFibration, PiLp.smul_apply, smul_eq_mul] at hc
+  have hneg :
+      ‖s4ADKRaw (s4TorusEmbed wt).1‖⁻¹ * s4ADKRaw (s4TorusEmbed wt).1 2 < 0 :=
+    mul_neg_of_pos_of_neg (inv_pos.mpr (norm_s4ADKRaw_pos _))
+      (s4ADKRaw_s4TorusEmbed_coord2_neg wt)
+  have hnp : s2NorthPole.1 2 = 1 := rfl
+  linarith
+
+/-- South-hemisphere stereographic base coordinate map for `s4ADKFibration`. -/
+noncomputable def g_adk_south (wt : s4TorusDisk × Torus2) : EuclideanPlane :=
+  northPoleStereoChart (s4ADKFibration (s4TorusEmbed wt))
+
+private theorem contMDiff_g_adk_south :
+    ContMDiff ((𝓡 2).prod (𝓡 2)) (𝓡 2) ∞ g_adk_south := by
+  let hpunct : s4TorusDisk × Torus2 → s2PuncturedSouth := fun wt ↦
+    ⟨s2Antipodal (s4ADKFibration (s4TorusEmbed wt)),
+      s2Antipodal_ne_southPole_of_ne_northPole (s4ADKFibration_s4TorusEmbed_ne_northPole wt)⟩
+  have hhpunct : ContMDiff ((𝓡 2).prod (𝓡 2)) (𝓡 2) ∞ hpunct :=
+    (TauCeti.ContMDiff.subtypeVal_comp_iff s2PuncturedSouth _).mp
+      (s2Antipodal.contMDiff.comp (contMDiff_s4ADKFibration.comp contMDiff_s4TorusEmbed))
+  have heq : g_adk_south = ⇑southPoleStereoDiffeomorph.symm ∘ hpunct := rfl
+  rw [heq]
+  exact southPoleStereoDiffeomorph.symm.contMDiff.comp hhpunct
+
+private theorem northPoleStereoInv_g_adk_south (wt : s4TorusDisk × Torus2) :
+    northPoleStereoInv (g_adk_south wt) = s4ADKFibration (s4TorusEmbed wt) :=
+  northPoleStereoInv_chart (s4ADKFibration_s4TorusEmbed_ne_northPole wt)
+
+@[simp]
+private theorem g_adk_south_zero_left (t : Torus2) :
+    g_adk_south (s4TorusDiskZero, t) = 0 := by
+  have hsp : s4ADKFibration (s4TorusEmbed (s4TorusDiskZero, t)) = s2SouthPole := by
+    rw [s4ADKFibration_eq_southPole_iff]
+    have hu1 : t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2 = 1 := by
+      rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.fst.2, one_pow]
+    have hu2 : t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2 = 1 := by
+      rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.snd.2, one_pow]
+    refine ⟨?_, ?_, ?_⟩
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_zero, vec5_one, sub_zero,
+        zero_pow (by decide : 2 ≠ 0)]
+      calc
+        (Real.sqrt (1 / 2) * t.fst.1 0) ^ 2 + (Real.sqrt (1 / 2) * t.fst.1 1) ^ 2
+          = Real.sqrt (1 / 2) ^ 2 * (t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2) := by ring
+        _ = 1 / 2 := by rw [Real.sq_sqrt (by norm_num), hu1, mul_one]
+    · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+      simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_two, vec5_three, add_zero]
+      calc
+        (Real.sqrt (1 / 2) * t.snd.1 0) ^ 2 + (Real.sqrt (1 / 2) * t.snd.1 1) ^ 2
+          = Real.sqrt (1 / 2) ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) := by ring
+        _ = 1 / 2 := by rw [Real.sq_sqrt (by norm_num), hu2, mul_one]
+    · simp [s4TorusEmbed, s4TorusEmbedRaw]
+  simp only [g_adk_south, hsp, ← northPoleStereoInv_zero, northPoleStereoChart_inv]
+
+/-- Product local trivialization candidate `Ψ_adk_south (w, t) = (g_adk_south (w, t), t)`. -/
+noncomputable def Ψ_adk_south (wt : s4TorusDisk × Torus2) :
+    EuclideanPlane × Torus2 :=
+  (g_adk_south wt, wt.2)
+
+private theorem contMDiff_Ψ_adk_south :
+    ContMDiff ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞ Ψ_adk_south :=
+  contMDiff_g_adk_south.prodMk contMDiff_snd
+
+private theorem injOn_Ψ_adk_south_zeroSlice :
+    Set.InjOn Ψ_adk_south (({s4TorusDiskZero} : Set s4TorusDisk) ×ˢ (Set.univ : Set Torus2)) := by
+  rintro ⟨w₁, t₁⟩ ⟨hw₁, -⟩ ⟨w₂, t₂⟩ ⟨hw₂, -⟩ hEq
+  rw [Set.mem_singleton_iff] at hw₁ hw₂
+  have ht : t₁ = t₂ := congrArg Prod.snd hEq
+  exact Prod.ext (hw₁.trans hw₂.symm) ht
+
+private noncomputable def adkSouthGRaw (t : Torus2) (u : EuclideanPlane) : EuclideanPlane :=
+  let r₁ := Real.sqrt (1 / 2 - u 0 - u 1 ^ 2)
+  let r₂ := Real.sqrt (1 / 2 + u 0)
+  let W :=
+    s4ADKRaw (vec5 (r₁ * t.fst.1 0) (r₁ * t.fst.1 1) (r₂ * t.snd.1 0) (r₂ * t.snd.1 1) (u 1))
+  vec2 (-2 * W 0 / (‖W‖ - W 2)) (-2 * W 1 / (‖W‖ - W 2))
+
+private theorem g_adk_south_eq_adkSouthGRaw (w : s4TorusDisk) (t : Torus2) :
+    g_adk_south (w, t) = adkSouthGRaw t w.1 := by
+  let x := s4TorusEmbed (w, t)
+  let W := s4ADKRaw x.1
+  have hW_pos : 0 < ‖W‖ := norm_s4ADKRaw_pos x
+  have hW2_neg : W 2 < 0 := s4ADKRaw_s4TorusEmbed_coord2_neg (w, t)
+  have hden1 : 1 + -(‖W‖⁻¹ * W 2) ≠ 0 := by
+    have : 0 < 1 - ‖W‖⁻¹ * W 2 := by
+      have : ‖W‖⁻¹ * W 2 < 0 := mul_neg_of_pos_of_neg (inv_pos.mpr hW_pos) hW2_neg
+      linarith
+    linarith
+  have hden2 : ‖W‖ - W 2 ≠ 0 := by linarith
+  have hcomp (c : ℝ) :
+      2 * -(‖W‖⁻¹ * c) / (1 + -(‖W‖⁻¹ * W 2)) = -2 * c / (‖W‖ - W 2) := by
+    rw [div_eq_div_iff hden1 hden2]
+    field_simp [hW_pos.ne']
+    ring
+  have hW_eq :
+      s4ADKRaw
+        (vec5 (Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) * t.fst.1 0)
+          (Real.sqrt (1 / 2 - w.1 0 - w.1 1 ^ 2) * t.fst.1 1)
+          (Real.sqrt (1 / 2 + w.1 0) * t.snd.1 0)
+          (Real.sqrt (1 / 2 + w.1 0) * t.snd.1 1) (w.1 1)) = W :=
+    rfl
+  refine ext_vec2 ?_ ?_
+  · simp only [g_adk_south, northPoleStereoChart, southPoleStereoChart, coe_s2Antipodal,
+      coe_s4ADKFibration, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul, vec2_zero, adkSouthGRaw]
+    rw [hW_eq]
+    exact hcomp (W 0)
+  · simp only [g_adk_south, northPoleStereoChart, southPoleStereoChart, coe_s2Antipodal,
+      coe_s4ADKFibration, PiLp.neg_apply, PiLp.smul_apply, smul_eq_mul, vec2_one, adkSouthGRaw]
+    rw [hW_eq]
+    exact hcomp (W 1)
+
+private theorem hasFDerivAt_adkSouthGRaw_zero (t : Torus2) :
+    let s₀ : ℝ := -4 * Real.sqrt (1 / 2)
+    HasFDerivAt (adkSouthGRaw t)
+      (clmVec2
+        ((s₀ * t.fst.1 0) • euclidProj 0 - (s₀ * t.fst.1 1) • euclidProj 1)
+        ((s₀ * t.fst.1 1) • euclidProj 0 + (s₀ * t.fst.1 0) • euclidProj 1)) 0 := by
+  intro s₀
+  let r₁ : EuclideanPlane → ℝ := fun u ↦ Real.sqrt (1 / 2 - u 0 - u 1 ^ 2)
+  let r₂ : EuclideanPlane → ℝ := fun u ↦ Real.sqrt (1 / 2 + u 0)
+  let W : EuclideanPlane → EuclideanSpace ℝ (Fin 3) := fun u ↦
+    s4ADKRaw (vec5 (r₁ u * t.fst.1 0) (r₁ u * t.fst.1 1) (r₂ u * t.snd.1 0) (r₂ u * t.snd.1 1)
+      (u 1))
+  have hu (i : Fin 2) : DifferentiableAt ℝ (fun u : EuclideanPlane ↦ u i) 0 :=
+    (euclidProj i).differentiableAt
+  have hr1_diff : DifferentiableAt ℝ r₁ 0 :=
+    (((differentiableAt_const _).sub (hu 0)).sub ((hu 1).pow 2)).sqrt (by norm_num)
+  have hr2_diff : DifferentiableAt ℝ r₂ 0 :=
+    ((differentiableAt_const _).add (hu 0)).sqrt (by norm_num)
+  have hr1_0 : r₁ 0 = Real.sqrt (1 / 2) := by simp [r₁]
+  have hu1 : t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.fst.2, one_pow]
+  have hu2 : t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2 = 1 := by
+    rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.snd.2, one_pow]
+  have hball_nhds : s4TorusDisk.1 ∈ 𝓝 (0 : EuclideanPlane) :=
+    Metric.ball_mem_nhds 0 s4TorusDiskRadius_pos
+  have hW0_ev : (fun u ↦ W u 0) =ᶠ[𝓝 0]
+      fun u ↦ r₁ u * (t.fst.1 0 * u 0 - t.fst.1 1 * u 1) := by
+    filter_upwards [hball_nhds] with u hu_mem
+    have hr2_pos := torusRad2Sq_pos hu_mem
+    simp only [W, s4ADKRaw_zero, vec5_zero, vec5_one, vec5_two, vec5_three, vec5_four]
+    have hA : (r₂ u * t.snd.1 0) ^ 2 + (r₂ u * t.snd.1 1) ^ 2 - 1 / 2 = u 0 := by
+      calc
+        (r₂ u * t.snd.1 0) ^ 2 + (r₂ u * t.snd.1 1) ^ 2 - 1 / 2
+          = r₂ u ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) - 1 / 2 := by ring
+        _ = u 0 := by dsimp [r₂]; rw [Real.sq_sqrt hr2_pos.le, hu2]; ring
+    rw [hA]
+    ring
+  have hW1_ev : (fun u ↦ W u 1) =ᶠ[𝓝 0]
+      fun u ↦ r₁ u * (t.fst.1 1 * u 0 + t.fst.1 0 * u 1) := by
+    filter_upwards [hball_nhds] with u hu_mem
+    have hr2_pos := torusRad2Sq_pos hu_mem
+    simp only [W, s4ADKRaw_one, vec5_zero, vec5_one, vec5_two, vec5_three, vec5_four]
+    have hA : (r₂ u * t.snd.1 0) ^ 2 + (r₂ u * t.snd.1 1) ^ 2 - 1 / 2 = u 0 := by
+      calc
+        (r₂ u * t.snd.1 0) ^ 2 + (r₂ u * t.snd.1 1) ^ 2 - 1 / 2
+          = r₂ u ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) - 1 / 2 := by ring
+        _ = u 0 := by dsimp [r₂]; rw [Real.sq_sqrt hr2_pos.le, hu2]; ring
+    rw [hA]
+    ring
+  have hL0 : HasFDerivAt (fun u : EuclideanPlane ↦ t.fst.1 0 * u 0 - t.fst.1 1 * u 1)
+      (t.fst.1 0 • euclidProj 0 - t.fst.1 1 • euclidProj 1) 0 :=
+    ((euclidProj 0).hasFDerivAt.const_mul (t.fst.1 0)).sub
+      ((euclidProj 1).hasFDerivAt.const_mul (t.fst.1 1))
+  have hL1 : HasFDerivAt (fun u : EuclideanPlane ↦ t.fst.1 1 * u 0 + t.fst.1 0 * u 1)
+      (t.fst.1 1 • euclidProj 0 + t.fst.1 0 • euclidProj 1) 0 :=
+    ((euclidProj 0).hasFDerivAt.const_mul (t.fst.1 1)).add
+      ((euclidProj 1).hasFDerivAt.const_mul (t.fst.1 0))
+  have hW0 : HasFDerivAt (fun u ↦ W u 0)
+      ((Real.sqrt (1 / 2) * t.fst.1 0) • euclidProj 0 -
+        (Real.sqrt (1 / 2) * t.fst.1 1) • euclidProj 1) 0 := by
+    refine ((hr1_diff.hasFDerivAt.mul hL0).congr_fderiv ?_).congr_of_eventuallyEq hW0_ev
+    ext v
+    simp only [hr1_0, PiLp.zero_apply, mul_zero, sub_self, zero_smul, add_zero,
+      smul_apply, sub_apply, smul_eq_mul]
+    ring
+  have hW1 : HasFDerivAt (fun u ↦ W u 1)
+      ((Real.sqrt (1 / 2) * t.fst.1 1) • euclidProj 0 +
+        (Real.sqrt (1 / 2) * t.fst.1 0) • euclidProj 1) 0 := by
+    refine ((hr1_diff.hasFDerivAt.mul hL1).congr_fderiv ?_).congr_of_eventuallyEq hW1_ev
+    ext v
+    simp only [hr1_0, PiLp.zero_apply, mul_zero, add_zero, zero_smul,
+      smul_apply, add_apply, smul_eq_mul]
+    ring
+  have hW_0_val : W 0 = vec3 0 0 (-1 / 4) := by
+    refine ext_vec3 ?_ ?_ ?_
+    · simp only [W, r₂, s4ADKRaw_zero, PiLp.zero_apply, add_zero, vec5_zero, vec5_one, vec5_two,
+        vec5_three, vec5_four]
+      have hA0 : (Real.sqrt (1 / 2) * t.snd.1 0) ^ 2 +
+          (Real.sqrt (1 / 2) * t.snd.1 1) ^ 2 - 1 / 2 = 0 := by
+        calc
+          (Real.sqrt (1 / 2) * t.snd.1 0) ^ 2 + (Real.sqrt (1 / 2) * t.snd.1 1) ^ 2 - 1 / 2
+            = Real.sqrt (1 / 2) ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) - 1 / 2 := by ring
+          _ = 0 := by rw [Real.sq_sqrt (by norm_num), hu2]; ring
+      rw [hA0]; simp
+    · simp only [W, r₂, s4ADKRaw_one, PiLp.zero_apply, add_zero, vec5_zero, vec5_one, vec5_two,
+        vec5_three, vec5_four]
+      have hA0 : (Real.sqrt (1 / 2) * t.snd.1 0) ^ 2 +
+          (Real.sqrt (1 / 2) * t.snd.1 1) ^ 2 - 1 / 2 = 0 := by
+        calc
+          (Real.sqrt (1 / 2) * t.snd.1 0) ^ 2 + (Real.sqrt (1 / 2) * t.snd.1 1) ^ 2 - 1 / 2
+            = Real.sqrt (1 / 2) ^ 2 * (t.snd.1 0 ^ 2 + t.snd.1 1 ^ 2) - 1 / 2 := by ring
+          _ = 0 := by rw [Real.sq_sqrt (by norm_num), hu2]; ring
+      rw [hA0]; simp
+    · simp only [W, r₁, s4ADKRaw_two, PiLp.zero_apply, sub_zero, zero_pow (by decide : 2 ≠ 0),
+        vec5_zero, vec5_one, vec3_two]
+      calc
+        1 / 4 - ((Real.sqrt (1 / 2) * t.fst.1 0) ^ 2 + (Real.sqrt (1 / 2) * t.fst.1 1) ^ 2)
+          = 1 / 4 - Real.sqrt (1 / 2) ^ 2 * (t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2) := by ring
+        _ = -1 / 4 := by rw [Real.sq_sqrt (by norm_num), hu1]; ring
+  have hW0_norm : ‖W 0‖ = 1 / 4 := by
+    have hsq : ‖W 0‖ ^ 2 = (1 / 4) ^ 2 := by rw [hW_0_val, norm_sq_vec3]; norm_num
+    nlinarith [norm_nonneg (W 0)]
+  have hW_diff : DifferentiableAt ℝ W 0 := by
+    have hpi : DifferentiableAt ℝ
+        (fun u : EuclideanPlane ↦
+          ![r₁ u * t.fst.1 0, r₁ u * t.fst.1 1, r₂ u * t.snd.1 0, r₂ u * t.snd.1 1, u 1]) 0 := by
+      refine differentiableAt_pi.mpr fun i ↦ ?_
+      fin_cases i
+      · exact hr1_diff.mul_const _
+      · exact hr1_diff.mul_const _
+      · exact hr2_diff.mul_const _
+      · exact hr2_diff.mul_const _
+      · exact hu 1
+    exact (contDiff_s4ADKRaw.contDiffAt.differentiableAt (by simp)).comp 0
+      (((EuclideanSpace.equiv (Fin 5) ℝ).symm.differentiableAt).comp 0 hpi)
+  have hW2_diff : DifferentiableAt ℝ (fun u ↦ W u 2) 0 :=
+    ((euclidProj (2 : Fin 3)).differentiableAt).comp 0 hW_diff
+  have hW0_ne : W 0 ≠ 0 := by
+    rw [hW_0_val]
+    intro h
+    have hc := congrArg (fun q : EuclideanSpace ℝ (Fin 3) ↦ q 2) h
+    simp at hc
+  have hden_0 : ‖W 0‖ - W 0 2 = 1 / 2 := by
+    rw [hW0_norm, hW_0_val, vec3_two]; norm_num
+  have hden_inv_diff : DifferentiableAt ℝ (fun u ↦ (‖W u‖ - W u 2)⁻¹) 0 :=
+    ((DifferentiableAt.norm ℝ hW_diff hW0_ne).sub hW2_diff).inv
+      (by change ‖W 0‖ - W 0 2 ≠ 0; rw [hden_0]; norm_num)
+  have hg0_eq :
+      (fun u ↦ adkSouthGRaw t u 0) = fun u ↦ (-2 * W u 0) * (‖W u‖ - W u 2)⁻¹ :=
+    funext fun u ↦ div_eq_mul_inv _ _
+  have hg1_eq :
+      (fun u ↦ adkSouthGRaw t u 1) = fun u ↦ (-2 * W u 1) * (‖W u‖ - W u 2)⁻¹ :=
+    funext fun u ↦ div_eq_mul_inv _ _
+  have hg0 : HasFDerivAt (fun u ↦ adkSouthGRaw t u 0)
+      ((s₀ * t.fst.1 0) • euclidProj 0 - (s₀ * t.fst.1 1) • euclidProj 1) 0 := by
+    rw [hg0_eq]
+    have h00 : W 0 0 = 0 := by rw [hW_0_val]; rfl
+    refine ((hW0.const_mul (-2)).mul hden_inv_diff.hasFDerivAt).congr_fderiv ?_
+    ext v
+    simp only [h00, mul_zero, zero_smul, hden_0, s₀, smul_apply, sub_apply, smul_eq_mul]
+    norm_num
+    ring
+  have hg1 : HasFDerivAt (fun u ↦ adkSouthGRaw t u 1)
+      ((s₀ * t.fst.1 1) • euclidProj 0 + (s₀ * t.fst.1 0) • euclidProj 1) 0 := by
+    rw [hg1_eq]
+    have h01 : W 0 1 = 0 := by rw [hW_0_val]; rfl
+    refine ((hW1.const_mul (-2)).mul hden_inv_diff.hasFDerivAt).congr_fderiv ?_
+    ext v
+    simp only [h01, mul_zero, zero_smul, hden_0, s₀, smul_apply, add_apply, smul_eq_mul]
+    norm_num
+    ring
+  exact hasFDerivAt_vec2 hg0 hg1
+
+private theorem mfderiv_g_adk_south_zero_left_slice (t : Torus2)
+    (u : TangentSpace (𝓡 2) s4TorusDiskZero) :
+    let uE : EuclideanPlane := u
+    let s₀ : ℝ := -4 * Real.sqrt (1 / 2)
+    mfderiv (𝓡 2) (𝓡 2) (fun w : s4TorusDisk ↦ g_adk_south (w, t)) s4TorusDiskZero u =
+      vec2 (s₀ * t.fst.1 0 * uE 0 - s₀ * t.fst.1 1 * uE 1)
+        (s₀ * t.fst.1 1 * uE 0 + s₀ * t.fst.1 0 * uE 1) := by
+  intro uE s₀
+  have hcomp : (fun w : s4TorusDisk ↦ g_adk_south (w, t)) =
+      adkSouthGRaw t ∘ (Subtype.val : s4TorusDisk → EuclideanPlane) :=
+    funext fun w ↦ g_adk_south_eq_adkSouthGRaw w t
+  have hdf := hasFDerivAt_adkSouthGRaw_zero t
+  have hdf0 : DifferentiableAt ℝ (adkSouthGRaw t) s4TorusDiskZero.1 := by
+    simpa only [coe_s4TorusDiskZero] using hdf.differentiableAt
+  have hsub_at : MDifferentiableAt (𝓡 2) 𝓘(ℝ, EuclideanPlane)
+      (Subtype.val : s4TorusDisk → EuclideanPlane) s4TorusDiskZero :=
+    (contMDiff_subtype_val (n := ∞) s4TorusDiskZero).mdifferentiableAt (by simp)
+  have h1 :
+      mvfderiv (𝓡 2) (adkSouthGRaw t ∘ (Subtype.val : s4TorusDisk → EuclideanPlane))
+          s4TorusDiskZero u =
+        fderiv ℝ (adkSouthGRaw t) s4TorusDiskZero.1
+          (mvfderiv (𝓡 2) (Subtype.val : s4TorusDisk → EuclideanPlane) s4TorusDiskZero u) :=
+    TauCeti.mvfderiv_comp_apply_of_differentiableAt hdf0 hsub_at u
+  have hsub_u :
+      mvfderiv (𝓡 2) (Subtype.val : s4TorusDisk → EuclideanPlane) s4TorusDiskZero u = uE :=
+    TauCeti.Manifold.mvfderiv_subtype_val_apply s4TorusDiskZero u
+  have heq :
+      mfderiv (𝓡 2) (𝓡 2) (fun w : s4TorusDisk ↦ g_adk_south (w, t)) s4TorusDiskZero u =
+        mvfderiv (𝓡 2) (adkSouthGRaw t ∘ (Subtype.val : s4TorusDisk → EuclideanPlane))
+          s4TorusDiskZero u := by
+    rw [hcomp]; rfl
+  rw [heq, h1, hsub_u, coe_s4TorusDiskZero, hdf.fderiv, clmVec2_apply]
+  refine ext_vec2 ?_ ?_ <;> simp [s₀, sub_apply, add_apply, smul_apply, smul_eq_mul]
+
+private theorem mfderiv_g_adk_south_zero_left (t : Torus2)
+    (v : TangentSpace ((𝓡 2).prod (𝓡 2)) (s4TorusDiskZero, t)) :
+    let v1 : EuclideanPlane := v.1
+    let s₀ : ℝ := -4 * Real.sqrt (1 / 2)
+    mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2) g_adk_south (s4TorusDiskZero, t) v =
+      vec2 (s₀ * t.fst.1 0 * v1 0 - s₀ * t.fst.1 1 * v1 1)
+        (s₀ * t.fst.1 1 * v1 0 + s₀ * t.fst.1 0 * v1 1) := by
+  have hg_diff : MDifferentiableAt ((𝓡 2).prod (𝓡 2)) (𝓡 2) g_adk_south (s4TorusDiskZero, t) :=
+    (contMDiff_g_adk_south (s4TorusDiskZero, t)).mdifferentiableAt (by simp)
+  have hsplit :
+      mvfderiv ((𝓡 2).prod (𝓡 2)) g_adk_south (s4TorusDiskZero, t) v =
+        mvfderiv (𝓡 2) (fun w : s4TorusDisk ↦ g_adk_south (w, t)) s4TorusDiskZero v.1 +
+          mvfderiv (𝓡 2) (fun q : Torus2 ↦ g_adk_south (s4TorusDiskZero, q)) t v.2 :=
+    hg_diff.mvfderiv_prod_eq_add_apply v
+  have hconst_zero :
+      mvfderiv (𝓡 2) (fun q : Torus2 ↦ g_adk_south (s4TorusDiskZero, q)) t v.2 = 0 := by
+    have hfun : (fun q : Torus2 ↦ g_adk_south (s4TorusDiskZero, q)) =
+        fun _ ↦ (0 : EuclideanPlane) :=
+      funext fun q ↦ g_adk_south_zero_left q
+    change mfderiv (𝓡 2) (𝓡 2) (fun q : Torus2 ↦ g_adk_south (s4TorusDiskZero, q)) t v.2 = 0
+    rw [hfun, mfderiv_const]
+    rfl
+  change mvfderiv ((𝓡 2).prod (𝓡 2)) g_adk_south (s4TorusDiskZero, t) v = _
+  rw [hsplit, hconst_zero, add_zero]
+  exact mfderiv_g_adk_south_zero_left_slice t v.1
+
+private theorem isLocalDiffeomorphAt_Ψ_adk_south_zero_left (t : Torus2) :
+    IsLocalDiffeomorphAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞
+      Ψ_adk_south (s4TorusDiskZero, t) := by
+  have hΨ_diff :
+      MDifferentiableAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) Ψ_adk_south
+        (s4TorusDiskZero, t) :=
+    (contMDiff_Ψ_adk_south (s4TorusDiskZero, t)).mdifferentiableAt (by simp)
+  have hinj :
+      Function.Injective
+        (mfderiv ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) Ψ_adk_south (s4TorusDiskZero, t)) := by
+    intro v₁ v₂ hEq
+    suffices v₁ - v₂ = 0 from sub_eq_zero.mp this
+    set v := v₁ - v₂
+    have hv :
+        mfderiv ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) Ψ_adk_south (s4TorusDiskZero, t) v = 0 := by
+      simp only [v, map_sub, hEq, sub_self]
+    have hv_snd :
+        mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2) (Prod.snd ∘ Ψ_adk_south)
+          (s4TorusDiskZero, t) v = 0 := by
+      rw [mfderiv_comp _ mdifferentiableAt_snd hΨ_diff, ContinuousLinearMap.comp_apply, hv,
+        map_zero]
+    have hv2 : v.2 = 0 := by
+      have h1 : mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2) Prod.snd (s4TorusDiskZero, t) v = 0 := hv_snd
+      rwa [mfderiv_snd] at h1
+    have hv_fst :
+        mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2) (Prod.fst ∘ Ψ_adk_south)
+          (s4TorusDiskZero, t) v = 0 := by
+      rw [mfderiv_comp _ mdifferentiableAt_fst hΨ_diff, ContinuousLinearMap.comp_apply, hv,
+        map_zero]
+    have hg0 : mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2) g_adk_south (s4TorusDiskZero, t) v = 0 :=
+      hv_fst
+    rw [mfderiv_g_adk_south_zero_left t v] at hg0
+    let v1 : EuclideanPlane := v.1
+    let s₀ : ℝ := -4 * Real.sqrt (1 / 2)
+    have h0 : s₀ * t.fst.1 0 * v1 0 - s₀ * t.fst.1 1 * v1 1 = 0 :=
+      congrArg (fun w : EuclideanPlane ↦ w 0) hg0
+    have h1 : s₀ * t.fst.1 1 * v1 0 + s₀ * t.fst.1 0 * v1 1 = 0 :=
+      congrArg (fun w : EuclideanPlane ↦ w 1) hg0
+    have hu1 : t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2 = 1 := by
+      rw [← norm_sq_plane, mem_sphere_zero_iff_norm.mp t.fst.2, one_pow]
+    have hs₀_ne : s₀ ≠ 0 :=
+      mul_ne_zero (by norm_num) (Real.sqrt_pos.mpr (by norm_num)).ne'
+    have hs₀_sq_ne : s₀ ^ 2 ≠ 0 := pow_ne_zero 2 hs₀_ne
+    have hx0_mul : s₀ ^ 2 * v1 0 = 0 := by
+      have hlin : s₀ ^ 2 * (t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2) * v1 0 = 0 := by
+        linear_combination (s₀ * t.fst.1 0) * h0 + (s₀ * t.fst.1 1) * h1
+      rwa [hu1, mul_one] at hlin
+    have hx1_mul : s₀ ^ 2 * v1 1 = 0 := by
+      have hlin : s₀ ^ 2 * (t.fst.1 0 ^ 2 + t.fst.1 1 ^ 2) * v1 1 = 0 := by
+        linear_combination -(s₀ * t.fst.1 1) * h0 + (s₀ * t.fst.1 0) * h1
+      rwa [hu1, mul_one] at hlin
+    have hv1 : v.1 = 0 :=
+      ext_vec2 ((mul_eq_zero.mp hx0_mul).resolve_left hs₀_sq_ne)
+        ((mul_eq_zero.mp hx1_mul).resolve_left hs₀_sq_ne)
+    exact Prod.ext hv1 hv2
+  exact TauCeti.isLocalDiffeomorphAt_of_injective_mfderiv contMDiff_Ψ_adk_south.contMDiffOn
+    isOpen_univ (Set.mem_univ _) BoundarylessManifold.isInteriorPoint (by simp) hinj rfl
+
+/-- Open neighborhood & base-radius data for the south-hemisphere $T^2$ ADK trivialization. -/
+structure ADKTorusTrivData where
+  /-- Open neighborhood of `{0} × Torus2` in `s4TorusDisk × Torus2`. -/
+  U : Set (s4TorusDisk × Torus2)
+  /-- Openness of `U`. -/
+  hU_open : IsOpen U
+  /-- Inclusion of `{0} × Torus2` into `U`. -/
+  hK_sub : ({s4TorusDiskZero} : Set s4TorusDisk) ×ˢ (Set.univ : Set Torus2) ⊆ U
+  /-- Injectivity of `Ψ_adk_south` on `U`. -/
+  hU_inj : Set.InjOn Ψ_adk_south U
+  /-- Local diffeomorphism property of `Ψ_adk_south` on `U`. -/
+  hU_loc : IsLocalDiffeomorphOn ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞ Ψ_adk_south U
+  /-- Shrunk positive stereographic base radius `r > 0` around `s2SouthPole`. -/
+  r : ℝ
+  /-- Positivity `0 < r`. -/
+  hr_pos : 0 < r
+  /-- Image containment `ball 0 r × Torus2 ⊆ Ψ_adk_south '' U`. -/
+  hr_sub_target :
+    Metric.ball (0 : EuclideanPlane) r ×ˢ (Set.univ : Set Torus2) ⊆ Ψ_adk_south '' U
+  /-- Preimage containment over `northPoleStereoInv '' ball 0 r`. -/
+  hr_preimage_sub :
+    ∀ x : Sphere4,
+      s4ADKFibration x ∈ northPoleStereoInv '' Metric.ball (0 : EuclideanPlane) r →
+        x ∈ s4TorusEmbed '' U
+
+/-- Existence of an open trivialization neighborhood and shrunk regular base radius around
+`s2SouthPole` for `s4ADKFibration`. -/
+-- tier: T2
+theorem exists_adkTorusTrivData : Nonempty ADKTorusTrivData := by
+  let K : Set (s4TorusDisk × Torus2) :=
+    ({s4TorusDiskZero} : Set s4TorusDisk) ×ˢ (Set.univ : Set Torus2)
+  have hK_compact : IsCompact K := isCompact_singleton.prod isCompact_univ
+  have hK_loc :
+      ∀ wt ∈ K, IsLocalDiffeomorphAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞ Ψ_adk_south wt := by
+    rintro ⟨w, t⟩ ⟨hw, -⟩
+    rw [Set.mem_singleton_iff] at hw
+    subst hw
+    exact isLocalDiffeomorphAt_Ψ_adk_south_zero_left t
+  obtain ⟨U, hU_open, hK_U, hU_inj, hU_loc⟩ :=
+    injOn_Ψ_adk_south_zeroSlice.exists_isOpen_superset_isLocalDiffeomorphOn hK_compact hK_loc
+  have hU_img_open : IsOpen (Ψ_adk_south '' U) :=
+    (hU_loc.isLocalHomeomorphOn).isOpen_image hU_open
+  have h0_sub_img :
+      ({0} : Set EuclideanPlane) ×ˢ (Set.univ : Set Torus2) ⊆ Ψ_adk_south '' U := by
+    rintro ⟨w, t⟩ ⟨hw, -⟩
+    rw [Set.mem_singleton_iff] at hw
+    subst hw
+    exact ⟨(s4TorusDiskZero, t), hK_U ⟨rfl, trivial⟩, Prod.ext (g_adk_south_zero_left t) rfl⟩
+  obtain ⟨V, W, hV_open, _, h0_V, huniv_W, hVW_sub⟩ :=
+    generalized_tube_lemma isCompact_singleton isCompact_univ hU_img_open h0_sub_img
+  obtain ⟨r₁, hr₁_pos, hr₁_ball⟩ := Metric.isOpen_iff.mp hV_open 0 (h0_V rfl)
+  have hr₁_sub :
+      Metric.ball (0 : EuclideanPlane) r₁ ×ˢ (Set.univ : Set Torus2) ⊆ Ψ_adk_south '' U :=
+    fun _ hp ↦ hVW_sub ⟨hr₁_ball hp.1, huniv_W trivial⟩
+  have hU_s4_open : IsOpen (s4TorusEmbed '' U) := by
+    have heq : s4TorusEmbed '' U =
+        (Subtype.val : s4TorusTubularOpen → Sphere4) ''
+          (s4TorusTubularTrivialization.symm '' U) := by
+      ext x
+      simp only [Set.mem_image]
+      exact ⟨fun ⟨wt, hwt, hEq⟩ ↦ ⟨s4TorusTubularTrivialization.symm wt, ⟨wt, hwt, rfl⟩, hEq⟩,
+        fun ⟨_, ⟨wt, hwt, rfl⟩, hEq⟩ ↦ ⟨wt, hwt, hEq⟩⟩
+    rw [heq]
+    exact s4TorusTubularOpen.2.isOpenEmbedding_subtypeVal.isOpenMap _
+      (s4TorusTubularTrivialization.symm.toHomeomorph.isOpenMap _ hU_open)
+  let C : Set Sphere4 := (s4TorusEmbed '' U)ᶜ
+  have hfC_closed : IsClosed (s4ADKFibration '' C) :=
+    (hU_s4_open.isClosed_compl.isCompact.image contMDiff_s4ADKFibration.continuous).isClosed
+  have hsp_mem : s2SouthPole ∈ (s4ADKFibration '' C)ᶜ := by
+    rintro ⟨x, hxC, hfx⟩
+    obtain ⟨hr, hu, hv⟩ := (s4ADKFibration_eq_southPole_iff x).mp hfx
+    let r2 : ℝ := Real.sqrt 2
+    have hr2_sq : r2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+    let t : Torus2 :=
+      ⟨⟨vec2 (r2 * x.1 0) (r2 * x.1 1), mem_sphere_zero_iff_norm.mpr (by
+        have hsq : ‖vec2 (r2 * x.1 0) (r2 * x.1 1)‖ ^ 2 = 1 := by
+          rw [norm_sq_plane]; simp only [vec2_zero, vec2_one]
+          calc
+            (r2 * x.1 0) ^ 2 + (r2 * x.1 1) ^ 2 = r2 ^ 2 * (x.1 0 ^ 2 + x.1 1 ^ 2) := by ring
+            _ = 1 := by rw [hr2_sq, hr]; norm_num
+        nlinarith [norm_nonneg (vec2 (r2 * x.1 0) (r2 * x.1 1))])⟩,
+      ⟨vec2 (r2 * x.1 2) (r2 * x.1 3), mem_sphere_zero_iff_norm.mpr (by
+        have hsq : ‖vec2 (r2 * x.1 2) (r2 * x.1 3)‖ ^ 2 = 1 := by
+          rw [norm_sq_plane]; simp only [vec2_zero, vec2_one]
+          calc
+            (r2 * x.1 2) ^ 2 + (r2 * x.1 3) ^ 2 = r2 ^ 2 * (x.1 2 ^ 2 + x.1 3 ^ 2) := by ring
+            _ = 1 := by rw [hr2_sq, hu]; norm_num
+        nlinarith [norm_nonneg (vec2 (r2 * x.1 2) (r2 * x.1 3))])⟩⟩
+    have hx_eq : s4TorusEmbed (s4TorusDiskZero, t) = x := by
+      have hs : Real.sqrt (1 / 2) * r2 = 1 := by
+        dsimp only [r2]
+        rw [← Real.sqrt_mul (by norm_num)]
+        norm_num
+      apply Subtype.ext
+      refine ext_vec5 ?_ ?_ ?_ ?_ ?_
+      · dsimp only [s4TorusEmbed, s4TorusEmbedRaw, t]
+        simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_zero, vec2_zero, sub_zero,
+          zero_pow (by decide : 2 ≠ 0)]
+        linear_combination x.1 0 * hs
+      · dsimp only [s4TorusEmbed, s4TorusEmbedRaw, t]
+        simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_one, vec2_one, sub_zero,
+          zero_pow (by decide : 2 ≠ 0)]
+        linear_combination x.1 1 * hs
+      · dsimp only [s4TorusEmbed, s4TorusEmbedRaw, t]
+        simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_two, vec2_zero, add_zero]
+        linear_combination x.1 2 * hs
+      · dsimp only [s4TorusEmbed, s4TorusEmbedRaw, t]
+        simp only [coe_s4TorusDiskZero, PiLp.zero_apply, vec5_three, vec2_one, add_zero]
+        linear_combination x.1 3 * hs
+      · dsimp only [s4TorusEmbed, s4TorusEmbedRaw]
+        simp [hv]
+    exact hxC ⟨(s4TorusDiskZero, t), hK_U ⟨rfl, trivial⟩, hx_eq⟩
+  have hpre_open : IsOpen (northPoleStereoInv ⁻¹' (s4ADKFibration '' C)ᶜ) :=
+    hfC_closed.isOpen_compl.preimage contMDiff_northPoleStereoInv.continuous
+  have h0_mem_pre : (0 : EuclideanPlane) ∈ northPoleStereoInv ⁻¹' (s4ADKFibration '' C)ᶜ := by
+    simpa [northPoleStereoInv_zero] using hsp_mem
+  obtain ⟨r₂, hr₂_pos, hr₂_ball⟩ := Metric.isOpen_iff.mp hpre_open 0 h0_mem_pre
+  let r := min r₁ r₂
+  refine ⟨⟨U, hU_open, hK_U, hU_inj, hU_loc, r, lt_min hr₁_pos hr₂_pos,
+    fun p hp ↦ hr₁_sub ⟨Metric.ball_subset_ball (min_le_left _ _) hp.1, hp.2⟩, ?_⟩⟩
+  rintro x ⟨w, hw, hfx⟩
+  by_contra hnot
+  exact hr₂_ball (Metric.ball_subset_ball (min_le_right _ _) hw) ⟨x, hnot, hfx.symm⟩
+
+/-- Chosen `ADKTorusTrivData` witness. -/
+noncomputable def adkTorusTrivData : ADKTorusTrivData :=
+  Classical.choice exists_adkTorusTrivData
+
+/-- Positive stereographic base disk radius around `s2SouthPole`. -/
+noncomputable def s4ADKTorusBaseDiskRadius : ℝ :=
+  adkTorusTrivData.r
+
+/-- Positivity `0 < s4ADKTorusBaseDiskRadius`. -/
+theorem s4ADKTorusBaseDiskRadius_pos : 0 < s4ADKTorusBaseDiskRadius :=
+  adkTorusTrivData.hr_pos
+
+/-- Planar open coordinate disk `Metric.ball 0 s4ADKTorusBaseDiskRadius`. -/
+noncomputable abbrev s4ADKTorusBaseDiskOpen : Opens EuclideanPlane :=
+  ⟨Metric.ball (0 : EuclideanPlane) s4ADKTorusBaseDiskRadius, Metric.isOpen_ball⟩
+
+/-- Nonempty open regular base disk `s4ADKTorusBaseRegion ⊂ Sphere2` containing `s2SouthPole`
+in the $T^2$-fiber chamber of `s4ADKFibration`. -/
+noncomputable def s4ADKTorusBaseRegion : Opens Sphere2 :=
+  ⟨northPoleStereoInv '' Metric.ball (0 : EuclideanPlane) s4ADKTorusBaseDiskRadius,
+    isOpenEmbedding_northPoleStereoInv.isOpenMap _ Metric.isOpen_ball⟩
+
+/-- `s2SouthPole` lies in `s4ADKTorusBaseRegion`. -/
+theorem s2SouthPole_mem_s4ADKTorusBaseRegion : s2SouthPole ∈ s4ADKTorusBaseRegion.1 :=
+  ⟨0, Metric.mem_ball_self s4ADKTorusBaseDiskRadius_pos, northPoleStereoInv_zero⟩
+
+/-- `s4ADKTorusBaseRegion` is nonempty. -/
+theorem s4ADKTorusBaseRegion_nonempty : s4ADKTorusBaseRegion.1.Nonempty :=
+  ⟨s2SouthPole, s2SouthPole_mem_s4ADKTorusBaseRegion⟩
+
+/-- Smooth diffeomorphism `Metric.ball 0 s4ADKTorusBaseDiskRadius ≃ₘ s4ADKTorusBaseRegion`. -/
+-- tier: T2
+noncomputable def s4ADKTorusBaseDiskDiffeomorph :
+    s4ADKTorusBaseDiskOpen ≃ₘ⟮𝓡 2, 𝓡 2⟯ s4ADKTorusBaseRegion where
+  toFun w := ⟨northPoleStereoInv w.1, ⟨w.1, w.2, rfl⟩⟩
+  invFun b := ⟨northPoleStereoChart b.1, by
+    obtain ⟨w, hw, hw_eq⟩ := b.2
+    rwa [← hw_eq, northPoleStereoChart_inv]⟩
+  left_inv w := Subtype.ext (northPoleStereoChart_inv w.1)
+  right_inv b := by
+    obtain ⟨w, -, hw_eq⟩ := b.2
+    apply Subtype.ext
+    dsimp only
+    rw [← hw_eq, northPoleStereoChart_inv]
+  contMDiff_toFun :=
+    (TauCeti.ContMDiff.subtypeVal_comp_iff s4ADKTorusBaseRegion _).mp
+      (contMDiff_northPoleStereoInv.comp contMDiff_subtype_val)
+  contMDiff_invFun := by
+    have hne : ∀ b : s4ADKTorusBaseRegion, b.1 ≠ s2NorthPole := by
+      rintro ⟨_, ⟨w, -, rfl⟩⟩
+      exact northPoleStereoInv_ne_northPole w
+    have hincl : ContMDiff (𝓡 2) (𝓡 2) ∞
+        (fun b : s4ADKTorusBaseRegion ↦
+          (⟨s2Antipodal b.1, s2Antipodal_ne_southPole_of_ne_northPole (hne b)⟩ :
+            s2PuncturedSouth)) :=
+      (TauCeti.ContMDiff.subtypeVal_comp_iff s2PuncturedSouth _).mp
+        (s2Antipodal.contMDiff.comp contMDiff_subtype_val)
+    exact (TauCeti.ContMDiff.subtypeVal_comp_iff s4ADKTorusBaseDiskOpen _).mp
+      (southPoleStereoDiffeomorph.symm.contMDiff.comp hincl)
+
+@[simp]
+private theorem coe_s4ADKTorusBaseDiskDiffeomorph_symm (b : s4ADKTorusBaseRegion) :
+    ((s4ADKTorusBaseDiskDiffeomorph.symm b : s4ADKTorusBaseDiskOpen) : EuclideanPlane) =
+      northPoleStereoChart b.1 :=
+  rfl
+
+/-- Open preimage `s4ADKFibration ⁻¹' s4ADKTorusBaseRegion` in `Sphere4`. -/
+noncomputable abbrev s4ADKTorusPreimageOpen : Opens Sphere4 :=
+  ⟨s4ADKFibration ⁻¹' s4ADKTorusBaseRegion.1,
+    s4ADKTorusBaseRegion.2.preimage contMDiff_s4ADKFibration.continuous⟩
+
+/-- Containment `s4ADKTorusPreimageOpen ⊆ s4TorusTubularOpen`. -/
+theorem s4ADKTorusPreimageOpen_mem_tubular {x : Sphere4}
+    (hx : x ∈ s4ADKTorusPreimageOpen.1) : x ∈ s4TorusTubularOpen.1 := by
+  obtain ⟨wt, -, rfl⟩ := adkTorusTrivData.hr_preimage_sub x hx
+  exact s4TorusEmbed_mem_tubularOpen wt
+
+/-- Canonical inclusion of `s4ADKTorusPreimageOpen` into `s4TorusDisk × Torus2`. -/
+noncomputable def s4ADKTorusIncl (u : s4ADKTorusPreimageOpen) :
+    s4TorusDisk × Torus2 :=
+  s4TorusTubularTrivialization ⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩
+
+private theorem s4TorusEmbed_s4ADKTorusIncl (u : s4ADKTorusPreimageOpen) :
+    s4TorusEmbed (s4ADKTorusIncl u) = u.1 := by
+  change (s4TorusTubularTrivialization.symm
+    (s4TorusTubularTrivialization ⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩)).1 = u.1
+  rw [s4TorusTubularTrivialization.symm_apply_apply]
+
+private theorem s4ADKTorusIncl_mem_U (u : s4ADKTorusPreimageOpen) :
+    s4ADKTorusIncl u ∈ adkTorusTrivData.U := by
+  obtain ⟨wt, hwt, hEq⟩ := adkTorusTrivData.hr_preimage_sub u.1 u.2
+  have hwt_triv : s4ADKTorusIncl u = wt := by
+    have h1 : (⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩ : s4TorusTubularOpen) =
+        s4TorusTubularTrivialization.symm wt :=
+      Subtype.ext hEq.symm
+    change s4TorusTubularTrivialization ⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩ = wt
+    rw [h1, s4TorusTubularTrivialization.apply_symm_apply]
+  rwa [hwt_triv]
+
+private theorem contMDiff_s4ADKTorusIncl :
+    ContMDiff (𝓡 4) ((𝓡 2).prod (𝓡 2)) ∞ s4ADKTorusIncl :=
+  s4TorusTubularTrivialization.contMDiff.comp
+    ((TauCeti.ContMDiff.subtypeVal_comp_iff s4TorusTubularOpen _).mp contMDiff_subtype_val)
+
+private theorem isLocalDiffeomorph_s4ADKTorusIncl :
+    IsLocalDiffeomorph (𝓡 4) ((𝓡 2).prod (𝓡 2)) ∞ s4ADKTorusIncl := by
+  intro u
+  let subMap : s4ADKTorusPreimageOpen → s4TorusTubularOpen :=
+    fun v ↦ ⟨v.1, s4ADKTorusPreimageOpen_mem_tubular v.2⟩
+  have hsub_loc : IsLocalDiffeomorphAt (𝓡 4) (𝓡 4) ∞ subMap u := by
+    have hcomp : ((Subtype.val : s4TorusTubularOpen → Sphere4) ∘ subMap) =
+        (Subtype.val : s4ADKTorusPreimageOpen → Sphere4) := rfl
+    have hval1 : IsLocalDiffeomorphAt (𝓡 4) (𝓡 4) ∞
+        (Subtype.val : s4ADKTorusPreimageOpen → Sphere4) u :=
+      TauCeti.isLocalDiffeomorph_subtype_val u
+    have hval2 : IsLocalDiffeomorphAt (𝓡 4) (𝓡 4) ∞
+        (Subtype.val : s4TorusTubularOpen → Sphere4) (subMap u) :=
+      TauCeti.isLocalDiffeomorph_subtype_val (subMap u)
+    rw [← hcomp] at hval1
+    exact hval1.of_comp_left hval2 ((continuous_subtype_val.subtype_mk _).continuousAt)
+  exact hsub_loc.comp (hg := s4TorusTubularTrivialization.isLocalDiffeomorph (subMap u))
+
+/-- Forward south-hemisphere trivialization map `s4ADKTorusPreimageOpen → s4ADKTorusBaseRegion ×
+Torus2`. -/
+noncomputable def s4ADKTorusTrivFun (u : s4ADKTorusPreimageOpen) :
+    s4ADKTorusBaseRegion × Torus2 :=
+  (⟨s4ADKFibration u.1, u.2⟩, (s4ADKTorusIncl u).2)
+
+private theorem contMDiff_s4ADKTorusTrivFun :
+    ContMDiff (𝓡 4) ((𝓡 2).prod (𝓡 2)) ∞ s4ADKTorusTrivFun :=
+  ((TauCeti.ContMDiff.subtypeVal_comp_iff s4ADKTorusBaseRegion _).mp
+      (contMDiff_s4ADKFibration.comp contMDiff_subtype_val)).prodMk
+    (contMDiff_snd.comp contMDiff_s4ADKTorusIncl)
+
+/-- Bijectivity of `s4ADKTorusTrivFun`. -/
+theorem bijective_s4ADKTorusTrivFun : Function.Bijective s4ADKTorusTrivFun := by
+  constructor
+  · intro u₁ u₂ hEq
+    have hf : s4ADKFibration u₁.1 = s4ADKFibration u₂.1 :=
+      congrArg (fun p : s4ADKTorusBaseRegion × Torus2 ↦ p.1.1) hEq
+    have ht : (s4ADKTorusIncl u₁).2 = (s4ADKTorusIncl u₂).2 :=
+      congrArg (Prod.snd : s4ADKTorusBaseRegion × Torus2 → Torus2) hEq
+    have hg : g_adk_south (s4ADKTorusIncl u₁) = g_adk_south (s4ADKTorusIncl u₂) := by
+      apply injective_northPoleStereoInv
+      rw [northPoleStereoInv_g_adk_south, northPoleStereoInv_g_adk_south,
+        s4TorusEmbed_s4ADKTorusIncl, s4TorusEmbed_s4ADKTorusIncl, hf]
+    have hincl : s4ADKTorusIncl u₁ = s4ADKTorusIncl u₂ :=
+      adkTorusTrivData.hU_inj (s4ADKTorusIncl_mem_U u₁) (s4ADKTorusIncl_mem_U u₂)
+        (Prod.ext hg ht)
+    exact Subtype.ext <| calc
+      u₁.1 = s4TorusEmbed (s4ADKTorusIncl u₁) := (s4TorusEmbed_s4ADKTorusIncl u₁).symm
+      _ = s4TorusEmbed (s4ADKTorusIncl u₂) := congrArg s4TorusEmbed hincl
+      _ = u₂.1 := s4TorusEmbed_s4ADKTorusIncl u₂
+  · rintro ⟨⟨b, hb⟩, t⟩
+    obtain ⟨w₀, hw₀, rfl⟩ := hb
+    obtain ⟨wt, _, hΨ⟩ :=
+      adkTorusTrivData.hr_sub_target (Set.mk_mem_prod hw₀ (Set.mem_univ t))
+    have hg : g_adk_south wt = w₀ := congrArg Prod.fst hΨ
+    have ht : wt.2 = t := congrArg Prod.snd hΨ
+    let x := s4TorusEmbed wt
+    have hx_pre : x ∈ s4ADKTorusPreimageOpen.1 := by
+      change s4ADKFibration (s4TorusEmbed wt) ∈ s4ADKTorusBaseRegion.1
+      rw [← northPoleStereoInv_g_adk_south wt, hg]
+      exact ⟨w₀, hw₀, rfl⟩
+    let u : s4ADKTorusPreimageOpen := ⟨x, hx_pre⟩
+    have hu_incl : s4ADKTorusIncl u = wt := by
+      have h1 : (⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩ : s4TorusTubularOpen) =
+          s4TorusTubularTrivialization.symm wt := rfl
+      change s4TorusTubularTrivialization ⟨u.1, s4ADKTorusPreimageOpen_mem_tubular u.2⟩ = wt
+      rw [h1, s4TorusTubularTrivialization.apply_symm_apply]
+    refine ⟨u, Prod.ext (Subtype.ext ?_) ?_⟩
+    · change s4ADKFibration (s4TorusEmbed wt) = northPoleStereoInv w₀
+      rw [← northPoleStereoInv_g_adk_south wt, hg]
+    · dsimp only [s4ADKTorusTrivFun]
+      rw [hu_incl, ht]
+
+/-- Local diffeomorphism property of `s4ADKTorusTrivFun`. -/
+-- tier: T2
+theorem isLocalDiffeomorph_s4ADKTorusTrivFun :
+    IsLocalDiffeomorph (𝓡 4) ((𝓡 2).prod (𝓡 2)) ∞ s4ADKTorusTrivFun := by
+  let Φ₀ : s4ADKTorusBaseRegion × Torus2 → EuclideanPlane × Torus2 :=
+    fun bt ↦ ((s4ADKTorusBaseDiskDiffeomorph.symm bt.1).1, bt.2)
+  have hΦ₀_comp : Φ₀ ∘ s4ADKTorusTrivFun = Ψ_adk_south ∘ s4ADKTorusIncl := by
+    funext u
+    dsimp only [Function.comp_apply, Φ₀, s4ADKTorusTrivFun, Ψ_adk_south]
+    refine Prod.ext ?_ rfl
+    rw [coe_s4ADKTorusBaseDiskDiffeomorph_symm]
+    change northPoleStereoChart (s4ADKFibration u.1) = g_adk_south (s4ADKTorusIncl u)
+    rw [← s4TorusEmbed_s4ADKTorusIncl u]
+    rfl
+  have hΦ₀_loc :
+      ∀ bt : s4ADKTorusBaseRegion × Torus2,
+        IsLocalDiffeomorphAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞ Φ₀ bt := by
+    intro bt
+    let d := s4ADKTorusBaseDiskDiffeomorph.symm.prodCongr (Diffeomorph.refl (𝓡 2) Torus2 ∞)
+    let j : s4ADKTorusBaseDiskOpen × Torus2 → EuclideanPlane × Torus2 :=
+      fun q ↦ (q.1.1, q.2)
+    have hΦ₀_eq : Φ₀ = j ∘ ⇑d := rfl
+    have hj_loc :
+        IsLocalDiffeomorphAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞ j (d bt) :=
+      (TauCeti.isLocalDiffeomorph_subtype_val (I := 𝓡 2) (n := ∞) (d bt).1).prodMap
+        ((Diffeomorph.refl (𝓡 2) Torus2 ∞).isLocalDiffeomorph (d bt).2)
+    rw [hΦ₀_eq]
+    exact (d.isLocalDiffeomorph bt).comp (hg := hj_loc)
+  intro u
+  have hΨu :
+      IsLocalDiffeomorphAt ((𝓡 2).prod (𝓡 2)) ((𝓡 2).prod (𝓡 2)) ∞
+        Ψ_adk_south (s4ADKTorusIncl u) :=
+    adkTorusTrivData.hU_loc ⟨s4ADKTorusIncl u, s4ADKTorusIncl_mem_U u⟩
+  have hcomp_loc : IsLocalDiffeomorphAt (𝓡 4) ((𝓡 2).prod (𝓡 2)) ∞
+      (Φ₀ ∘ s4ADKTorusTrivFun) u := by
+    rw [hΦ₀_comp]
+    exact (isLocalDiffeomorph_s4ADKTorusIncl u).comp (hg := hΨu)
+  exact hcomp_loc.of_comp_left (hΦ₀_loc (s4ADKTorusTrivFun u))
+    ((contMDiff_s4ADKTorusTrivFun u).continuousAt)
+
+/-- Explicit smooth south-hemisphere trivialization
+`s4ADKFibration ⁻¹' s4ADKTorusBaseRegion ≃ₘ s4ADKTorusBaseRegion × Torus2`. -/
+-- tier: T2
+noncomputable def s4ADKTorusTrivialization :
+    s4ADKTorusPreimageOpen ≃ₘ⟮𝓡 4, (𝓡 2).prod (𝓡 2)⟯ (s4ADKTorusBaseRegion × Torus2) :=
+  isLocalDiffeomorph_s4ADKTorusTrivFun.diffeomorphOfBijective bijective_s4ADKTorusTrivFun
+
+/-- First-factor projection law `(s4ADKTorusTrivialization u).1 = ⟨s4ADKFibration u.1, u.2⟩`. -/
+@[simp]
+theorem s4ADKTorusTrivialization_fst (u : s4ADKTorusPreimageOpen) :
+    (s4ADKTorusTrivialization u).1 = ⟨s4ADKFibration u.1, u.2⟩ := by
+  rw [s4ADKTorusTrivialization, IsLocalDiffeomorph.coe_diffeomorphOfBijective]
+  rfl
+
+/-- Every point of `s4ADKFibration ⁻¹' s4ADKTorusBaseRegion` is a regular point of
+`s4ADKFibration`. -/
+-- tier: T2
+theorem regular_on_s4ADKTorusBaseRegion :
+    ∀ x ∈ s4ADKFibration ⁻¹' s4ADKTorusBaseRegion.1,
+      Function.Surjective (mfderiv (𝓡 4) (𝓡 2) s4ADKFibration x) := by
+  intro x hx
+  let p' : s4ADKTorusPreimageOpen := ⟨x, hx⟩
+  have hcomp_eq :
+      s4ADKFibration ∘ (Subtype.val : s4ADKTorusPreimageOpen → Sphere4) =
+        (Subtype.val : s4ADKTorusBaseRegion → Sphere2) ∘
+          (Prod.fst ∘ ⇑s4ADKTorusTrivialization) :=
+    funext fun q ↦ (congrArg Subtype.val (s4ADKTorusTrivialization_fst q)).symm
+  have hf_at : MDifferentiableAt (𝓡 4) (𝓡 2) s4ADKFibration x :=
+    (contMDiff_s4ADKFibration x).mdifferentiableAt (by simp)
+  have hsub_in : MDifferentiableAt (𝓡 4) (𝓡 4)
+      (Subtype.val : s4ADKTorusPreimageOpen → Sphere4) p' :=
+    (TauCeti.isLocalDiffeomorph_subtype_val (I := 𝓡 4) (n := ∞)
+      p').contMDiffAt.mdifferentiableAt (by simp)
+  have htriv_at : MDifferentiableAt (𝓡 4) ((𝓡 2).prod (𝓡 2))
+      (⇑s4ADKTorusTrivialization) p' :=
+    (s4ADKTorusTrivialization.contMDiff p').mdifferentiableAt (by simp)
+  have hfst_at : MDifferentiableAt ((𝓡 2).prod (𝓡 2)) (𝓡 2)
+      (Prod.fst : s4ADKTorusBaseRegion × Torus2 → s4ADKTorusBaseRegion)
+      (s4ADKTorusTrivialization p') :=
+    ((contMDiff_fst (n := ∞)) (s4ADKTorusTrivialization p')).mdifferentiableAt (by simp)
+  have hsub_out : MDifferentiableAt (𝓡 2) (𝓡 2)
+      (Subtype.val : s4ADKTorusBaseRegion → Sphere2) (s4ADKTorusTrivialization p').1 :=
+    (TauCeti.isLocalDiffeomorph_subtype_val (I := 𝓡 2) (n := ∞)
+      (s4ADKTorusTrivialization p').1).contMDiffAt.mdifferentiableAt (by simp)
+  have hlhs_comp := mfderiv_comp p' hf_at hsub_in
+  have hrhs_comp :
+      mfderiv (𝓡 4) (𝓡 2)
+          ((Subtype.val : s4ADKTorusBaseRegion → Sphere2) ∘
+            (Prod.fst ∘ ⇑s4ADKTorusTrivialization)) p' =
+        (mfderiv (𝓡 2) (𝓡 2) (Subtype.val : s4ADKTorusBaseRegion → Sphere2)
+            (s4ADKTorusTrivialization p').1).comp
+          ((mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2)
+              (Prod.fst : s4ADKTorusBaseRegion × Torus2 → s4ADKTorusBaseRegion)
+              (s4ADKTorusTrivialization p')).comp
+            (mfderiv (𝓡 4) ((𝓡 2).prod (𝓡 2)) (⇑s4ADKTorusTrivialization) p')) := by
+    rw [mfderiv_comp p' hsub_out (hfst_at.comp p' htriv_at),
+      mfderiv_comp p' hfst_at htriv_at]
+    rfl
+  have hsurj_triv : Function.Surjective
+      (mfderiv (𝓡 4) ((𝓡 2).prod (𝓡 2)) (⇑s4ADKTorusTrivialization) p') :=
+    (s4ADKTorusTrivialization.isLocalDiffeomorph p').isInvertible_mfderiv (by simp) |>.surjective
+  have hsurj_fst : Function.Surjective
+      (mfderiv ((𝓡 2).prod (𝓡 2)) (𝓡 2)
+        (Prod.fst : s4ADKTorusBaseRegion × Torus2 → s4ADKTorusBaseRegion)
+        (s4ADKTorusTrivialization p')) := fun v ↦ by
+    rw [mfderiv_fst]; exact ⟨(v, 0), rfl⟩
+  have hsurj_sub_out : Function.Surjective
+      (mfderiv (𝓡 2) (𝓡 2) (Subtype.val : s4ADKTorusBaseRegion → Sphere2)
+        (s4ADKTorusTrivialization p').1) :=
+    (TauCeti.isLocalDiffeomorph_subtype_val (I := 𝓡 2) (n := ∞)
+      (s4ADKTorusTrivialization p').1).isInvertible_mfderiv (by simp) |>.surjective
+  have hsurj_rhs : Function.Surjective
+      (mfderiv (𝓡 4) (𝓡 2)
+        ((Subtype.val : s4ADKTorusBaseRegion → Sphere2) ∘
+          (Prod.fst ∘ ⇑s4ADKTorusTrivialization)) p') := by
+    rw [hrhs_comp]
+    exact hsurj_sub_out.comp (hsurj_fst.comp hsurj_triv)
+  rw [← hcomp_eq, hlhs_comp] at hsurj_rhs
+  exact Function.Surjective.of_comp hsurj_rhs
+
+/-- Global ADK fibration `s4ADKFibration` packaged as a `RegularDiskFibration` over the
+south-hemisphere $T^2$ chamber `s4ADKTorusBaseRegion` (`s2SouthPole ∈ s4ADKTorusBaseRegion`). -/
+noncomputable def s4ADKTorusRegularDiskFibration :
+    RegularDiskFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Torus2 where
+  toFun := s4ADKFibration
+  contMDiff_toFun := contMDiff_s4ADKFibration
+  baseRegion := s4ADKTorusBaseRegion
+  baseRegion_nonempty := s4ADKTorusBaseRegion_nonempty
+  regular_on_preimage := regular_on_s4ADKTorusBaseRegion
+  baseDiskRadius := s4ADKTorusBaseDiskRadius
+  baseDiskRadius_pos := s4ADKTorusBaseDiskRadius_pos
+  baseDisk := s4ADKTorusBaseDiskDiffeomorph
+  trivialization := s4ADKTorusTrivialization
+  trivialization_fst := s4ADKTorusTrivialization_fst
+
+/-- **Global ADK Broken Lefschetz Fibration on $S^4$ ($T^2$ Chamber, `SC-R6b`)**:
+Trivializes the south-hemisphere Clifford-torus chamber around `s2SouthPole` with smooth fiber
+`Torus2`, complementing `s4BrokenLefschetzFibration` ($S^2$ chamber around `s2NorthPole`). -/
+-- tier: T2
+noncomputable def s4ADKTorusBrokenLefschetzFibration :
+    BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Torus2 where
+  toRegularDiskFibration := s4ADKTorusRegularDiskFibration
+  singularities_broken_lefschetz _ hp := Or.inr (isIndefiniteFoldAt_s4ADKFibration hp)
+
 /-- Named `[AdmitsWrinkledOrBrokenLefschetzFibration Sphere4]` witness constructed from the global
 ADK broken Lefschetz fibration `s4BrokenLefschetzFibration`. Not marked as a global `instance`
-so `instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4` remains unique in downstream modules. -/
+so `instAdmitsRegularDiskFibrationSphere4` remains unique in downstream modules. -/
 -- tier: T2
 @[instance_reducible]
 noncomputable def s4ADKAdmits : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4 :=
@@ -3742,6 +5516,7 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK :
         contMDiff_s4ADKFibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration, π_f.rankAt x = 2) ∧
       (criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration).Nonempty ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration, π_f.rankAt x = 0) ∧
@@ -3751,28 +5526,27 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK :
       (∀ b : s4ADKBaseRegion,
         ∃ d_b : Sphere2 ≃ₘ⟮𝓡 2, 𝓡 2⟯ Sphere2,
           (∀ z : Sphere2,
-            d_bar (s4ADKWrinkledFibration.embed (b, z)) =
-              s4ADKWrinkledFibration.embed (b, d_b z)) ∧
+            d_bar (s4ADKRegularDiskFibration.embed (b, z)) =
+              s4ADKRegularDiskFibration.embed (b, d_b z)) ∧
           TauCeti.SmoothForm.mpullback d_b d_b.contMDiff S2VolumeForm = S2VolumeForm ∧
           MeasurePreserving ⇑d_b S2PositiveVolumeForm.μ S2PositiveVolumeForm.μ) ∧
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  let _ : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4 := s4ADKAdmits
-  obtain ⟨V, π_f, d_bar, hπ, hunimV, hunim, hrank2, hrank0, hfib, hpois, hleaf, hvol, hmeas, htc,
-      hne⟩ :=
+  obtain ⟨V, π_f, d_bar, hπ, hunimV, hunim, hgen, hrank2, hrank0, hfib, hpois, hleaf, hvol,
+      hmeas, htc, hne⟩ :=
     Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
       (A := s4ADKAdmits) Sphere4
-  exact ⟨V, π_f, d_bar, hπ, hunimV, hunim, hrank2,
+  exact ⟨V, π_f, d_bar, hπ, hunimV, hunim, hgen, hrank2,
     ⟨s4ADKCritBase, s4ADKCritBase_mem_criticalPoints⟩,
     hrank0, hfib, hpois, hleaf, hvol, hmeas, htc, hne⟩
 
 /-- **ADK Poisson–Hamiltonian Realization on $S^4$ (Option A)**:
 Exhibits a finite list `Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯` of smooth Hamiltonians whose composed
 time-`1` Poisson–Hamiltonian flow on `Sphere4` (adapted to `s4ADKAdmits`)
-preserves `s4ADKFibration`, `Ω`, `μ`, and `π_f`, and is Turing complete (`IsTuringComplete`,
-`≠ id`). -/
+preserves `s4ADKFibration`, `Ω`, `μ`, and the generically rank-`2` unimodular Poisson structure
+`π_f`, and is Turing complete (`IsTuringComplete`, `≠ id`). -/
 -- tier: T2
 theorem exists_poisson_hamiltonian_realization_S4_ADK :
     ∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
@@ -3780,7 +5554,9 @@ theorem exists_poisson_hamiltonian_realization_S4_ADK :
       (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
       (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
       π_f.IsUnimodularWithVolume V.Ω ∧
-      d_bar = composePoissonHamiltonianTimeOneFlows (A := s4ADKAdmits) Sphere4 Hs ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_bar = composePoissonHamiltonianTimeOneFlows
+        (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4 Hs ∧
       s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
       SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
         d_bar d_bar.contMDiff ∧
@@ -3788,13 +5564,15 @@ theorem exists_poisson_hamiltonian_realization_S4_ADK :
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  let _ : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4 := s4ADKAdmits
   obtain ⟨Hs, d_bar, hcomp, hfib, hpois, hvol, hmeas, htc, hne⟩ :=
-    exists_poisson_hamiltonian_realization_fourManifold (A := s4ADKAdmits) Sphere4
-  exact ⟨alignedPositiveVolume (A := s4ADKAdmits) Sphere4,
-    adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4,
+    exists_poisson_hamiltonian_realization_fourManifold
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4
+  exact ⟨alignedPositiveVolume (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    adaptedJacobianPoisson (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
     Hs, d_bar,
-    isUnimodularWithVolume_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4,
+    isUnimodularWithVolume_adaptedJacobianPoisson
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4,
     hcomp, hfib, hpois, hvol, hmeas, htc, hne⟩
 
 end ADKTrivializationAndTheorems

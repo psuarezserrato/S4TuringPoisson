@@ -26,13 +26,16 @@ This file implements Milestone M2.3 of `S4TuringPoisson`:
      `S2VolumeForm = TauCeti.sphereAreaForm`.
    - Constructs the canonical model symplectic form `planeSymplecticForm` on `EuclideanPlane`
      satisfying `planeSymplecticForm.constSmooth = planeAreaForm`.
-2. **Gay–Kirby / Lekili Fibration Typeclass (`AdmitsWrinkledOrBrokenLefschetzFibration`)**:
-   - Packages a closed oriented smooth 4-manifold `M` admitting a compatible `WrinkledFibration`
-     (or `BrokenLefschetzFibration`) `f : M → Sphere2` with nonempty compact oriented smooth
-     surface fiber `F` of arbitrary genus `g ≥ 0`, together with positive co-orientation over the
-     regular base disk `B ⊂ Sphere2`.
-   - Supplies the **unconditional instance** `instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4`
-     from Milestone M2.2 (`S4Fibration.lean`).
+2. **Regular-Disk vs. Genuine Wrinkled / Broken Lefschetz Fibration Typeclasses (`SC-R1`)**:
+   - `AdmitsRegularDiskFibration`: packages a smooth 4-manifold `M` admitting a compatible
+     `RegularDiskFibration` `f : M → Sphere2` with nonempty compact oriented smooth surface fiber
+     `F` of arbitrary genus `g ≥ 0` and positive co-orientation over `baseRegion ⊂ Sphere2`
+     (with unconditional `Sphere4` instance `instAdmitsRegularDiskFibrationSphere4` via
+     `s4RegularDiskFibration`).
+   - `AdmitsWrinkledOrBrokenLefschetzFibration` (`extends AdmitsRegularDiskFibration M`): adds the
+     global `Gay–Kirby (2007)` / `Lekili (2009)` singularity classification requiring every
+     critical point of `fibration.toFun` to satisfy `IsIndefiniteFoldAt ∨ IsWrinkledCuspAt ∨
+     IsRealLefschetzAt` (inhabited on `Sphere4` by `s4ADKAdmits` in `ADKS4Fibration.lean`).
 3. **Darboux Symplectic Disk Embedding (`SymplecticDiskChart`)**:
    - Uses `TauCeti.SmoothTwoForm.IsSymplectic.exists_darbouxChart_of_symplecticForm` to prove that
      **every** nonempty boundaryless smooth surface `(F, η)` carrying a symplectic 2-form `η`
@@ -166,19 +169,20 @@ theorem mpullback_planeScale_planeAreaForm (r : ℝ) :
 
 end SurfaceSymplectic
 
-/-! ## 2. `AdmitsWrinkledOrBrokenLefschetzFibration` & Unconditional $S^4$ Instance -/
+/-! ## 2. `AdmitsRegularDiskFibration` & `AdmitsWrinkledOrBrokenLefschetzFibration` (`SC-R1`) -/
 
 section FibrationClass
 
-/-- Typeclass packaging the `Gay–Kirby (2007)` / `Lekili (2009)` existence of a compatible
-wrinkled (or broken Lefschetz) fibration `f : M → Sphere2` on a smooth 4-manifold `M` with
-nonempty compact oriented smooth surface regular fiber `Fiber` (of arbitrary genus `g ≥ 0`) and
-strictly positively co-oriented smooth trivialization over `fibration.baseRegion`.
+/-- Typeclass packaging a smooth 4-manifold `M` equipped with a positive volume 4-form `Ω_M` and a
+smooth map `f : M → Sphere2` trivialized over one nonempty regular open base disk with nonempty
+compact oriented smooth surface regular fiber `Fiber` (of arbitrary genus `g ≥ 0`) and strictly
+positively co-oriented smooth trivialization over `fibration.baseRegion` (`SC-R1`).
 
-Expressing this topological input on general closed 4-manifolds as an explicit Lean `class` (with
-an unconditional instance for `Sphere4`) keeps `#print axioms` strictly within
-`{propext, Classical.choice, Quot.sound}`. -/
-class AdmitsWrinkledOrBrokenLefschetzFibration (M : Type*)
+Unlike `AdmitsWrinkledOrBrokenLefschetzFibration`, this base class imposes zero normal-form
+restrictions on `criticalPoints (𝓡 4) (𝓡 2) fibration.toFun`; it powers the leafwise volume,
+isotopy lift, and Poisson–Hamiltonian engine uniformly across both global wrinkled/ADK fibrations
+and local coordinate-ball constructions (`ClosedManifoldLocal.lean`). -/
+class AdmitsRegularDiskFibration (M : Type*)
     [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M] [IsManifold (𝓡 4) ∞ M]
     [MeasurableSpace M] [BorelSpace M] where
   /-- Ambient positive volume 4-form `Ω_M` on `M`. -/
@@ -203,14 +207,14 @@ class AdmitsWrinkledOrBrokenLefschetzFibration (M : Type*)
   instMeasurableSpaceFiber : MeasurableSpace Fiber
   /-- Borel compatibility on `Fiber`. -/
   instBorelSpaceFiber : @BorelSpace Fiber instTopologicalSpaceFiber instMeasurableSpaceFiber
-  /-- Underlying `WrinkledFibration` `M → Sphere2` with regular fiber `Fiber`. -/
+  /-- Underlying `RegularDiskFibration` `M → Sphere2` with regular fiber `Fiber`. -/
   fibration :
     letI := instTopologicalSpaceFiber
     letI := instChartedSpaceFiber
     letI := instIsManifoldFiber
     letI := instCompactSpaceFiber
     letI := instNonemptyFiber
-    WrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 Fiber
+    RegularDiskFibration (𝓡 4) M (𝓡 2) Sphere2 Fiber
   /-- Positive area / symplectic 2-form `ω_F` on `Fiber`. -/
   fiberVolume :
     letI := instTopologicalSpaceFiber
@@ -237,9 +241,55 @@ class AdmitsWrinkledOrBrokenLefschetzFibration (M : Type*)
               (contMDiff_subtype_val.comp contMDiff_fst) S2VolumeForm))).1 u =
         c • (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val ambientVolume.Ω).1 u
 
+/-- **Unconditional `AdmitsRegularDiskFibration` Instance for $S^4$**: `Sphere4` admits the
+explicit positively co-oriented regular-disk fibration `s4RegularDiskFibration : Sphere4 → Sphere2`
+with regular fiber `Sphere2` constructed in `S4Fibration.lean` (Milestone M2.2). -/
+noncomputable instance instAdmitsRegularDiskFibrationSphere4 :
+    AdmitsRegularDiskFibration Sphere4 where
+  ambientVolume := S4PositiveVolumeForm
+  Fiber := Sphere2
+  instTopologicalSpaceFiber := inferInstance
+  instChartedSpaceFiber := inferInstance
+  instIsManifoldFiber := inferInstance
+  instT2SpaceFiber := inferInstance
+  instCompactSpaceFiber := inferInstance
+  instNonemptyFiber := ⟨s2NorthPole⟩
+  instMeasurableSpaceFiber := inferInstance
+  instBorelSpaceFiber := inferInstance
+  fibration := s4RegularDiskFibration
+  fiberVolume := S2PositiveVolumeForm
+  trivialization_pos_cooriented := s4Trivialization_pos_cooriented
+
+/-- Typeclass packaging the genuine `Gay–Kirby (2007)` / `Lekili (2009)` existence of a positively
+co-oriented wrinkled or broken Lefschetz fibration `f : M → Sphere2` on a smooth 4-manifold `M`
+(`SC-R1`), extending `AdmitsRegularDiskFibration M` with the global singularity classification
+requiring every critical point of `fibration.toFun` to be locally modeled on an indefinite
+quadratic fold (`IsIndefiniteFoldAt`), a wrinkled cusp (`IsWrinkledCuspAt`), or an isolated real
+Lefschetz point (`IsRealLefschetzAt`).
+
+On `Sphere4`, this stronger class is inhabited unconditionally by `s4ADKAdmits`
+(`ADKS4Fibration.lean`, kept as a `def` rather than a global `instance` to avoid a typeclass
+diamond on `AdmitsRegularDiskFibration Sphere4` with `instAdmitsRegularDiskFibrationSphere4`). -/
+class AdmitsWrinkledOrBrokenLefschetzFibration (M : Type*)
+    [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M] [IsManifold (𝓡 4) ∞ M]
+    [MeasurableSpace M] [BorelSpace M]
+    extends AdmitsRegularDiskFibration M where
+  /-- Every critical point of `fibration.toFun` is an indefinite quadratic fold, a wrinkled cusp,
+  or an isolated real Lefschetz point (`GK07`, `Lek09`, `ADK05`). -/
+  singularities_wrinkled_or_lefschetz :
+    letI := instTopologicalSpaceFiber
+    letI := instChartedSpaceFiber
+    letI := instIsManifoldFiber
+    letI := instT2SpaceFiber
+    letI := instCompactSpaceFiber
+    letI := instNonemptyFiber
+    ∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) fibration.toFun,
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) fibration.toFun p ∨
+        IsWrinkledCuspAt (𝓡 4) (𝓡 2) fibration.toFun p ∨
+        IsRealLefschetzAt (𝓡 4) (𝓡 2) fibration.toFun p
+
 /-- Construct `AdmitsWrinkledOrBrokenLefschetzFibration M` from a positively co-oriented
-`BrokenLefschetzFibration` (`Achilles–Duistermaat–Kolk` / `Auroux–Donaldson–Katzarkov` /
-`Baykur` / `Gay–Kirby`). -/
+`BrokenLefschetzFibration` (`Auroux–Donaldson–Katzarkov` / `Baykur` / `Gay–Kirby`). -/
 @[instance_reducible]
 noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofBrokenLefschetz
     {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
@@ -250,7 +300,7 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofBrokenLefschetz
     [MeasurableSpace F] [BorelSpace F]
     (B_fib : BrokenLefschetzFibration (𝓡 4) M (𝓡 2) Sphere2 F)
     (V_F : PositiveVolumeForm (𝓡 2) F)
-    (hpos : ∀ u : B_fib.toWrinkledFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
+    (hpos : ∀ u : B_fib.toRegularDiskFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
       (TauCeti.SmoothForm.mpullback B_fib.trivialization B_fib.trivialization.contMDiff
           (TauCeti.SmoothForm.wedge
             (TauCeti.SmoothForm.mpullback Prod.snd contMDiff_snd V_F.Ω)
@@ -268,28 +318,34 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofBrokenLefschetz
   instNonemptyFiber := inferInstance
   instMeasurableSpaceFiber := inferInstance
   instBorelSpaceFiber := inferInstance
-  fibration := B_fib.toWrinkledFibration
+  fibration := B_fib.toRegularDiskFibration
   fiberVolume := V_F
   trivialization_pos_cooriented := hpos
+  singularities_wrinkled_or_lefschetz p hp :=
+    (B_fib.singularities_broken_lefschetz p hp).elim (fun h ↦ Or.inr (Or.inr h)) Or.inl
 
-/-- **Unconditional Instance for $S^4$**: `Sphere4` admits an explicit positively co-oriented
-wrinkled/singular fibration onto `Sphere2` with regular fiber `Sphere2`, constructed in
-`S4Fibration.lean` (Milestone M2.2). -/
-noncomputable instance instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4 :
-    AdmitsWrinkledOrBrokenLefschetzFibration Sphere4 where
-  ambientVolume := S4PositiveVolumeForm
-  Fiber := Sphere2
-  instTopologicalSpaceFiber := inferInstance
-  instChartedSpaceFiber := inferInstance
-  instIsManifoldFiber := inferInstance
-  instT2SpaceFiber := inferInstance
-  instCompactSpaceFiber := inferInstance
-  instNonemptyFiber := ⟨s2NorthPole⟩
-  instMeasurableSpaceFiber := inferInstance
-  instBorelSpaceFiber := inferInstance
-  fibration := s4WrinkledFibration
-  fiberVolume := S2PositiveVolumeForm
-  trivialization_pos_cooriented := s4Trivialization_pos_cooriented
+/-- For any `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`, the regular-point locus of
+`A.fibration.toFun` is dense in `M`. -/
+-- tier: T1
+theorem AdmitsWrinkledOrBrokenLefschetzFibration.dense_regularPoints
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    letI := A.instTopologicalSpaceFiber
+    letI := A.instChartedSpaceFiber
+    letI := A.instIsManifoldFiber
+    letI := A.instT2SpaceFiber
+    letI := A.instCompactSpaceFiber
+    letI := A.instNonemptyFiber
+    Dense {x : M | x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration.toFun} := by
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  exact dense_regularPoints_of_wrinkled_or_lefschetz A.fibration.contMDiff_toFun
+    A.singularities_wrinkled_or_lefschetz
 
 end FibrationClass
 
@@ -964,18 +1020,18 @@ end TuringIsotopy
 
 end SymplecticDiskChart
 
-/-! ## 5. Direct Fiber Accessors for `AdmitsWrinkledOrBrokenLefschetzFibration` -/
+/-! ## 5. Direct Fiber Accessors for `AdmitsRegularDiskFibration` -/
 
 section FiberAccessors
 
 set_option linter.concreteInstances false
 
 /-- Canonical Darboux symplectic disk chart on the regular surface fiber `A.Fiber` of any
-4-manifold `M` with `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`. -/
-noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart
+4-manifold `M` with `[A : AdmitsRegularDiskFibration M]`. -/
+noncomputable def AdmitsRegularDiskFibration.fiberDiskChart
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     letI := A.instTopologicalSpaceFiber
     letI := A.instChartedSpaceFiber
     letI := A.instIsManifoldFiber
@@ -991,12 +1047,12 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart
   exact A.fiberVolume.symplecticDiskChart
 
 /-- Open product embedding `A.fibration.baseRegion × diskOpen → M` over the regular base disk of any
-`[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`, directly usable by Milestone M4's leafwise bump
+`[A : AdmitsRegularDiskFibration M]`, directly usable by Milestone M4's leafwise bump
 isotopy lift and `IsTuringComplete.transfer`. -/
-noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed
+noncomputable def AdmitsRegularDiskFibration.baseDiskProductEmbed
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     letI := A.instTopologicalSpaceFiber
     letI := A.instChartedSpaceFiber
     letI := A.instIsManifoldFiber
@@ -1012,15 +1068,15 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed
   letI := A.instNonemptyFiber
   letI := A.instMeasurableSpaceFiber
   letI := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   exact fun by_pair ↦ A.fibration.embed (by_pair.1, C.embed by_pair.2)
 
 /-- `baseDiskProductEmbed M` is $C^\infty$ smooth, an open embedding, and maps `(b, y)` into the
 fiber of `A.fibration` over `b`. -/
-theorem AdmitsWrinkledOrBrokenLefschetzFibration.isOpenEmbedding_baseDiskProductEmbed
+theorem AdmitsRegularDiskFibration.isOpenEmbedding_baseDiskProductEmbed
     (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    [A : AdmitsRegularDiskFibration M] :
     letI := A.instTopologicalSpaceFiber
     letI := A.instChartedSpaceFiber
     letI := A.instIsManifoldFiber
@@ -1028,11 +1084,11 @@ theorem AdmitsWrinkledOrBrokenLefschetzFibration.isOpenEmbedding_baseDiskProduct
     letI := A.instCompactSpaceFiber
     letI := A.instNonemptyFiber
     ContMDiff ((𝓡 2).prod (𝓡 2)) (𝓡 4) ∞
-      (AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M) ∧
+      (AdmitsRegularDiskFibration.baseDiskProductEmbed M) ∧
     Topology.IsOpenEmbedding
-      (AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M) ∧
+      (AdmitsRegularDiskFibration.baseDiskProductEmbed M) ∧
     ∀ p : A.fibration.baseRegion × diskOpen,
-      A.fibration (AdmitsWrinkledOrBrokenLefschetzFibration.baseDiskProductEmbed M p) = p.1.1 := by
+      A.fibration (AdmitsRegularDiskFibration.baseDiskProductEmbed M p) = p.1.1 := by
   let _ := A.instTopologicalSpaceFiber
   let _ := A.instChartedSpaceFiber
   let _ := A.instIsManifoldFiber
@@ -1041,7 +1097,7 @@ theorem AdmitsWrinkledOrBrokenLefschetzFibration.isOpenEmbedding_baseDiskProduct
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  let C := AdmitsWrinkledOrBrokenLefschetzFibration.fiberDiskChart M
+  let C := AdmitsRegularDiskFibration.fiberDiskChart M
   refine ⟨?_, ?_, fun p ↦ A.fibration.apply_embed p.1 (C.embed p.2)⟩
   · exact A.fibration.contMDiff_embed.comp (contMDiff_fst.prodMk (C.contMDiff_embed.comp
       contMDiff_snd))

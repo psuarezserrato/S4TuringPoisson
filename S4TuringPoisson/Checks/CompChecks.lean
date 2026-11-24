@@ -12,6 +12,7 @@ module
 public import S4TuringPoisson.Dynamics.GeneralizedShift
 public import S4TuringPoisson.Dynamics.UndecidabilityAndTransfer
 public import S4TuringPoisson.Extension.PoissonHamiltonian
+public import S4TuringPoisson.Fibration.ADKS4Fibration
 public import S4TuringPoisson.Interfaces
 public import S4TuringPoisson.Main
 public import S4TuringPoisson.Smoothing.CMPP.Realize
@@ -613,7 +614,7 @@ theorem gate6_sphere4_witness :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  obtain ⟨V, π_f, d_bar, _, hunimod, _, _, _, _, hf_comp, hpoiss, _, hvol, hmp, htc, _⟩ :=
+  obtain ⟨V, π_f, d_bar, _, hunimod, _, _, _, _, _, hf_comp, hpoiss, _, hvol, hmp, htc, _⟩ :=
     Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4
   obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hiter_f, hne_id⟩ :=
     gate6_foliation_and_halting_separation s4Fibration (⇑d_bar) hf_comp htc
@@ -645,7 +646,7 @@ theorem gate6_sphere4_witness_of_cmpp [HasCMPPCantorCirculationHamiltonians] :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  obtain ⟨V, π_f, d_bar, _, hunimod, _, _, _, _, hf_comp, hpoiss, _, hvol, hmp, htc, _⟩ :=
+  obtain ⟨V, π_f, d_bar, _, hunimod, _, _, _, _, _, hf_comp, hpoiss, _, hvol, hmp, htc, _⟩ :=
     Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_of_cmpp
   obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hiter_f, hne_id⟩ :=
     gate6_foliation_and_halting_separation s4Fibration (⇑d_bar) hf_comp htc
@@ -656,8 +657,8 @@ theorem gate6_sphere4_witness_of_cmpp [HasCMPPCantorCirculationHamiltonians] :
 
 /-- Corollary 2 Gate 6 check: instantiates
 `Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold` (and `_of_cmpp`) on
-`Sphere4` via its unconditional `AdmitsWrinkledOrBrokenLefschetzFibration Sphere4` instance and
-verifies 2-state halting/looping orbit separation and leaf preservation. -/
+`Sphere4` via `s4ADKAdmits : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4` and verifies
+2-state halting/looping orbit separation and leaf preservation. -/
 theorem gate6_fourManifold_corollary2_on_S4 [HasCMPPCantorCirculationHamiltonians] :
     ∃ (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
       (p_h p_l : Sphere4)
@@ -666,21 +667,19 @@ theorem gate6_fourManifold_corollary2_on_S4 [HasCMPPCantorCirculationHamiltonian
       U_l.1.Nonempty ∧
       (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
       (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
-      ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∘ ⇑d_bar =
-        ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∧
+      s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  obtain ⟨_, _, d_bar, _, _, _, _, _, hf_comp, _, _, _, _, htc, _⟩ :=
-    Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_of_cmpp Sphere4
+  obtain ⟨_, _, d_bar, _, _, _, _, _, _, hf_comp, _, _, _, _, htc, _⟩ :=
+    Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_of_cmpp
+      (A := s4ADKAdmits) Sphere4
   obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, _, hne_id⟩ :=
-    gate6_foliation_and_halting_separation
-      (⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)))
-      (⇑d_bar) hf_comp htc
+    gate6_foliation_and_halting_separation s4ADKFibration (⇑d_bar) hf_comp htc
   exact ⟨d_bar, p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hne_id⟩
 
 /-- Unconditional Corollary 2 Gate 6 check on `Sphere4`: instantiates the unconditional
-`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold` on `Sphere4` (with
-**zero** external typeclass hypotheses) and verifies 2-state halting/looping orbit separation and
-fibration leaf preservation. -/
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold` on `Sphere4` via
+`s4ADKAdmits` (with **zero** external typeclass hypotheses) and verifies 2-state halting/looping
+orbit separation and fibration leaf preservation. -/
 -- tier: T2
 theorem gate6_fourManifold_corollary2_on_S4_unconditional :
     ∃ (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
@@ -690,15 +689,13 @@ theorem gate6_fourManifold_corollary2_on_S4_unconditional :
       U_l.1.Nonempty ∧
       (∃ n : ℕ, (⇑d_bar)^[n] p_h ∈ U_h) ∧
       (∀ n : ℕ, (⇑d_bar)^[n] p_l ∉ U_l) ∧
-      ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∘ ⇑d_bar =
-        ⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)) ∧
+      s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
       (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
-  obtain ⟨_, _, d_bar, _, _, _, _, _, hf_comp, _, _, _, _, htc, _⟩ :=
-    Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4
+  obtain ⟨_, _, d_bar, _, _, _, _, _, _, hf_comp, _, _, _, _, htc, _⟩ :=
+    Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
+      (A := s4ADKAdmits) Sphere4
   obtain ⟨p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, _, hne_id⟩ :=
-    gate6_foliation_and_halting_separation
-      (⇑(AdmitsWrinkledOrBrokenLefschetzFibration.fibration (M := Sphere4)))
-      (⇑d_bar) hf_comp htc
+    gate6_foliation_and_halting_separation s4ADKFibration (⇑d_bar) hf_comp htc
   exact ⟨d_bar, p_h, p_l, U_h, U_l, hUh, hUl, hreach, hloop, hf_eq, hne_id⟩
 
 /-- **Unconditional Deliverable R5 Gate 6 Check (`PoissonHamiltonian` on `Sphere4`)**:
