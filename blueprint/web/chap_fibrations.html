@@ -103,6 +103,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsRealLefschetzAt" class="lean_decl">S4TuringPoisson.IsRealLefschetzAt</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsWrinkledCuspAt" class="lean_decl">S4TuringPoisson.IsWrinkledCuspAt</a></li>
+          
         </ul>
     
       </div>
@@ -112,7 +114,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   Indefinite quadratic fold and real Lefschetz singularities, defined through local charts. </p>
+  <p>   Indefinite quadratic fold, real Lefschetz, and wrinkled cusp singularities, defined through local charts. </p>
 
   </div>
 </div>
@@ -122,7 +124,7 @@
     Definition
     </span>
     <span class="definition_thmlabel">4.2</span>
-    <span class="definition_thmtitle">Wrinkled and broken Lefschetz fibrations</span>
+    <span class="definition_thmtitle">Wrinkled, broken Lefschetz, and purely wrinkled fibrations</span>
     <div class="thm_header_extras">
 
     
@@ -169,6 +171,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.BrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.BrokenLefschetzFibration</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.PurelyWrinkledFibration" class="lean_decl">S4TuringPoisson.PurelyWrinkledFibration</a></li>
+          
         </ul>
     
       </div>
@@ -178,7 +182,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    A <span class="ttfamily">WrinkledFibration</span> is a smooth map \(f\colon M\to N\) with a disk-shaped open region of regular values over which \(f\) is smoothly trivial with compact surface fiber. It places no constraint on the critical points; <span class="ttfamily">BrokenLefschetzFibration</span> adds the requirement that every critical point is a Lefschetz point or an indefinite fold. </p>
+  <p>    A <span class="ttfamily">WrinkledFibration</span> is a smooth map \(f\colon M\to N\) with a disk-shaped open region of regular values over which \(f\) is smoothly trivial with compact surface fiber. It places no constraint on critical points; <span class="ttfamily">BrokenLefschetzFibration</span> requires every critical point to be a real Lefschetz point or an indefinite fold, while <span class="ttfamily">PurelyWrinkledFibration</span> requires every critical point to be an indefinite fold or a wrinkled cusp. </p>
 
   </div>
 </div>
@@ -315,7 +319,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>    \(f\) is smooth and \(\mathrm{Crit}(f)=\{ x_2=x_3=x_4=0\} \), a nonempty circle on which the fibers collapse to points (a definite fold, not the indefinite folds of Auroux–Donaldson–Katzarkov). </p>
+  <p>    \(f\) is smooth and \(\mathrm{Crit}(f)=\{ x_2=x_3=x_4=0\} \), a nonempty circle on which the fibers collapse to points (a definite fold, proved unable to lift to <span class="ttfamily">BrokenLefschetzFibration</span> or <span class="ttfamily">PurelyWrinkledFibration</span>). </p>
 
   </div>
 </div>
@@ -384,6 +388,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled</a></li>
+          
         </ul>
     
       </div>
@@ -393,7 +399,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    A class packaging an ambient volume form, a <span class="ttfamily">WrinkledFibration</span> \(M\to S^2\) with compact fiber \(F\), an area form on \(F\), and positive co-orientation of the trivialization. </p>
+  <p>    A class packaging an ambient volume form, a <span class="ttfamily">WrinkledFibration</span> \(M\to S^2\) with compact fiber \(F\), an area form on \(F\), and positive co-orientation of the trivialization, together with constructors from broken Lefschetz and purely wrinkled fibrations. </p>
 
   </div>
 </div>
@@ -541,19 +547,109 @@
 
   </div>
 </div>
-<div class="theorem_thmwrapper theorem-style-plain" id="ext_fibration_existence">
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_lekili_moves">
   <div class="theorem_thmheading">
     <span class="theorem_thmcaption">
     Theorem
     </span>
     <span class="theorem_thmlabel">4.8</span>
-    <span class="theorem_thmtitle">Existence of the fibration structure (external input)</span>
+    <span class="theorem_thmtitle">Lekili planar moves and broken-to-wrinkled smoothing (Track&#160;A)</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap_fibrations.html#ext_fibration_existence">#</a>
+    <a class="icon proof" href="chap_fibrations.html#thm_lekili_moves">#</a>
+    
+    <a class="icon proof" href="chap_fibrations.html#a0000000009"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_fibrations.html#def_wrinkled">Definition 4.2</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.lekiliMove1" class="lean_decl">S4TuringPoisson.lekiliMove1</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.singularities_lekiliMove1" class="lean_decl">S4TuringPoisson.singularities_lekiliMove1</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.gate52_lekiliMove1_three_cusps" class="lean_decl">S4TuringPoisson.gate52_lekiliMove1_three_cusps</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.BrokenLefschetzFibration.exists_purelyWrinkledFibration" class="lean_decl">S4TuringPoisson.BrokenLefschetzFibration.exists_purelyWrinkledFibration</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    Explicit smooth homotopies realize Lekili’s Moves&#160;1–4: Move&#160;1 resolves a real Lefschetz singularity into a \(3\)-cusp deltoid circle of indefinite folds with cusps at \(\theta \in \{ 0,2\pi /3,4\pi /3\} \). Shrinking the regular base disk and gluing compactly supported Move&#160;1 bumps deforms every <span class="ttfamily">BrokenLefschetzFibration</span> on a compact Hausdorff \(4\)-manifold to a <span class="ttfamily">PurelyWrinkledFibration</span>. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000009">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Classify cusps by Weierstrass preparation (\(d=3\)) and indefinite folds by implicit chart inversion (\(d=2\)), prove finite isolation of real Lefschetz critical points by compactness, shrink <span class="ttfamily">baseRegion</span> to half radius, and eliminate Lefschetz points inductively while fixing the regular product region. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_adk_s4">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">4.9</span>
+    <span class="theorem_thmtitle">Global Auroux–Donaldson–Katzarkov fibration on \(S^4\) (Track&#160;A)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_fibrations.html#thm_adk_s4">#</a>
+    
+    <a class="icon proof" href="chap_fibrations.html#a0000000010"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -570,6 +666,8 @@
           
           <li><a href="chap_fibrations.html#def_admits">Definition 4.5</a></li>
           
+          <li><a href="chap_fibrations.html#def_s4_fibration">Definition 4.3</a></li>
+          
         </ul>
     
       </div>
@@ -577,10 +675,130 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKFibration" class="lean_decl">S4TuringPoisson.s4ADKFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4BrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.s4BrokenLefschetzFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4PurelyWrinkledFibration" class="lean_decl">S4TuringPoisson.s4PurelyWrinkledFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKAdmits" class="lean_decl">S4TuringPoisson.s4ADKAdmits</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   Every closed oriented smooth \(4\)-manifold admits an <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> structure. The paper cites Gay–Kirby and Lekili. Because <span class="ttfamily">WrinkledFibration</span> does not constrain singularities, an elementary local construction (an embedded \(D^2\times S^2\) in a coordinate ball) may suffice. <b class="bfseries">Not formalized.</b> </p>
+  <p>    There is an explicit global <span class="ttfamily">BrokenLefschetzFibration</span> and <span class="ttfamily">PurelyWrinkledFibration</span> \(f_{\mathrm{ADK}}\colon S^4\to S^2\) realizing the round-handle decomposition of Auroux–Donaldson–Katzarkov, with regular \(S^2\) and \(T^2\) fibers separated by a single equatorial circle \(\{ x_2=x_3=x_4=0\} \) of indefinite quadratic folds, positively co-oriented with the round volume forms on \(S^4\) and \(S^2\). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000010">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Project \(S^4\subset \mathbb {R}^5\) via the \(\mathrm{SO}(3)\)-equivariant homogeneous map \((x_0x_2+x_1x_3,\,  x_0x_3-x_1x_2,\,  \tfrac {1}{4}-(x_0^2+x_1^2))\) normalized to \(S^2\), certify critical points and indefinite-fold normal forms, and trivialize over an open regular disk around the north pole. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="ext_fibration_existence">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">4.10</span>
+    <span class="theorem_thmtitle">Existence of the fibration structure on closed \(4\)-manifolds (Track&#160;B)</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_fibrations.html#ext_fibration_existence">#</a>
+    
+    <a class="icon proof" href="chap_fibrations.html#a0000000011"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_fibrations.html#def_admits">Definition 4.5</a></li>
+          
+          <li><a href="chap_fibrations.html#def_s4_fibration">Definition 4.3</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.closedManifoldWrinkledFibration" class="lean_decl">S4TuringPoisson.closedManifoldWrinkledFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    Every nonempty compact Hausdorff smooth \(4\)-manifold \(M\) equipped with a positive volume \(4\)-form \(V_M\) admits a positively co-oriented <span class="ttfamily">WrinkledFibration</span> \(M\to S^2\) with fiber \(S^2\) (an instance of <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> constructed locally inside an orientation-preserving coordinate ball without global definite-fold elimination). </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000011">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Compose an orientation-preserving coordinate-ball chart \(B^4(0,2)\hookrightarrow M\) with a radial cut-off blend of <span class="ttfamily">s4Fibration</span> that collapses the exterior to the south pole outside <span class="ttfamily">s4BaseRegion</span>, and pull back \(S^2\times \mathbb {R}^2\) product co-orientation. </p>
 
   </div>
 </div>

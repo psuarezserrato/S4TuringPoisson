@@ -16,6 +16,10 @@ public import S4TuringPoisson.Poisson.SingularCircleNormalForm
 public import S4TuringPoisson.Fibration.LocalSingularModels
 public import S4TuringPoisson.Fibration.S4Fibration
 public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
+public import S4TuringPoisson.Fibration.PurelyWrinkled
+public import S4TuringPoisson.Fibration.LekiliMoves
+public import S4TuringPoisson.Fibration.ClosedManifoldLocal
+public import S4TuringPoisson.Fibration.ADKS4Fibration
 public import S4TuringPoisson.Smoothing.DiskSmoothing
 public import S4TuringPoisson.Main
 public import TauCeti.Geometry.Symplectic.Manifold.Sphere
@@ -83,6 +87,18 @@ This file implements the Milestone M0–M5 geometric verification gates from Sec
   - `m5_headline_theorems_S4_and_fourManifold_check` &
     `m5_cmpp_headline_theorems_S4_and_fourManifold_check`: verifies Theorem 1 and Corollary 2
     instantiated on `Sphere4` (including Gate 5 non-degeneracy on the existential volume `V`).
+- **Gates G5.1–G5.3 & Unconditional Corollary 2 Checks (`Lekili`, `ADK`, `ClosedManifoldLocal`)**:
+  - `gate51_definite_fold_exclusion_witness`: verifies `s4Fibration` has a definite fold
+    at `s4CriticalPoint` that cannot lift to `BrokenLefschetzFibration` or
+    `PurelyWrinkledFibration`.
+  - `gate52_lekili_astroid_and_surgery_witness`: verifies Lekili Move 1's 3-cusp deltoid and
+    indefinite fold together with `s4BrokenLefschetzFibration.exists_purelyWrinkledFibration`.
+  - `gate53_adk_s4_topology_and_turing_witness`: verifies `S²` and `T²` regular fibers,
+    indefinite-fold critical circle, and Turing completeness / Hamiltonian flow realization for
+    the global ADK fibration on `Sphere4`.
+  - `unconditional_corollary2_closedFourManifold_on_S4_check`: instantiates unconditional
+    Corollary 2 (`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold`
+    and `undecidable_orbit_reachability_closedFourManifold`) on `Sphere4`.
 -/
 
 @[expose] public section
@@ -1242,5 +1258,159 @@ theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
     exact ⟨V', π_f', d_bar', hunim', hfib', hpoiss', hmp', htc'⟩
 
 end M5HeadlineChecks
+
+/-! ## 9. Gates G5.1–G5.3: Definite-Fold Exclusion, Lekili Surgery, ADK & Unconditional Cor. 2 -/
+
+section LekiliAndADKChecks
+
+set_option linter.concreteInstances false
+
+/-- **Gate G5.1 Definite-Fold Exclusion Witness**:
+`s4Fibration` at `s4CriticalPoint` satisfies neither `IsIndefiniteFoldAt`, `IsWrinkledCuspAt`,
+nor `IsRealLefschetzAt`, so `s4Fibration` admits neither a `BrokenLefschetzFibration` nor a
+`PurelyWrinkledFibration` lift. -/
+theorem gate51_definite_fold_exclusion_witness :
+    s4CriticalPoint ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration ∧
+      ¬ IsIndefiniteFoldAt (𝓡 4) (𝓡 2) s4Fibration s4CriticalPoint ∧
+      ¬ IsWrinkledCuspAt (𝓡 4) (𝓡 2) s4Fibration s4CriticalPoint ∧
+      ¬ IsRealLefschetzAt (𝓡 4) (𝓡 2) s4Fibration s4CriticalPoint ∧
+      (∀ B : BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2,
+        B.toFun ≠ s4Fibration) ∧
+      ∀ P : PurelyWrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2,
+        P.toFun ≠ s4Fibration :=
+  ⟨s4CriticalPoint_mem_criticalPoints,
+    not_isIndefiniteFoldAt_s4Fibration s4CriticalPoint_mem_criticalPoints,
+    not_isWrinkledCuspAt_s4Fibration s4CriticalPoint_mem_criticalPoints,
+    not_isRealLefschetzAt_s4Fibration s4CriticalPoint_mem_criticalPoints,
+    not_brokenLefschetzFibration_s4Fibration,
+    not_purelyWrinkledFibration_s4Fibration⟩
+
+/-- **Gate G5.2 Lekili Move 1 Deltoid Cusp & Broken-to-Purely-Wrinkled Surgery Witness**:
+Verifies `lekiliMove1 1` produces three pairwise distinct cusps (`deriv = 0` at `0, 2π/3, 4π/3`),
+an indefinite fold at `θ = π` (`deriv ≠ 0`), full cusp/fold classification on `Crit(lekiliMove1 1)`,
+and `s4BrokenLefschetzFibration.exists_purelyWrinkledFibration` over `Sphere4`. -/
+theorem gate52_lekili_astroid_and_surgery_witness :
+    (deriv (lekiliMove1CritValue 1) 0 = 0 ∧
+        deriv (lekiliMove1CritValue 1) (2 * Real.pi / 3) = 0 ∧
+        deriv (lekiliMove1CritValue 1) (4 * Real.pi / 3) = 0 ∧
+        deriv (lekiliMove1CritValue 1) Real.pi ≠ 0 ∧
+        lekiliMove1CritValue 1 0 ≠ lekiliMove1CritValue 1 (2 * Real.pi / 3) ∧
+        lekiliMove1CritValue 1 0 ≠ lekiliMove1CritValue 1 (4 * Real.pi / 3) ∧
+        lekiliMove1CritValue 1 (2 * Real.pi / 3) ≠ lekiliMove1CritValue 1 (4 * Real.pi / 3)) ∧
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove1 1) (lekiliMove1CritCurve 1 Real.pi) ∧
+      (∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove1 1),
+        IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove1 1) p ∨
+          IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove1 1) p) ∧
+      ∃ P : PurelyWrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2,
+        0 < P.baseDiskRadius ∧
+        P.baseRegion.1.Nonempty ∧
+        P.baseRegion.1 ⊆ s4ADKBaseRegion.1 ∧
+        ∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = s4ADKFibration x := by
+  obtain ⟨h0, h23, h43, _, hpi_ne, hd1, hd2, hd3⟩ := gate52_lekiliMove1_three_cusps 1 one_ne_zero
+  obtain ⟨P, _, hsub, hval⟩ := s4BrokenLefschetzFibration.exists_purelyWrinkledFibration
+  exact ⟨⟨h0, h23, h43, hpi_ne, hd1, hd2, hd3⟩,
+    isIndefiniteFoldAt_lekiliMove1_pi one_ne_zero,
+    singularities_lekiliMove1 one_ne_zero,
+    ⟨P, P.baseDiskRadius_pos, P.baseRegion_nonempty, hsub, hval⟩⟩
+
+/-- **Gate G5.3 Global ADK Broken Lefschetz Fibration Topology & Turing Completeness on $S^4$**:
+Verifies that `s4ADKFibration` has both `S²` (`s2NorthPole`) and `T²` (`s2SouthPole`) regular
+fibers, an indefinite-fold critical point at `s4ADKCritBase`, an unconditional Turing complete
+volume-preserving Poisson diffeomorphism (with Gate 5 bounds on `V`), and a finite
+Poisson–Hamiltonian flow realization. -/
+theorem gate53_adk_s4_topology_and_turing_witness :
+    Nonempty (Sphere2 ≃ₜ {x : Sphere4 // s4ADKFibration x = s2NorthPole}) ∧
+      Nonempty ((Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1) ≃ₜ
+        {x : Sphere4 // s4ADKFibration x = s2SouthPole}) ∧
+      s4ADKCritBase ∈ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration ∧
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) s4ADKFibration s4ADKCritBase ∧
+      (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+        (π_f : PoissonStructure (𝓡 4) Sphere4)
+        (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+        0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+        V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
+        π_f.IsUnimodularWithVolume V.Ω ∧
+        s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
+        SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+          d_bar d_bar.contMDiff ∧
+        TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+        MeasurePreserving ⇑d_bar V.μ V.μ ∧
+        IsTuringComplete ⇑d_bar ∧
+        (⇑d_bar : Sphere4 → Sphere4) ≠ id) ∧
+      ∃ (V' : PositiveVolumeForm (𝓡 4) Sphere4)
+        (π_f' : PoissonStructure (𝓡 4) Sphere4)
+        (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+        (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+        d_bar' = composePoissonHamiltonianTimeOneFlows (A := s4ADKAdmits) Sphere4 Hs ∧
+        s4ADKFibration ∘ ⇑d_bar' = s4ADKFibration ∧
+        π_f'.IsUnimodularWithVolume V'.Ω ∧
+        IsTuringComplete ⇑d_bar' := by
+  have hcrit : s4ADKCritBase ∈ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration := by
+    rw [criticalPoints_s4ADKFibration]
+    exact ⟨rfl, rfl, rfl⟩
+  refine ⟨⟨s4ADKNorthFiberHomeomorph⟩, ⟨s4ADKTorusFiberHomeomorph⟩, hcrit,
+    isIndefiniteFoldAt_s4ADKFibration hcrit, ?_, ?_⟩
+  · obtain ⟨V, π_f, d_bar, _, hunimV, _, _, _, _, hfib, hpoiss, _, hpull, hmp, htc, hne⟩ :=
+      exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK
+    obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
+    exact ⟨V, π_f, d_bar, hpos, hlt, hunimV, hfib, hpoiss, hpull, hmp, htc, hne⟩
+  · obtain ⟨V', π_f', Hs, d_bar', hunimV', hcomp, hfib, _, _, _, htc, _⟩ :=
+      exists_poisson_hamiltonian_realization_S4_ADK
+    exact ⟨V', π_f', Hs, d_bar', hcomp, hfib, hunimV', htc⟩
+
+/-- **Unconditional Closed 4-Manifold Corollary 2 Check (`L-R3`, Track B) on `Sphere4`**:
+Instantiates the zero-fibration-hypothesis closed-manifold theorems
+(`exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold`,
+`undecidable_orbit_reachability_closedFourManifold`, and
+`exists_poisson_hamiltonian_realization_closedFourManifold`) on `(Sphere4, S4PositiveVolumeForm)`,
+verifying Gate 5 ball-volume bounds on the existential co-oriented volume `V`. -/
+theorem unconditional_corollary2_closedFourManifold_on_S4_check :
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (f : Sphere4 → Sphere2)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
+      V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
+      (∀ x : Sphere4, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • S4PositiveVolumeForm.Ω.1 x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      f ∘ ⇑d_bar = f ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar ∧
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id) ∧
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
+      (U : Opens Sphere4)
+      (chart : UnitDisk2 → Sphere4)
+      (coord : Nat.Partrec.Code → UnitDisk2),
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      U.1.Nonempty ∧
+      REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
+        ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U)) ∧
+    ∃ (V' : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f' : PoissonStructure (𝓡 4) Sphere4)
+      (f' : Sphere4 → Sphere2)
+      (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+      (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      π_f'.IsUnimodularWithVolume V'.Ω ∧
+      d_bar' = composePoissonStructureTimeOneFlows Sphere4 π_f' Hs ∧
+      f' ∘ ⇑d_bar' = f' ∧
+      IsTuringComplete ⇑d_bar' := by
+  have : Nonempty Sphere4 := ⟨s4BasePoint⟩
+  refine ⟨?_, ?_, ?_⟩
+  · obtain ⟨V, π_f, f, _, d_bar, _, hposΩ, hunimV, _, _, _, hf_comp, _, _, _, hmp, htc, hne⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold
+        Sphere4 S4PositiveVolumeForm
+    obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
+    exact ⟨V, π_f, f, d_bar, hpos, hlt, hposΩ, hunimV, hf_comp, hmp, htc, hne⟩
+  · obtain ⟨V, _, d_bar, U, chart, coord, _, _, _, _, _, hmp, hU, _, _, _, _, _, hre,
+        hnotcomp, _⟩ :=
+      Main.undecidable_orbit_reachability_closedFourManifold Sphere4 S4PositiveVolumeForm
+    exact ⟨V, d_bar, U, chart, coord, hmp, hU, hre, hnotcomp⟩
+  · obtain ⟨V', π_f', f', Hs, d_bar', _, hunimV', hcomp, hf_comp, _, _, _, htc, _⟩ :=
+      exists_poisson_hamiltonian_realization_closedFourManifold Sphere4 S4PositiveVolumeForm
+    exact ⟨V', π_f', f', Hs, d_bar', hunimV', hcomp, hf_comp, htc⟩
+
+end LekiliAndADKChecks
 
 end S4TuringPoisson.Checks

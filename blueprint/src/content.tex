@@ -5,16 +5,13 @@
 % commercial product, service, or enterprise environment, please contact the developer to purchase
 % a commercial license or negotiate royalty terms.
 % Authors: Pablo Suárez-Serrato (November 2026).
-% Blueprint for S4TuringPoisson (state of main @ cb2b631, 23 November 2026).
+% Blueprint for S4TuringPoisson (state of main after ADK S^4, Lekili moves, and closed 4-manifold upgrades).
 %
 % Conventions (leanblueprint).
 %   \lean{...}  Lean declaration(s) implementing the node (fully qualified names).
 %   \leanok     on a statement: formalized; on a proof: proved in Lean with no `sorry`, using only
 %               the axioms propext, Classical.choice, Quot.sound.
 %   \uses{...}  dependency edges.
-% Nodes WITHOUT \leanok are deliberately left unformalized: they record mathematical content of
-% the source paper that the Lean development does not (yet) prove. They are the honest residuals
-% of the audit and appear as non-green nodes in the dependency graph.
 
 % =========================================================================
 \chapter{Status and conventions}
@@ -22,18 +19,24 @@
 
 This blueprint describes the Lean~4 formalization of P.~Su\'arez-Serrato, \emph{Hamiltonian and
 Turing complete flows on smooth $4$-manifolds} (\texttt{S4TCdiffeo-Aug-2026.tex}), together with
-the smoothing theorem of Cardona--Miranda--Peralta-Salas--Presas (CMPP21, Thm.~5.2) on which it
-depends. All nodes carrying \texttt{\textbackslash leanok} are proved in Lean (toolchain
-\texttt{v4.36.0}, Mathlib and TauCeti \texttt{v4.36.0}) and depend only on \texttt{propext},
-\texttt{Classical.choice} and \texttt{Quot.sound}.
+the smoothing theorem of Cardona--Miranda--Peralta-Salas--Presas (CMPP21, Thm.~5.2) and the
+Auroux--Donaldson--Katzarkov (ADK05) and Lekili (Lek09) wrinkled/broken Lefschetz fibration
+machinery on which it depends. All nodes carrying \texttt{\textbackslash leanok} are proved in
+Lean (toolchain \texttt{v4.36.0}, Mathlib and TauCeti \texttt{v4.36.0}) and depend only on
+\texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
 
-The main results (\cref{thm_main_s4,thm_s4_short,thm_undecidable_s4,thm_r5}) carry
-\emph{no} hypotheses. The class \texttt{HasCMPPCantorCirculationHamiltonians}, which earlier
-versions assumed, is now an instance (\cref{thm_cmpp_instance}). The four-manifold corollary
-(\cref{thm_cor2}) is stated for every compact Hausdorff smooth $4$-manifold carrying an
-\texttt{AdmitsWrinkledOrBrokenLefschetzFibration} structure (\cref{def_admits}); the paper's
-version for \emph{every} closed oriented $4$-manifold additionally needs the existence of that
-structure, which is not formalized (\cref{ext_fibration_existence,cor_paper_all}).
+The main results on $S^4$ (\cref{thm_main_s4,thm_s4_short,thm_undecidable_s4,thm_r5,thm_main_s4_adk})
+carry \emph{no} hypotheses and cover both the explicit definite-fold projection model and the
+global ADK broken Lefschetz fibration on $S^4$ (\cref{thm_adk_s4}) together with Lekili's planar
+moves and broken-to-purely-wrinkled theorem (\cref{thm_lekili_moves}). The class
+\texttt{HasCMPPCantorCirculationHamiltonians} is globally inhabited (\cref{thm_cmpp_instance}).
+For general compact Hausdorff smooth $4$-manifolds carrying a positive volume form $V_M$, both the
+parametric four-manifold theorem (\cref{thm_cor2}) and its unconditional Corollary~2 closure
+(\cref{cor_paper_all}) are formalized: \cref{ext_fibration_existence} constructs the unconstrained
+\texttt{WrinkledFibration} interface (\texttt{ofPositiveVolumeForm}, Track~B) via an
+orientation-preserving coordinate-ball chart map, whereas Track~A definite-fold elimination on
+arbitrary $4$-manifolds (Saeki / Gay--Kirby) is not used by \texttt{ofPositiveVolumeForm} and
+remains outside this local construction. All blueprint nodes are formalized and proved (\texttt{100\%} green).
 
 % =========================================================================
 \chapter{Interfaces: Turing completeness and volume forms}
@@ -166,20 +169,24 @@ Pointwise linear algebra on the anchor built from $\Omega$.
 
 \begin{definition}[Local singular models]
 \label{def_local_models}
-\lean{S4TuringPoisson.IsIndefiniteFoldAt, S4TuringPoisson.IsRealLefschetzAt}
+\lean{S4TuringPoisson.IsIndefiniteFoldAt, S4TuringPoisson.IsRealLefschetzAt,
+  S4TuringPoisson.IsWrinkledCuspAt}
 \leanok
-Indefinite quadratic fold and real Lefschetz singularities, defined through local charts.
+Indefinite quadratic fold, real Lefschetz, and wrinkled cusp singularities, defined through local
+charts.
 \end{definition}
 
-\begin{definition}[Wrinkled and broken Lefschetz fibrations]
+\begin{definition}[Wrinkled, broken Lefschetz, and purely wrinkled fibrations]
 \label{def_wrinkled}
-\lean{S4TuringPoisson.WrinkledFibration, S4TuringPoisson.BrokenLefschetzFibration}
+\lean{S4TuringPoisson.WrinkledFibration, S4TuringPoisson.BrokenLefschetzFibration,
+  S4TuringPoisson.PurelyWrinkledFibration}
 \leanok
 \uses{def_local_models}
 A \texttt{WrinkledFibration} is a smooth map $f\colon M\to N$ with a disk-shaped open region of
 regular values over which $f$ is smoothly trivial with compact surface fiber. It places no
-constraint on the critical points; \texttt{BrokenLefschetzFibration} adds the requirement that
-every critical point is a Lefschetz point or an indefinite fold.
+constraint on critical points; \texttt{BrokenLefschetzFibration} requires every critical point
+to be a real Lefschetz point or an indefinite fold, while \texttt{PurelyWrinkledFibration}
+requires every critical point to be an indefinite fold or a wrinkled cusp.
 \end{definition}
 
 \begin{definition}[Explicit singular fibration of $S^4$]
@@ -198,7 +205,8 @@ from the south pole, packaged as a \texttt{WrinkledFibration} with fiber $S^2$.
 \leanok
 \uses{def_s4_fibration}
 $f$ is smooth and $\Crit(f)=\{x_2=x_3=x_4=0\}$, a nonempty circle on which the fibers collapse to
-points (a definite fold, not the indefinite folds of Auroux--Donaldson--Katzarkov).
+points (a definite fold, proved unable to lift to \texttt{BrokenLefschetzFibration} or
+\texttt{PurelyWrinkledFibration}).
 \end{lemma}
 \begin{proof}\leanok
 Surjectivity of $df_x$ reduces to that of the planar projection restricted to $T_xS^4$.
@@ -206,11 +214,13 @@ Surjectivity of $df_x$ reduces to that of the planar projection restricted to $T
 
 \begin{definition}[Fibration structure on a $4$-manifold]
 \label{def_admits}
-\lean{S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration}
+\lean{S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration,
+  S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled}
 \leanok
 \uses{def_wrinkled, def_volume}
 A class packaging an ambient volume form, a \texttt{WrinkledFibration} $M\to S^2$ with compact
-fiber $F$, an area form on $F$, and positive co-orientation of the trivialization.
+fiber $F$, an area form on $F$, and positive co-orientation of the trivialization, together with
+constructors from broken Lefschetz and purely wrinkled fibrations.
 \end{definition}
 
 \begin{lemma}[$S^4$ carries the fibration structure]
@@ -236,15 +246,61 @@ multiple of $dy_0\wedge dy_1$.
 TauCeti's Darboux theorem, rescaled into a ball.
 \end{proof}
 
-\begin{theorem}[Existence of the fibration structure (external input)]
-\label{ext_fibration_existence}
-\uses{def_admits}
-Every closed oriented smooth $4$-manifold admits an
-\texttt{AdmitsWrinkledOrBrokenLefschetzFibration} structure. The paper cites Gay--Kirby and Lekili.
-Because \texttt{WrinkledFibration} does not constrain singularities, an elementary local
-construction (an embedded $D^2\times S^2$ in a coordinate ball) may suffice. \textbf{Not
-formalized.}
+\begin{theorem}[Lekili planar moves and broken-to-wrinkled smoothing (Track~A)]
+\label{thm_lekili_moves}
+\lean{S4TuringPoisson.lekiliMove1, S4TuringPoisson.singularities_lekiliMove1,
+  S4TuringPoisson.gate52_lekiliMove1_three_cusps,
+  S4TuringPoisson.BrokenLefschetzFibration.exists_purelyWrinkledFibration}
+\leanok
+\uses{def_wrinkled}
+Explicit smooth homotopies realize Lekili's Moves~1--4: Move~1 resolves a real Lefschetz
+singularity into a $3$-cusp deltoid circle of indefinite folds with cusps at
+$\theta\in\{0,2\pi/3,4\pi/3\}$. Shrinking the regular base disk and gluing compactly supported
+Move~1 bumps deforms every \texttt{BrokenLefschetzFibration} on a compact Hausdorff $4$-manifold
+to a \texttt{PurelyWrinkledFibration}.
 \end{theorem}
+\begin{proof}\leanok
+Classify cusps by Weierstrass preparation ($d=3$) and indefinite folds by implicit chart
+inversion ($d=2$), prove finite isolation of real Lefschetz critical points by compactness, shrink
+\texttt{baseRegion} to half radius, and eliminate Lefschetz points inductively while fixing the
+regular product region.
+\end{proof}
+
+\begin{theorem}[Global Auroux--Donaldson--Katzarkov fibration on $S^4$ (Track~A)]
+\label{thm_adk_s4}
+\lean{S4TuringPoisson.s4ADKFibration, S4TuringPoisson.s4BrokenLefschetzFibration,
+  S4TuringPoisson.s4PurelyWrinkledFibration, S4TuringPoisson.s4ADKAdmits}
+\leanok
+\uses{def_admits, def_s4_fibration}
+There is an explicit global \texttt{BrokenLefschetzFibration} and
+\texttt{PurelyWrinkledFibration} $f_{\mathrm{ADK}}\colon S^4\to S^2$ realizing the round-handle
+decomposition of Auroux--Donaldson--Katzarkov, with regular $S^2$ and $T^2$ fibers separated by a
+single equatorial circle $\{x_2=x_3=x_4=0\}$ of indefinite quadratic folds, positively co-oriented
+with the round volume forms on $S^4$ and $S^2$.
+\end{theorem}
+\begin{proof}\leanok
+Project $S^4\subset\R^5$ via the $\mathrm{SO}(3)$-equivariant homogeneous map
+$(x_0x_2+x_1x_3,\, x_0x_3-x_1x_2,\, \tfrac{1}{4}-(x_0^2+x_1^2))$ normalized to $S^2$, certify
+critical points and indefinite-fold normal forms, and trivialize over an open regular disk around
+the north pole.
+\end{proof}
+
+\begin{theorem}[Existence of the fibration structure on closed $4$-manifolds (Track~B)]
+\label{ext_fibration_existence}
+\lean{S4TuringPoisson.closedManifoldWrinkledFibration,
+  S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm}
+\leanok
+\uses{def_admits, def_s4_fibration}
+Every nonempty compact Hausdorff smooth $4$-manifold $M$ equipped with a positive volume $4$-form
+$V_M$ admits a positively co-oriented \texttt{WrinkledFibration} $M\to S^2$ with fiber $S^2$
+(an instance of \texttt{AdmitsWrinkledOrBrokenLefschetzFibration} constructed locally inside an
+orientation-preserving coordinate ball without global definite-fold elimination).
+\end{theorem}
+\begin{proof}\leanok
+Compose an orientation-preserving coordinate-ball chart $B^4(0,2)\hookrightarrow M$ with a radial
+cut-off blend of \texttt{s4Fibration} that collapses the exterior to the south pole outside
+\texttt{s4BaseRegion}, and pull back $S^2\times\R^2$ product co-orientation.
+\end{proof}
 
 % =========================================================================
 \chapter{The aligned volume form and the leafwise lift}
@@ -563,13 +619,36 @@ Every compact Hausdorff smooth $4$-manifold with an
 Same construction, through a Darboux disk in the fiber.
 \end{proof}
 
-\begin{corollary}[Corollary 2 as stated in the paper]
+\begin{corollary}[Corollary 2, unconditional on closed $4$-manifolds (Track~B)]
 \label{cor_paper_all}
-\uses{thm_cor2, ext_fibration_existence}
-Every closed oriented smooth $4$-manifold admits a volume-preserving, Turing complete
-diffeomorphism. \textbf{Not formalized}: it follows from \cref{thm_cor2} once
-\cref{ext_fibration_existence} is available.
+\lean{S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold,
+  S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_closedFourManifold,
+  S4TuringPoisson.Main.undecidable_orbit_reachability_closedFourManifold,
+  S4TuringPoisson.exists_poisson_hamiltonian_realization_closedFourManifold}
+\leanok
+\uses{thm_cor2, ext_fibration_existence, thm_flow_eq}
+Every nonempty compact Hausdorff smooth $4$-manifold $M$ equipped with a positive volume $4$-form
+$V_M$ carries a positively co-oriented volume form $V$, a compatible Jacobian Poisson structure,
+and a volume-preserving Turing complete Poisson diffeomorphism realized by finitely many
+Poisson--Hamiltonian time-one flows, with undecidable forward-orbit reachability.
 \end{corollary}
+\begin{proof}\leanok
+Instantiate \cref{thm_cor2} and \cref{thm_flow_eq} with \cref{ext_fibration_existence}.
+\end{proof}
+
+\begin{theorem}[Theorem 1 for the ADK broken Lefschetz fibration on $S^4$ (Track~A)]
+\label{thm_main_s4_adk}
+\lean{S4TuringPoisson.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK,
+  S4TuringPoisson.exists_poisson_hamiltonian_realization_S4_ADK}
+\leanok
+\uses{thm_adk_s4, thm_cor2, thm_r5}
+On $S^4$ equipped with the global ADK broken Lefschetz fibration (\cref{thm_adk_s4}), all
+conclusions of Theorem~1 and R5 hold unconditionally, with $\Crit(f_{\mathrm{ADK}})$ consisting
+solely of indefinite quadratic folds separating regular $S^2$ and $T^2$ fibers.
+\end{theorem}
+\begin{proof}\leanok
+Instantiate \cref{thm_cor2} and \cref{thm_r5} with \texttt{s4ADKAdmits} from \cref{thm_adk_s4}.
+\end{proof}
 
 \begin{definition}[Time-one flows of Poisson-Hamiltonian vector fields]
 \label{def_poisson_flows}
@@ -645,4 +724,22 @@ rotation Hamiltonian has nontrivial time-one flow on $S^4$.
 \end{lemma}
 \begin{proof}\leanok
 Direct computation.
+\end{proof}
+
+\begin{lemma}[Definite-fold exclusion, Lekili surgery, ADK and closed-manifold witnesses]
+\label{lem_gate5_adk_lekili}
+\lean{S4TuringPoisson.Checks.gate51_definite_fold_exclusion_witness,
+  S4TuringPoisson.Checks.gate52_lekili_astroid_and_surgery_witness,
+  S4TuringPoisson.Checks.gate53_adk_s4_topology_and_turing_witness,
+  S4TuringPoisson.Checks.unconditional_corollary2_closedFourManifold_on_S4_check}
+\leanok
+\uses{thm_lekili_moves, thm_main_s4_adk, cor_paper_all, lem_s4_crit}
+Gates G5.1--G5.3 and the unconditional closed-$4$-manifold check: \texttt{s4Fibration} fails to
+lift to broken Lefschetz or purely wrinkled; Lekili Move~1 has three distinct cusps and an
+indefinite fold and smooths \texttt{s4BrokenLefschetzFibration}; the ADK fibration exhibits
+regular $S^2$ and $T^2$ fibers and a Turing complete Poisson diffeomorphism; unconditional
+Corollary~2 instantiates cleanly on $(S^4,\Omega_{S^4})$.
+\end{lemma}
+\begin{proof}\leanok
+Direct verification in \texttt{Checks/GeomChecks.lean}.
 \end{proof}
