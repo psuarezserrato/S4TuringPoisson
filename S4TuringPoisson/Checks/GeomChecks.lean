@@ -21,6 +21,8 @@ public import S4TuringPoisson.Fibration.LekiliMoves
 public import S4TuringPoisson.Fibration.ClosedManifoldLocal
 public import S4TuringPoisson.Fibration.ADKS4Fibration
 public import S4TuringPoisson.Smoothing.DiskSmoothing
+public import S4TuringPoisson.Extension.MoserVolume
+public import S4TuringPoisson.Extension.PoissonHamiltonian
 public import S4TuringPoisson.Main
 public import TauCeti.Geometry.Symplectic.Manifold.Sphere
 
@@ -1225,12 +1227,12 @@ theorem m5_headline_theorems_S4_and_fourManifold_check
       (⇑d_bar' : Sphere4 → Sphere4) ≠ id) := by
   constructor
   · obtain ⟨V, π_f, d_bar, -, hunim, -, hgen, hreg, hne, hcrit, hfib, hpoiss, -, hpull, hmp, htc,
-      hne_id⟩ := Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4
+      hne_id, -⟩ := Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4
     obtain ⟨hpos, hlt, hfin⟩ := positiveVolumeForm_s4_gate5 V
     exact ⟨V, π_f, d_bar, hpos, hlt, hfin, hunim, hgen, hreg, hne, hcrit, hfib, hpoiss, hpull,
       hmp, htc, hne_id⟩
   · obtain ⟨V', π_f', d_bar', -, hunim', -, hgen', -, -, hfib', hpoiss', -, -, hmp', htc',
-        hne_id'⟩ :=
+        hne_id', -⟩ :=
       Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
         (A := s4ADKAdmits) Sphere4
     obtain ⟨hpos', hlt', -⟩ := positiveVolumeForm_s4_gate5 V'
@@ -1260,7 +1262,7 @@ theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
       MeasurePreserving ⇑d_bar' V'.μ V'.μ ∧
       IsTuringComplete ⇑d_bar' := by
   constructor
-  · obtain ⟨V, d_bar, hfib, hpull, hmp, htc⟩ :=
+  · obtain ⟨V, d_bar, hfib, hpull, hmp, htc, -⟩ :=
       Main.exists_turingComplete_volumePreserving_diffeomorph_S4_of_cmpp
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
     exact ⟨V, d_bar, hpos, hlt, hfib, hpull, hmp, htc⟩
@@ -1372,7 +1374,7 @@ theorem gate53_adk_s4_topology_and_turing_witness :
   refine ⟨⟨s4ADKNorthFiberDiffeomorph⟩, ⟨s4ADKTorusFiberDiffeomorph⟩,
     s2SouthPole_mem_s4ADKTorusBaseRegion, hcrit,
     isIndefiniteFoldAt_s4ADKFibration hcrit, ?_, ?_⟩
-  · obtain ⟨V, π_f, d_bar, _, hunimV, _, hgen, _, _, _, hfib, hpoiss, _, hpull, hmp, htc, hne⟩ :=
+  · obtain ⟨V, π_f, d_bar, _, hunimV, _, hgen, _, _, _, hfib, hpoiss, _, hpull, hmp, htc, hne, _⟩ :=
       exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
     exact ⟨V, π_f, d_bar, hpos, hlt, hunimV, hgen, hfib, hpoiss, hpull, hmp, htc, hne⟩
@@ -1453,7 +1455,7 @@ theorem unconditional_corollary2_closedFourManifold_on_S4_check :
       IsTuringComplete ⇑d_bar' := by
   have : Nonempty Sphere4 := ⟨s4BasePoint⟩
   refine ⟨?_, ?_, ?_⟩
-  · obtain ⟨V, π_f, f, _, d_bar, _, hposΩ, hunimV, _, _, _, hf_comp, _, _, _, hmp, htc, hne⟩ :=
+  · obtain ⟨V, π_f, f, _, d_bar, _, hposΩ, hunimV, _, _, _, hf_comp, _, _, _, hmp, htc, hne, _⟩ :=
       Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold
         Sphere4 S4PositiveVolumeForm
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
@@ -1465,6 +1467,165 @@ theorem unconditional_corollary2_closedFourManifold_on_S4_check :
   · obtain ⟨V', π_f', f', Hs, d_bar', _, hunimV', hcomp, hf_comp, _, _, _, htc, _⟩ :=
       exists_poisson_hamiltonian_realization_closedFourManifold Sphere4 S4PositiveVolumeForm
     exact ⟨V', π_f', f', Hs, d_bar', hunimV', hcomp, hf_comp, htc⟩
+
+attribute [local instance] TauCeti.finrank_euclideanSpace_fin_succ_fact
+
+/-- **Gate G5.4 / G5-Geom-2 Lekili Moves 2–4 & Chiral vs. Achiral Lefschetz Witness (`SC-R6a,d`)**:
+Externally exercises:
+- **Move 2 (2-cusp birth)**: empty critical locus at `s = -1` vs. two wrinkled cusps `(±1, 0, 0, 0)`
+  and indefinite fold `(0, 1, 0, 0)` at `s = 1`,
+- **Move 3 (cusp-merge)**: two wrinkled cusps `(±1, 0, 0, 0)` and indefinite fold `(√2, 1, 0, 0)` at
+  `s = 1` vs. pure indefinite-fold critical locus after merging to `s = -1`,
+- **Move 4 (swallowtail flip)**: pure indefinite-fold critical locus at `s = 1` (`0` cusps) vs. two
+  wrinkled cusps `x₁ = ±1` (`±√(-(-3)/3)`), indefinite fold at `x₁ = 0`, and complete fold-or-cusp
+  classification across `Crit(lekiliMove4 (-3))`, and
+- **Chiral vs. achiral Lefschetz**: `realLefschetzMap` is chiral at `0`, while
+  `achiralRealLefschetzMap` satisfies `IsRealLefschetzAt` yet `¬ IsChiralRealLefschetzAt`. -/
+-- tier: T2
+theorem gate54_lekili_moves_234_witness :
+    (criticalPoints (𝓡 4) (𝓡 2) (lekiliMove2 (-1)) = ∅ ∧
+      IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove2 1) (vec4 (1 * Real.sqrt 1) 0 0 0) ∧
+      IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove2 1) (vec4 ((-1) * Real.sqrt 1) 0 0 0) ∧
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove2 1) (vec4 0 1 0 0)) ∧
+    (IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove3 1) (vec4 (1 * Real.sqrt 1) 0 0 0) ∧
+      IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove3 1) (vec4 ((-1) * Real.sqrt 1) 0 0 0) ∧
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove3 1) (vec4 (Real.sqrt 2) 1 0 0) ∧
+      ∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove3 (-1)),
+        IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove3 (-1)) p) ∧
+    ((∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 1),
+        IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 1) p) ∧
+      IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 (-3))
+        (lekiliMove4CritCurve (-3) (Real.sqrt (-(-3 : ℝ) / 3))) ∧
+      IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 (-3))
+        (lekiliMove4CritCurve (-3) (-Real.sqrt (-(-3 : ℝ) / 3))) ∧
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 (-3)) (lekiliMove4CritCurve (-3) 0) ∧
+      ∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 (-3)),
+        IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 (-3)) p ∨
+          IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 (-3)) p) ∧
+    (IsChiralRealLefschetzAt euclidean4Orientation euclideanPlaneOrientation realLefschetzMap 0 ∧
+      IsRealLefschetzAt (𝓡 4) (𝓡 2) achiralRealLefschetzMap 0 ∧
+      ¬ IsChiralRealLefschetzAt euclidean4Orientation euclideanPlaneOrientation
+          achiralRealLefschetzMap 0) := by
+  have hm2_mem : vec4 0 1 0 0 ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove2 1) := by
+    rw [criticalPoints_lekiliMove2_nonneg (by norm_num), Set.mem_ofPred_eq]
+    refine ⟨?_, ?_, ?_⟩ <;> simp [vec4]
+  have hm3_mem : vec4 (Real.sqrt 2) 1 0 0 ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove3 1) := by
+    rw [criticalPoints_lekiliMove3, Set.mem_ofPred_eq]
+    refine ⟨?_, ?_, ?_⟩
+    · simp only [vec4_zero, vec4_one, Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
+      norm_num
+    · simp [vec4]
+    · simp [vec4]
+  exact ⟨⟨criticalPoints_lekiliMove2_neg (by norm_num),
+      isWrinkledCuspAt_lekiliMove2 (by norm_num) (Or.inl rfl),
+      isWrinkledCuspAt_lekiliMove2 (by norm_num) (Or.inr rfl),
+      isIndefiniteFoldAt_lekiliMove2 (by norm_num) hm2_mem (by simp [vec4])⟩,
+    ⟨isWrinkledCuspAt_lekiliMove3 (by norm_num) (Or.inl rfl),
+      isWrinkledCuspAt_lekiliMove3 (by norm_num) (Or.inr rfl),
+      isIndefiniteFoldAt_lekiliMove3 1 hm3_mem (by simp [vec4]),
+      fun _ hp ↦ isIndefiniteFoldAt_lekiliMove3_of_neg (by norm_num) hp⟩,
+    ⟨singularities_lekiliMove4_pos (by norm_num),
+      isWrinkledCuspAt_lekiliMove4_pos (s := -3) (by norm_num),
+      isWrinkledCuspAt_lekiliMove4_neg (s := -3) (by norm_num),
+      isIndefiniteFoldAt_lekiliMove4 (-3) 0 (by norm_num),
+      singularities_lekiliMove4_neg (by norm_num)⟩,
+    ⟨isChiralRealLefschetzAt_realLefschetzMap_zero,
+      isRealLefschetzAt_achiralRealLefschetzMap_zero,
+      not_isChiralRealLefschetzAt_achiralRealLefschetzMap_zero⟩⟩
+
+/-- **Gate G5-Geom-3 & `SC-R3` / `SC-R2` Exact Moser Volume & `PurelyWrinkled` Corollary 2
+Witness**:
+Verifies:
+1. Exact preservation of `S4PositiveVolumeForm.Ω` and `S4PositiveVolumeForm.μ` on `Sphere4` (both
+   `s4Fibration` and global ADK `BrokenLefschetzFibration`, with `IsGenericallyRankTwo` and R5
+   Hamiltonian flow realization),
+2. Parametric exact preservation of `V_M.Ω` and `V_M.μ` on **every** nonempty compact Hausdorff
+   smooth 4-manifold `(M, V_M)` with **zero** `[ConnectedSpace M]` assumption, and
+3. Explicit `PurelyWrinkledFibration` and `BrokenLefschetzFibration` Corollary 2 realizations
+   exporting `IsGenericallyRankTwo`, smooth deformation homotopy `H`, and
+   `V.μ = TauCeti.RoughForm.measure V.Ω.1`. -/
+-- tier: T2
+theorem exact_moser_volume_S4_and_closedFourManifold_witness :
+    (∃ (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (f : Sphere4 → Sphere2)
+      (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_exact = composePoissonStructureTimeOneFlows Sphere4 π_f Hs ∧
+      f ∘ ⇑d_exact = f ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      S4PositiveVolumeForm.μ = TauCeti.RoughForm.measure S4PositiveVolumeForm.Ω.1) ∧
+    (∃ (B_exact : BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      (criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun).Nonempty ∧
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      B_exact.toFun ∘ ⇑d_exact = B_exact.toFun ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact) ∧
+    (∀ (M : Type) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+        [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+        [CompactSpace M] [T2Space M] [Nonempty M]
+        (V_M : PositiveVolumeForm (𝓡 4) M),
+      ∃ (π_f : PoissonStructure (𝓡 4) M)
+        (f : M → Sphere2)
+        (Hs : List C^∞⟮𝓡 4, M; ℝ⟯)
+        (d_exact : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+        π_f.IsUnimodularWithVolume V_M.Ω ∧
+        d_exact = composePoissonStructureTimeOneFlows M π_f Hs ∧
+        f ∘ ⇑d_exact = f ∧
+        TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff V_M.Ω = V_M.Ω ∧
+        MeasurePreserving ⇑d_exact V_M.μ V_M.μ ∧
+        IsTuringComplete ⇑d_exact) ∧
+    (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      s4PurelyWrinkledFibration.toFun ∘ ⇑d_bar = s4PurelyWrinkledFibration.toFun ∧
+      IsTuringComplete ⇑d_bar ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1) ∧
+    (∃ (P : PurelyWrinkledFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2)
+      (K : Set Sphere4) (H : ℝ → Sphere4 → Sphere2)
+      (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      IsCompact K ∧
+      ContMDiff (𝓘(ℝ, ℝ).prod (𝓡 4)) (𝓡 2) ∞ (Function.uncurry H) ∧
+      (∀ x, H 0 x = s4BrokenLefschetzFibration.toFun x) ∧
+      (∀ x, H 1 x = P.toFun x) ∧
+      π_f.IsGenericallyRankTwo ∧
+      IsTuringComplete ⇑d_bar ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · obtain ⟨π_f, f, Hs, d_exact, _, hunimV, hgen, hcomp, hfib, _, hvol, hmp, htc, _, hμ⟩ :=
+      exists_exactVolumePreserving_poisson_hamiltonian_realization_S4
+    exact ⟨π_f, f, Hs, d_exact, hunimV, hgen, hcomp, hfib, hvol, hmp, htc, hμ⟩
+  · obtain ⟨B_exact, π_f, d_exact, hcrit, hunimV, hgen, hfib, _, hvol, hmp, htc, _⟩ :=
+      Main.exists_turingComplete_exactVolumePreserving_diffeomorph_S4_ADK
+    exact ⟨B_exact, π_f, d_exact, hcrit, hunimV, hgen, hfib, hvol, hmp, htc⟩
+  · intro M _ _ _ _ _ _ _ _ V_M
+    obtain ⟨π_f, f, Hs, d_exact, _, hunimV, hcomp, hfib, _, hvol, hmp, htc, _⟩ :=
+      exists_exactVolumePreserving_poisson_hamiltonian_realization_closedFourManifold M V_M
+    exact ⟨π_f, f, Hs, d_exact, hunimV, hcomp, hfib, hvol, hmp, htc⟩
+  · obtain ⟨V, π_f, d_bar, _, _, hunimV, _, hgen, _, _, hfib, _, _, _, _, htc, _, hμ⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_purelyWrinkled
+        Sphere4 S4PositiveVolumeForm Sphere2 s4PurelyWrinkledFibration S2PositiveVolumeForm
+        s4ADKTrivialization_pos_cooriented
+    exact ⟨V, π_f, d_bar, hunimV, hgen, hfib, htc, hμ⟩
+  · obtain ⟨P, K, H, V, π_f, d_bar, _, _, hK_comp, _, _, _, hH_md, hH_0, hH_1, _, _, _, _, _,
+        hgen, _, _, _, _, _, _, _, htc, _, hμ⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_brokenLefschetz
+        Sphere4 S4PositiveVolumeForm Sphere2 s4BrokenLefschetzFibration S2PositiveVolumeForm
+        s4ADKTrivialization_pos_cooriented
+    exact ⟨P, K, H, V, π_f, d_bar, hK_comp, hH_md, hH_0, hH_1, hgen, htc, hμ⟩
 
 end LekiliAndADKChecks
 

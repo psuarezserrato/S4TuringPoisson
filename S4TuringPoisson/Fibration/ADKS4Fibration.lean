@@ -2456,15 +2456,15 @@ private theorem contDiffOn_adkSrcMap :
     ((EuclideanSpace.equiv (Fin 4) ℝ).symm.contDiff.contDiffAt).comp y hpi
   exact hvec.contDiffWithinAt
 
-private noncomputable def clmVec4 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+private noncomputable def adkClmVec4 {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     (L₀ L₁ L₂ L₃ : E →L[ℝ] ℝ) : E →L[ℝ] EuclideanSpace ℝ (Fin 4) :=
   (EuclideanSpace.equiv (Fin 4) ℝ).symm.toContinuousLinearMap.comp
     (ContinuousLinearMap.pi ![L₀, L₁, L₂, L₃])
 
 @[simp]
-private theorem clmVec4_apply {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+private theorem adkClmVec4_apply {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     (L₀ L₁ L₂ L₃ : E →L[ℝ] ℝ) (v : E) :
-    clmVec4 L₀ L₁ L₂ L₃ v = vec4 (L₀ v) (L₁ v) (L₂ v) (L₃ v) := by
+    adkClmVec4 L₀ L₁ L₂ L₃ v = vec4 (L₀ v) (L₁ v) (L₂ v) (L₃ v) := by
   refine PiLp.ext fun i ↦ ?_
   fin_cases i <;> rfl
 
@@ -2472,7 +2472,7 @@ private theorem hasFDerivAt_vec4 {E : Type*} [NormedAddCommGroup E] [NormedSpace
     {g₀ g₁ g₂ g₃ : E → ℝ} {L₀ L₁ L₂ L₃ : E →L[ℝ] ℝ} {x : E}
     (h₀ : HasFDerivAt g₀ L₀ x) (h₁ : HasFDerivAt g₁ L₁ x)
     (h₂ : HasFDerivAt g₂ L₂ x) (h₃ : HasFDerivAt g₃ L₃ x) :
-    HasFDerivAt (fun y ↦ vec4 (g₀ y) (g₁ y) (g₂ y) (g₃ y)) (clmVec4 L₀ L₁ L₂ L₃) x := by
+    HasFDerivAt (fun y ↦ vec4 (g₀ y) (g₁ y) (g₂ y) (g₃ y)) (adkClmVec4 L₀ L₁ L₂ L₃) x := by
   have hpi : HasFDerivAt (fun y : E ↦ (![g₀ y, g₁ y, g₂ y, g₃ y] : Fin 4 → ℝ))
       (ContinuousLinearMap.pi ![L₀, L₁, L₂, L₃]) x := by
     refine hasFDerivAt_pi.mpr fun i ↦ ?_
@@ -2560,7 +2560,7 @@ private theorem exists_fderiv_adkSrcMap :
       (euclidProj (0 : Fin 4) - (2 : ℝ) • euclidProj (3 : Fin 4)) 0 :=
     htermA.sub htermB
   have hmap : HasFDerivAt adkSrcMap
-      (clmVec4 (a₀ • euclidProj 3) (a₁ • euclidProj 1) (a₁ • euclidProj 2)
+      (adkClmVec4 (a₀ • euclidProj 3) (a₁ • euclidProj 1) (a₁ • euclidProj 2)
         (euclidProj 0 - (2 : ℝ) • euclidProj 3)) 0 :=
     hasFDerivAt_vec4 h0 h1 h2 h3
   let e_lin : EuclideanSpace ℝ (Fin 4) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 4) :=
@@ -2588,7 +2588,7 @@ private theorem exists_fderiv_adkSrcMap :
   rw [hmap.fderiv]
   ext v i
   fin_cases i <;>
-    simp [e, e_lin, clmVec4_apply, sub_apply, smul_apply, smul_eq_mul]
+    simp [e, e_lin, adkClmVec4_apply, sub_apply, smul_apply, smul_eq_mul]
 
 private theorem adk_single_denom_rat {Q H u v P₂ C₁ D : ℝ}
     (hq_pos : 0 < Q) (hfac_pos : 0 < 3 * Real.sqrt Q - 2 * H)
@@ -5533,14 +5533,15 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
-      (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
   obtain ⟨V, π_f, d_bar, hπ, hunimV, hunim, hgen, hrank2, hrank0, hfib, hpois, hleaf, hvol,
-      hmeas, htc, hne⟩ :=
+      hmeas, htc, hne, hμ_eq⟩ :=
     Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
       (A := s4ADKAdmits) Sphere4
   exact ⟨V, π_f, d_bar, hπ, hunimV, hunim, hgen, hrank2,
     ⟨s4ADKCritBase, s4ADKCritBase_mem_criticalPoints⟩,
-    hrank0, hfib, hpois, hleaf, hvol, hmeas, htc, hne⟩
+    hrank0, hfib, hpois, hleaf, hvol, hmeas, htc, hne, hμ_eq⟩
 
 /-- **ADK Poisson–Hamiltonian Realization on $S^4$ (Option A)**:
 Exhibits a finite list `Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯` of smooth Hamiltonians whose composed
@@ -5563,7 +5564,8 @@ theorem exists_poisson_hamiltonian_realization_S4_ADK :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
-      (⇑d_bar : Sphere4 → Sphere4) ≠ id := by
+      (⇑d_bar : Sphere4 → Sphere4) ≠ id ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
   obtain ⟨Hs, d_bar, hcomp, hfib, hpois, hvol, hmeas, htc, hne⟩ :=
     exists_poisson_hamiltonian_realization_fourManifold
       (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4
@@ -5573,7 +5575,261 @@ theorem exists_poisson_hamiltonian_realization_S4_ADK :
     isUnimodularWithVolume_adaptedJacobianPoisson
       (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
     isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4,
-    hcomp, hfib, hpois, hvol, hmeas, htc, hne⟩
+    hcomp, hfib, hpois, hvol, hmeas, htc, hne, rfl⟩
+
+/-- **ADK Algorithmic Undecidability of Forward-Orbit Reachability on $S^4$ (`SC-R4`)**:
+Exhibits on `Sphere4` an aligned positive volume 4-form `V`
+(`V.μ = TauCeti.RoughForm.measure V.Ω.1`), a **generically rank-2** unimodular Jacobian–Poisson
+structure `π_f` adapted to `s4ADKFibration`, a smooth leaf-preserving Poisson diffeomorphism
+`d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4`, an open-tube chart
+`openChart : Param × UnitDisk2 → Sphere4`, a `Computable` dyadic rational approximation `approx`,
+and a `Computable` rational-box enumerator `targetBoxes : ℕ → RatBox2` generating `U` inside
+`openChart` such that forward-orbit reachability into `U` is recursively enumerable (`REPred`) yet
+algorithmically undecidable (`¬ ComputablePred`). -/
+-- tier: T2
+theorem undecidable_orbit_reachability_S4_ADK :
+    ∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
+      (U : Opens Sphere4)
+      (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → Sphere4)
+      (chart : UnitDisk2 → Sphere4)
+      (coord : Nat.Partrec.Code → UnitDisk2)
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
+      s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
+      Continuous chart ∧
+      Function.Injective chart ∧
+      Computable approx ∧
+      (∀ (c : Nat.Partrec.Code) (m : ℕ),
+        ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
+      (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
+      REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
+          ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      (¬ ∃ dec : Nat.Partrec.Code → Bool,
+          Computable dec ∧
+          ∀ c : Nat.Partrec.Code,
+            dec c = true ↔ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
+  let _ : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4 := s4ADKAdmits
+  obtain ⟨U, Param, instTopParam, param₀, openChart, chart, coord, approx, targetBoxes, hU,
+      hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+      hnotcomp, hnodec⟩ :=
+    undecidable_orbit_reachability_leafwiseBumpDiffeomorph
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4
+  exact ⟨alignedPositiveVolume (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    adaptedJacobianPoisson (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    leafwiseBumpDiffeomorph (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    U, Param, instTopParam, param₀, openChart, chart, coord, approx, targetBoxes,
+    fibration_comp_leafwiseBumpDiffeomorph
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    isUnimodularWithVolume_adaptedJacobianPoisson
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4,
+    isPoissonMap_leafwiseBumpDiffeomorph
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    measurePreserving_leafwiseBumpDiffeomorph
+      (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4,
+    hU, hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+    hnotcomp, hnodec, rfl⟩
+
+/-- **Exact Round-Volume ADK Poisson–Hamiltonian Realization on $S^4$ (`SC-R3`)**:
+Conjugates the ADK Poisson–Hamiltonian flow on `Sphere4` by the global Moser diffeomorphism `W.ψ`
+so that `B_exact := s4BrokenLefschetzFibration.compDiffeomorph W.ψ` is a global broken Lefschetz
+fibration on `Sphere4` with nonempty critical locus, `π_f` is a **generically rank-2** Poisson
+structure unimodular with the **exact standard round volume form `S4PositiveVolumeForm.Ω`**, and
+`d_exact` is a finite composition of time-`1` Hamiltonian flows of `π_f` preserving `B_exact.toFun`,
+`π_f`, **`S4PositiveVolumeForm.Ω`**, and **`S4PositiveVolumeForm.μ`** (`IsTuringComplete ⇑d_exact`,
+`≠ id`). -/
+-- tier: T2
+theorem exists_exactVolumePreserving_poisson_hamiltonian_realization_S4_ADK :
+    ∃ (B_exact : BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      (criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun).Nonempty ∧
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_exact = composePoissonStructureTimeOneFlows Sphere4 π_f Hs ∧
+      B_exact.toFun ∘ ⇑d_exact = B_exact.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : Sphere4 → Sphere4) ≠ id ∧
+      S4PositiveVolumeForm.μ = TauCeti.RoughForm.measure S4PositiveVolumeForm.Ω.1 := by
+  let A_reg : AdmitsRegularDiskFibration Sphere4 := s4ADKAdmits.toAdmitsRegularDiskFibration
+  let W : MoserVolume S4PositiveVolumeForm (alignedPositiveVolume (A := A_reg) Sphere4) :=
+    MoserVolume.ofPositivelyCooriented S4PositiveVolumeForm
+      (alignedPositiveVolume (A := A_reg) Sphere4)
+      (fun x ↦ alignedVolumeForm_pos_cooriented (A := A_reg) Sphere4 x)
+  let C_cmpp : HasCMPPCantorCirculationHamiltonians := universalReversibleSimulator_cmpp
+  let _ : HasTuringCompleteAreaPreservingDiskIsotopy :=
+    @instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP C_cmpp
+  let Hs₀ : List C^∞⟮𝓡 4, Sphere4; ℝ⟯ :=
+    C_cmpp.generators.map (liftPlanarHamiltonianTo4Manifold (A := A_reg) Sphere4)
+  let Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯ := Hs₀.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩
+  have hcomp₀ :
+      leafwiseBumpDiffeomorph (A := A_reg) Sphere4 =
+        composePoissonStructureTimeOneFlows Sphere4
+          (adaptedJacobianPoisson (A := A_reg) Sphere4) Hs₀ := by
+    rw [composePoissonStructureTimeOneFlows_adaptedJacobianPoisson (A := A_reg)]
+    exact (composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq (A := A_reg) Sphere4
+      C_cmpp.r₀_mem_Ioo universalReversibleSimulator_cmpp_isAutonomous).symm
+  have hcomp :
+      W.conjDiffeomorph (leafwiseBumpDiffeomorph (A := A_reg) Sphere4) =
+        composePoissonStructureTimeOneFlows Sphere4
+          (W.pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration) Hs := by
+    rw [W.composePoissonStructureTimeOneFlows_map_comp s4ADKFibration contMDiff_s4ADKFibration Hs₀,
+      show jacobianPoissonOfPositiveVolume (alignedPositiveVolume (A := A_reg) Sphere4)
+          S2VolumeForm s4ADKFibration contMDiff_s4ADKFibration =
+        adaptedJacobianPoisson (A := A_reg) Sphere4 from rfl,
+      ← hcomp₀]
+  have hcrit_ne :
+      (criticalPoints (𝓡 4) (𝓡 2)
+        (s4BrokenLefschetzFibration.compDiffeomorph W.ψ).toFun).Nonempty :=
+    ⟨W.ψ.symm s4ADKCritBase,
+      (W.mem_criticalPoints_comp_ψ_iff s4ADKFibration contMDiff_s4ADKFibration _).mpr
+        (by rw [W.ψ.apply_symm_apply]; exact s4ADKCritBase_mem_criticalPoints)⟩
+  exact ⟨s4BrokenLefschetzFibration.compDiffeomorph W.ψ,
+    W.pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration, Hs,
+    W.conjDiffeomorph (leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    hcrit_ne,
+    W.isUnimodularWithVolume_pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration,
+    (W.isGenericallyRankTwo_pullbackJacobianPoisson_iff s4ADKFibration
+      contMDiff_s4ADKFibration).mpr
+      (isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4),
+    hcomp,
+    W.fibration_comp_conjDiffeomorph
+      (fibration_comp_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.isPoissonMap_conjDiffeomorph s4ADKFibration contMDiff_s4ADKFibration
+      (isPoissonMap_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.mpullback_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph (A := A_reg) Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm (A := A_reg) Sphere4),
+    W.measurePreserving_conjDiffeomorph
+      (connectedComponent_leafwiseBumpDiffeomorph (A := A_reg) Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm (A := A_reg) Sphere4),
+    W.isTuringComplete_conjDiffeomorph
+      (isTuringComplete_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.conjDiffeomorph_ne_id (isTuringComplete_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    rfl⟩
+
+namespace Main
+
+/-- **ADK Broken Lefschetz Theorem 1 on $S^4$ Preserving Exact Round Volume `S4PositiveVolumeForm`
+(`SC-R3`, Full Poisson Bundle)**:
+Moser conjugation on `Sphere4` produces a global `BrokenLefschetzFibration` `B_exact`
+(`s4BrokenLefschetzFibration.compDiffeomorph W.ψ`) with nonempty critical locus, a **generically
+rank-2** Poisson structure `π_f` unimodular with **`S4PositiveVolumeForm.Ω` itself**, and a
+$C^\infty$ Turing complete Poisson diffeomorphism `d_exact` preserving `B_exact.toFun`,
+**`S4PositiveVolumeForm.Ω`**, and **`S4PositiveVolumeForm.μ`**. -/
+-- tier: T2
+theorem exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4_ADK :
+    ∃ (B_exact : BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      (criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun).Nonempty ∧
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsUnimodularPoisson ∧
+      π_f.IsGenericallyRankTwo ∧
+      (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun, π_f.rankAt x = 2) ∧
+      (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun, π_f.rankAt x = 0) ∧
+      B_exact.toFun ∘ ⇑d_exact = B_exact.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : Sphere4 → Sphere4) ≠ id ∧
+      S4PositiveVolumeForm.μ = TauCeti.RoughForm.measure S4PositiveVolumeForm.Ω.1 := by
+  let A_reg : AdmitsRegularDiskFibration Sphere4 := s4ADKAdmits.toAdmitsRegularDiskFibration
+  let W : MoserVolume S4PositiveVolumeForm (alignedPositiveVolume (A := A_reg) Sphere4) :=
+    MoserVolume.ofPositivelyCooriented S4PositiveVolumeForm
+      (alignedPositiveVolume (A := A_reg) Sphere4)
+      (fun x ↦ alignedVolumeForm_pos_cooriented (A := A_reg) Sphere4 x)
+  have hcrit_ne :
+      (criticalPoints (𝓡 4) (𝓡 2)
+        (s4BrokenLefschetzFibration.compDiffeomorph W.ψ).toFun).Nonempty :=
+    ⟨W.ψ.symm s4ADKCritBase,
+      (W.mem_criticalPoints_comp_ψ_iff s4ADKFibration contMDiff_s4ADKFibration _).mpr
+        (by rw [W.ψ.apply_symm_apply]; exact s4ADKCritBase_mem_criticalPoints)⟩
+  exact ⟨s4BrokenLefschetzFibration.compDiffeomorph W.ψ,
+    W.pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration,
+    W.conjDiffeomorph (leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    hcrit_ne,
+    W.isUnimodularWithVolume_pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration,
+    W.isUnimodularPoisson_pullbackJacobianPoisson s4ADKFibration contMDiff_s4ADKFibration,
+    (W.isGenericallyRankTwo_pullbackJacobianPoisson_iff s4ADKFibration
+      contMDiff_s4ADKFibration).mpr
+      (isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4),
+    fun x hx ↦
+      W.rankAt_pullbackJacobianPoisson_of_notMem_criticalPoints s4ADKFibration
+        contMDiff_s4ADKFibration hx,
+    fun x hx ↦
+      W.rankAt_pullbackJacobianPoisson_of_mem_criticalPoints s4ADKFibration
+        contMDiff_s4ADKFibration hx,
+    W.fibration_comp_conjDiffeomorph
+      (fibration_comp_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.isPoissonMap_conjDiffeomorph s4ADKFibration contMDiff_s4ADKFibration
+      (isPoissonMap_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.mpullback_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph (A := A_reg) Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm (A := A_reg) Sphere4),
+    W.measurePreserving_conjDiffeomorph
+      (connectedComponent_leafwiseBumpDiffeomorph (A := A_reg) Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm (A := A_reg) Sphere4),
+    W.isTuringComplete_conjDiffeomorph
+      (isTuringComplete_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    W.conjDiffeomorph_ne_id (isTuringComplete_leafwiseBumpDiffeomorph (A := A_reg) Sphere4),
+    rfl⟩
+
+/-- **ADK Broken Lefschetz Theorem 1 on $S^4$ Preserving Exact Round Volume `S4PositiveVolumeForm`
+(`SC-R3`, Concise Headline Statement)**:
+There exists a $C^\infty$ Turing complete Poisson diffeomorphism `d_exact` on `Sphere4` preserving a
+global broken Lefschetz fibration `B_exact` (with nonempty critical locus), a **generically rank-2**
+Poisson structure `π_f` unimodular with **`S4PositiveVolumeForm.Ω`**, and the **exact standard round
+volume form `S4PositiveVolumeForm.Ω` and Borel measure `S4PositiveVolumeForm.μ`**. -/
+-- tier: T2
+theorem exists_turingComplete_exactVolumePreserving_diffeomorph_S4_ADK :
+    ∃ (B_exact : BrokenLefschetzFibration (𝓡 4) Sphere4 (𝓡 2) Sphere2 Sphere2)
+      (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      (criticalPoints (𝓡 4) (𝓡 2) B_exact.toFun).Nonempty ∧
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      B_exact.toFun ∘ ⇑d_exact = B_exact.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : Sphere4 → Sphere4) ≠ id := by
+  obtain ⟨B_exact, π_f, d_exact, hcrit, hunimV, _, hgen, _, _, hfib, hpoiss, hvol, hmp, htc, hne,
+      _⟩ :=
+    exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4_ADK
+  exact ⟨B_exact, π_f, d_exact, hcrit, hunimV, hgen, hfib, hpoiss, hvol, hmp, htc, hne⟩
+
+end Main
 
 end ADKTrivializationAndTheorems
 

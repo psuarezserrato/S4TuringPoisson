@@ -33,6 +33,7 @@ public import S4TuringPoisson.Smoothing.CMPP.Simulator
 public import S4TuringPoisson.Smoothing.CMPPInstance
 public import S4TuringPoisson.Extension.AlignedUnimodularVolume
 public import S4TuringPoisson.Extension.BumpIsotopyLift
+public import S4TuringPoisson.Extension.MoserVolume
 public import S4TuringPoisson.Main
 public import S4TuringPoisson.Extension.PoissonHamiltonian
 public import S4TuringPoisson.Checks.GeomChecks

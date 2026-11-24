@@ -1818,7 +1818,8 @@ theorem exists_poisson_hamiltonian_realization_closedFourManifold
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
       IsTuringComplete ⇑d_bar ∧
-      (⇑d_bar : M → M) ≠ id := by
+      (⇑d_bar : M → M) ≠ id ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
   let A : AdmitsRegularDiskFibration M :=
     AdmitsRegularDiskFibration.ofPositiveVolumeForm V_M
   let _ : AdmitsRegularDiskFibration M := A
@@ -1851,7 +1852,454 @@ theorem exists_poisson_hamiltonian_realization_closedFourManifold
     mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M,
     measurePreserving_leafwiseBumpDiffeomorph M,
     isTuringComplete_leafwiseBumpDiffeomorph M,
-    leafwiseBumpDiffeomorph_ne_id M⟩
+    leafwiseBumpDiffeomorph_ne_id M,
+    rfl⟩
+
+/-! ## 7. Purely Wrinkled, Broken Lefschetz & Exact-Volume Moser R5 Realizations (`SC-R2`/`SC-R3`)
+-/
+
+/-- Pointwise evaluation of `poissonStructureTimeOneDiffeomorph M π_str H` as the time-`1` flow of
+`π_str.hamiltonianVectorField H`. -/
+-- tier: T1
+@[simp]
+theorem poissonStructureTimeOneDiffeomorph_apply
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    (π_str : PoissonStructure (𝓡 4) M) (H : C^∞⟮𝓡 4, M; ℝ⟯) (x : M) :
+    poissonStructureTimeOneDiffeomorph M π_str H x =
+      TauCeti.timeDependentFlowOf (fun _ : ℝ ↦ π_str.hamiltonianVectorField H) 0 1 x := by
+  rw [poissonStructureTimeOneDiffeomorph, TauCeti.timeDependentFlowDiffeomorph_apply]
+
+/-- **Moser Conjugation of Time-`1` Poisson–Hamiltonian Flows (`SC-R3`)**:
+For any global Moser bundle `W : MoserVolume V₀ V₁`, smooth map `f : M → Sphere2`, and smooth
+Hamiltonian `h : C^∞⟮𝓡 4, M; ℝ⟯`, the time-`1` Hamiltonian flow of `h ∘ W.ψ` with respect to
+`W.pullbackJacobianPoisson f hf` equals `W.conjDiffeomorph` applied to the time-`1` Hamiltonian
+flow of `h` with respect to `jacobianPoissonOfPositiveVolume V₁ S2VolumeForm f hf`. -/
+-- tier: T2
+theorem MoserVolume.poissonStructureTimeOneDiffeomorph_comp
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    {V₀ V₁ : PositiveVolumeForm (𝓡 4) M} (W : MoserVolume V₀ V₁)
+    (f : M → Sphere2) (hf : ContMDiff (𝓡 4) (𝓡 2) ∞ f) (h : C^∞⟮𝓡 4, M; ℝ⟯) :
+    poissonStructureTimeOneDiffeomorph M (W.pullbackJacobianPoisson f hf)
+        (h.comp ⟨W.ψ, W.ψ.contMDiff⟩) =
+      W.conjDiffeomorph (poissonStructureTimeOneDiffeomorph M
+        (jacobianPoissonOfPositiveVolume V₁ S2VolumeForm f hf) h) := by
+  let P_pull := W.pullbackJacobianPoisson f hf
+  let P₁ := jacobianPoissonOfPositiveVolume V₁ S2VolumeForm f hf
+  let h_pull := h.comp ⟨W.ψ, W.ψ.contMDiff⟩
+  let X_pull := P_pull.hamiltonianVectorField h_pull
+  let X₁ := P₁.hamiltonianVectorField h
+  have hX_pull : ContMDiff (𝓘(ℝ, ℝ).prod (𝓡 4)) (𝓡 4).tangent 1
+      (fun p : ℝ × M ↦ (⟨p.2, X_pull p.2⟩ : TangentBundle (𝓡 4) M)) :=
+    ((P_pull.contMDiff_hamiltonianVectorField h_pull).comp contMDiff_snd).of_le (by simp)
+  have hX₁ : ContMDiff (𝓘(ℝ, ℝ).prod (𝓡 4)) (𝓡 4).tangent 1
+      (fun p : ℝ × M ↦ (⟨p.2, X₁ p.2⟩ : TangentBundle (𝓡 4) M)) :=
+    ((P₁.contMDiff_hamiltonianVectorField h).comp contMDiff_snd).of_le (by simp)
+  apply Diffeomorph.ext
+  intro x
+  let c : ℝ → M := fun u ↦ TauCeti.timeDependentFlowOf (fun _ : ℝ ↦ X₁) 0 u (W.ψ x)
+  let γ : ℝ → M := fun u ↦ W.ψ.symm (c u)
+  have hγ0 : γ 0 = x := by
+    change W.ψ.symm (TauCeti.timeDependentFlowOf (fun _ : ℝ ↦ X₁) 0 0 (W.ψ x)) = x
+    rw [TauCeti.timeDependentFlowOf_self, W.ψ.symm_apply_apply]
+  have hγ1 : γ 1 = W.conjDiffeomorph (poissonStructureTimeOneDiffeomorph M P₁ h) x := by
+    rw [MoserVolume.conjDiffeomorph_apply, poissonStructureTimeOneDiffeomorph_apply]
+  have hγ_deriv : ∀ u ∈ Set.Ioo (-1 : ℝ) 2,
+      HasMFDerivAt 𝓘(ℝ, ℝ) (𝓡 4) γ u ((1 : ℝ →L[ℝ] ℝ).smulRight (X_pull (γ u))) := by
+    intro u _
+    have hdom : ((0, u), W.ψ x) ∈ TauCeti.timeDependentFlowDomain (fun _ : ℝ ↦ X₁) := by
+      rw [TauCeti.timeDependentFlowDomain_eq_univ
+        (isComplete_hamiltonianVectorField_poissonStructure M P₁ h)]
+      exact Set.mem_univ _
+    have hc_at : HasMFDerivAt 𝓘(ℝ, ℝ) (𝓡 4) c u ((1 : ℝ →L[ℝ] ℝ).smulRight (X₁ (c u))) :=
+      TauCeti.hasMFDerivAt_timeDependentFlowOf hX₁ hdom
+    have hsymm_at :
+        HasMFDerivAt (𝓡 4) (𝓡 4) W.ψ.symm (c u) (mfderiv (𝓡 4) (𝓡 4) W.ψ.symm (c u)) :=
+      (W.ψ.symm.contMDiff.mdifferentiableAt (by simp)).hasMFDerivAt
+    refine (hsymm_at.comp u hc_at).congr_mfderiv ?_
+    apply ContinuousLinearMap.ext
+    intro s
+    let s₀ : ℝ := s
+    change mfderiv (𝓡 4) (𝓡 4) W.ψ.symm (c u) (((1 : ℝ →L[ℝ] ℝ) s₀) • X₁ (c u)) =
+      ((1 : ℝ →L[ℝ] ℝ) s₀) • X_pull (γ u)
+    rw [map_smul]
+    congr 1
+    have hrel := W.hamiltonianVectorField_pullbackJacobianPoisson_comp f hf h (γ u)
+    have hψγ : W.ψ (γ u) = c u := W.ψ.apply_symm_apply (c u)
+    change mfderiv (𝓡 4) (𝓡 4) W.ψ.symm (c u) (X₁ (c u)) = X_pull (γ u)
+    dsimp only [X_pull, X₁, P_pull, P₁, h_pull]
+    rw [hrel, hψγ]
+  have hode := TauCeti.timeDependentFlowOf_eq_of_hasMFDerivAt hX_pull
+    (s := (0 : ℝ)) (t := (1 : ℝ)) (a := (-1 : ℝ)) (b := (2 : ℝ))
+    hγ_deriv ⟨by norm_num, by norm_num⟩ ⟨by norm_num, by norm_num⟩
+  rw [hγ0, hγ1] at hode
+  rw [poissonStructureTimeOneDiffeomorph_apply]
+  exact hode
+
+/-- **Moser Conjugation of Right-Fold Poisson–Hamiltonian Flow Lists (`SC-R3`)**:
+Pulling back a finite list `Hs : List C^∞⟮𝓡 4, M; ℝ⟯` of Hamiltonians along `W.ψ` conjugates
+their composed time-`1` Poisson–Hamiltonian flow by `W.ψ`. -/
+-- tier: T1
+theorem MoserVolume.composePoissonStructureTimeOneFlows_map_comp
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    {V₀ V₁ : PositiveVolumeForm (𝓡 4) M} (W : MoserVolume V₀ V₁)
+    (f : M → Sphere2) (hf : ContMDiff (𝓡 4) (𝓡 2) ∞ f) (Hs : List C^∞⟮𝓡 4, M; ℝ⟯) :
+    composePoissonStructureTimeOneFlows M (W.pullbackJacobianPoisson f hf)
+        (Hs.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩) =
+      W.conjDiffeomorph (composePoissonStructureTimeOneFlows M
+        (jacobianPoissonOfPositiveVolume V₁ S2VolumeForm f hf) Hs) := by
+  let P_pull := W.pullbackJacobianPoisson f hf
+  let P₁ := jacobianPoissonOfPositiveVolume V₁ S2VolumeForm f hf
+  induction Hs with
+  | nil =>
+    apply Diffeomorph.ext
+    intro x
+    change x = W.ψ.symm (W.ψ x)
+    exact (W.ψ.symm_apply_apply x).symm
+  | cons H Hs ih =>
+    rw [List.map_cons]
+    change (composePoissonStructureTimeOneFlows M P_pull
+          (Hs.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩)).trans
+        (poissonStructureTimeOneDiffeomorph M P_pull (H.comp ⟨W.ψ, W.ψ.contMDiff⟩)) =
+      W.conjDiffeomorph ((composePoissonStructureTimeOneFlows M P₁ Hs).trans
+        (poissonStructureTimeOneDiffeomorph M P₁ H))
+    rw [ih, W.poissonStructureTimeOneDiffeomorph_comp f hf H]
+    apply Diffeomorph.ext
+    intro x
+    change W.ψ.symm (poissonStructureTimeOneDiffeomorph M P₁ H
+      (W.ψ (W.ψ.symm (composePoissonStructureTimeOneFlows M P₁ Hs (W.ψ x))))) =
+      W.ψ.symm (poissonStructureTimeOneDiffeomorph M P₁ H
+        (composePoissonStructureTimeOneFlows M P₁ Hs (W.ψ x)))
+    rw [W.ψ.apply_symm_apply]
+
+/-- **Poisson–Hamiltonian Realization over `PurelyWrinkledFibration` (`SC-R2` / R5 Companion)**:
+For any positively co-oriented `PurelyWrinkledFibration` `P : M → Sphere2`, exhibits an aligned
+positive volume 4-form `V` (`V.μ = TauCeti.RoughForm.measure V.Ω.1`), a **generically rank-2**
+(`π_f.IsGenericallyRankTwo`) unimodular Jacobian–Poisson structure `π_f`, and a finite list `Hs` of
+smooth Hamiltonians whose composed time-`1` Poisson–Hamiltonian flow `d_bar` preserves `P.toFun`,
+`π_f`, `V.Ω`, and `V.μ`, and satisfies `IsTuringComplete ⇑d_bar` (`≠ id`). -/
+-- tier: T2
+theorem exists_poisson_hamiltonian_realization_of_purelyWrinkled
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    (V_M : PositiveVolumeForm (𝓡 4) M)
+    (F : Type) [TopologicalSpace F] [ChartedSpace (EuclideanSpace ℝ (Fin 2)) F]
+    [IsManifold (𝓡 2) ∞ F] [T2Space F] [CompactSpace F] [Nonempty F]
+    [MeasurableSpace F] [BorelSpace F]
+    (P : PurelyWrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 F)
+    (V_F : PositiveVolumeForm (𝓡 2) F)
+    (hpos : ∀ u : P.toRegularDiskFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
+      (TauCeti.SmoothForm.mpullback P.trivialization P.trivialization.contMDiff
+          (TauCeti.SmoothForm.wedge
+            (TauCeti.SmoothForm.mpullback Prod.snd contMDiff_snd V_F.Ω)
+            (TauCeti.SmoothForm.mpullback (Subtype.val ∘ Prod.fst)
+              (contMDiff_subtype_val.comp contMDiff_fst) S2VolumeForm))).1 u =
+        c • (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val V_M.Ω).1 u) :
+    ∃ (V : PositiveVolumeForm (𝓡 4) M)
+      (π_f : PoissonStructure (𝓡 4) M)
+      (Hs : List C^∞⟮𝓡 4, M; ℝ⟯)
+      (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_bar = composePoissonStructureTimeOneFlows M π_f Hs ∧
+      P.toFun ∘ ⇑d_bar = P.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar ∧
+      (⇑d_bar : M → M) ≠ id ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
+  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
+    AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled V_M F P V_F hpos
+  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  obtain ⟨Hs, d_bar, hcomp, hfib, hpoiss, hvol, hmp, htc, hne⟩ :=
+    exists_poisson_hamiltonian_realization_fourManifold M
+  have hcomp' : d_bar = composePoissonStructureTimeOneFlows M (adaptedJacobianPoisson M) Hs := by
+    rw [composePoissonStructureTimeOneFlows_adaptedJacobianPoisson]
+    exact hcomp
+  exact ⟨alignedPositiveVolume M, adaptedJacobianPoisson M, Hs, d_bar,
+    fun x ↦ alignedVolumeForm_pos_cooriented M x,
+    isUnimodularWithVolume_adaptedJacobianPoisson M,
+    isGenericallyRankTwo_adaptedJacobianPoisson M,
+    hcomp', hfib, hpoiss, hvol, hmp, htc, hne, rfl⟩
+
+/-- **Poisson–Hamiltonian Realization over `BrokenLefschetzFibration` (`SC-R2` / R5 Companion)**:
+Deforms any positively co-oriented `BrokenLefschetzFibration` `B : M → Sphere2` via Lekili's
+wrinkling deformation (`H : ℝ → M → Sphere2`, `H 0 = B.toFun`, `H 1 = P.toFun`) to a
+`PurelyWrinkledFibration` `P : M → Sphere2` and realizes a Turing complete Poisson diffeomorphism on
+`M` as a finite composition of time-`1` Hamiltonian flows of the **generically rank-2** unimodular
+Jacobian–Poisson structure `π_f` adapted to `P.toFun`. -/
+-- tier: T2
+theorem exists_poisson_hamiltonian_realization_of_brokenLefschetz
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    (V_M : PositiveVolumeForm (𝓡 4) M)
+    (F : Type) [TopologicalSpace F] [ChartedSpace (EuclideanSpace ℝ (Fin 2)) F]
+    [IsManifold (𝓡 2) ∞ F] [T2Space F] [CompactSpace F] [Nonempty F]
+    [MeasurableSpace F] [BorelSpace F]
+    (B : BrokenLefschetzFibration (𝓡 4) M (𝓡 2) Sphere2 F)
+    (V_F : PositiveVolumeForm (𝓡 2) F)
+    (hpos : ∀ u : B.toRegularDiskFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
+      (TauCeti.SmoothForm.mpullback B.trivialization B.trivialization.contMDiff
+          (TauCeti.SmoothForm.wedge
+            (TauCeti.SmoothForm.mpullback Prod.snd contMDiff_snd V_F.Ω)
+            (TauCeti.SmoothForm.mpullback (Subtype.val ∘ Prod.fst)
+              (contMDiff_subtype_val.comp contMDiff_fst) S2VolumeForm))).1 u =
+        c • (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val V_M.Ω).1 u) :
+    ∃ (P : PurelyWrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 F)
+      (K : Set M) (H : ℝ → M → Sphere2)
+      (V : PositiveVolumeForm (𝓡 4) M)
+      (π_f : PoissonStructure (𝓡 4) M)
+      (Hs : List C^∞⟮𝓡 4, M; ℝ⟯)
+      (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      IsCompact K ∧
+      ContMDiff (𝓘(ℝ, ℝ).prod (𝓡 4)) (𝓡 2) ∞ (Function.uncurry H) ∧
+      (∀ x, H 0 x = B.toFun x) ∧
+      (∀ x, H 1 x = P.toFun x) ∧
+      (∀ (t : ℝ), ∀ x ∉ K, H t x = B.toFun x) ∧
+      (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
+      π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_bar = composePoissonStructureTimeOneFlows M π_f Hs ∧
+      P.toFun ∘ ⇑d_bar = P.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_bar d_bar.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_bar V.μ V.μ ∧
+      IsTuringComplete ⇑d_bar ∧
+      (⇑d_bar : M → M) ≠ id ∧
+      V.μ = TauCeti.RoughForm.measure V.Ω.1 := by
+  obtain ⟨P, K, H, _, _, hK_comp, _, _, _, _, hH_md, hH_0, hH_1, hH_stat, hpos_P⟩ :=
+    Main.exists_pos_cooriented_purelyWrinkledFibration_of_brokenLefschetz M V_M F B V_F hpos
+  obtain ⟨V, π_f, Hs, d_bar, hpos_V, hunimV, hgen, hcomp, hfib, hpoiss, hvol, hmp, htc, hne,
+      hμ_eq⟩ :=
+    exists_poisson_hamiltonian_realization_of_purelyWrinkled M V_M F P V_F hpos_P
+  exact ⟨P, K, H, V, π_f, Hs, d_bar, hK_comp, hH_md, hH_0, hH_1, hH_stat, hpos_V, hunimV, hgen,
+    hcomp, hfib, hpoiss, hvol, hmp, htc, hne, hμ_eq⟩
+
+/-- **Exact-`V_M` Closed 4-Manifold Poisson–Hamiltonian Realization (`SC-R3`, Zero `ConnectedSpace`
+Assumption)**:
+Every nonempty compact Hausdorff smooth 4-manifold `M` equipped with **any** positive volume 4-form
+`V_M : PositiveVolumeForm (𝓡 4) M` (requiring **zero** `[ConnectedSpace M]` assumption and **zero**
+fibration typeclasses!) carries a smooth map `f : M → Sphere2`, a Poisson structure `π_f` globally
+unimodular with **`V_M.Ω` itself**, and a finite list `Hs` of smooth Hamiltonians whose composed
+time-`1` Poisson–Hamiltonian flow `d_exact` preserves `f`, `π_f`, **`V_M.Ω` itself**, and **`V_M.μ`
+itself**, and satisfies `IsTuringComplete ⇑d_exact` (`≠ id`). -/
+-- tier: T2
+theorem exists_exactVolumePreserving_poisson_hamiltonian_realization_closedFourManifold
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
+    [CompactSpace M] [T2Space M] [Nonempty M]
+    (V_M : PositiveVolumeForm (𝓡 4) M) :
+    ∃ (π_f : PoissonStructure (𝓡 4) M)
+      (f : M → Sphere2)
+      (Hs : List C^∞⟮𝓡 4, M; ℝ⟯)
+      (d_exact : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      ContMDiff (𝓡 4) (𝓡 2) ∞ f ∧
+      π_f.IsUnimodularWithVolume V_M.Ω ∧
+      d_exact = composePoissonStructureTimeOneFlows M π_f Hs ∧
+      f ∘ ⇑d_exact = f ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff V_M.Ω = V_M.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_exact V_M.μ V_M.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : M → M) ≠ id := by
+  let A : AdmitsRegularDiskFibration M := AdmitsRegularDiskFibration.ofPositiveVolumeForm V_M
+  let _ : AdmitsRegularDiskFibration M := A
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  let _ := A.instMeasurableSpaceFiber
+  let _ := A.instBorelSpaceFiber
+  let W : MoserVolume V_M (alignedPositiveVolume M) :=
+    MoserVolume.ofPositivelyCooriented V_M (alignedPositiveVolume M)
+      (fun x ↦ alignedVolumeForm_pos_cooriented M x)
+  let C_cmpp : HasCMPPCantorCirculationHamiltonians := universalReversibleSimulator_cmpp
+  let _ : HasTuringCompleteAreaPreservingDiskIsotopy :=
+    @instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP C_cmpp
+  let Hs₀ : List C^∞⟮𝓡 4, M; ℝ⟯ := C_cmpp.generators.map (liftPlanarHamiltonianTo4Manifold M)
+  let Hs : List C^∞⟮𝓡 4, M; ℝ⟯ := Hs₀.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩
+  let f₀ : M → Sphere2 := ⇑A.fibration
+  have hf₀ : ContMDiff (𝓡 4) (𝓡 2) ∞ f₀ := A.fibration.contMDiff_toFun
+  have hcomp₀ :
+      leafwiseBumpDiffeomorph M =
+        composePoissonStructureTimeOneFlows M (adaptedJacobianPoisson M) Hs₀ := by
+    rw [composePoissonStructureTimeOneFlows_adaptedJacobianPoisson]
+    exact (composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq M C_cmpp.r₀_mem_Ioo
+      universalReversibleSimulator_cmpp_isAutonomous).symm
+  have hcomp :
+      W.conjDiffeomorph (leafwiseBumpDiffeomorph M) =
+        composePoissonStructureTimeOneFlows M (W.pullbackJacobianPoisson f₀ hf₀) Hs := by
+    rw [W.composePoissonStructureTimeOneFlows_map_comp f₀ hf₀ Hs₀,
+      show jacobianPoissonOfPositiveVolume (alignedPositiveVolume M) S2VolumeForm f₀ hf₀ =
+        adaptedJacobianPoisson M from rfl, ← hcomp₀]
+  exact ⟨W.pullbackJacobianPoisson f₀ hf₀, f₀ ∘ ⇑W.ψ, Hs,
+    W.conjDiffeomorph (leafwiseBumpDiffeomorph M),
+    hf₀.comp W.ψ.contMDiff,
+    W.isUnimodularWithVolume_pullbackJacobianPoisson f₀ hf₀,
+    hcomp,
+    W.fibration_comp_conjDiffeomorph (fibration_comp_leafwiseBumpDiffeomorph M),
+    W.isPoissonMap_conjDiffeomorph f₀ hf₀ (isPoissonMap_leafwiseBumpDiffeomorph M),
+    W.mpullback_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph M)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M),
+    W.measurePreserving_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph M)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M),
+    W.isTuringComplete_conjDiffeomorph (isTuringComplete_leafwiseBumpDiffeomorph M),
+    W.conjDiffeomorph_ne_id (isTuringComplete_leafwiseBumpDiffeomorph M)⟩
+
+/-- **Exact Round-Volume Poisson–Hamiltonian Realization on `Sphere4` (`SC-R3`)**:
+Exhibits a smooth map `f : Sphere4 → Sphere2`, a **generically rank-2** Poisson structure `π_f`
+unimodular with the **exact standard round volume form `S4PositiveVolumeForm.Ω`**, and a finite list
+`Hs` of smooth Hamiltonians whose composed time-`1` Poisson–Hamiltonian flow `d_exact` preserves
+`f`, `π_f`, **`S4PositiveVolumeForm.Ω`**, and **`S4PositiveVolumeForm.μ`**, and is Turing complete
+(`IsTuringComplete ⇑d_exact`, `≠ id`). -/
+-- tier: T2
+theorem exists_exactVolumePreserving_poisson_hamiltonian_realization_S4 :
+    ∃ (π_f : PoissonStructure (𝓡 4) Sphere4)
+      (f : Sphere4 → Sphere2)
+      (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
+      (d_exact : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
+      ContMDiff (𝓡 4) (𝓡 2) ∞ f ∧
+      π_f.IsUnimodularWithVolume S4PositiveVolumeForm.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_exact = composePoissonStructureTimeOneFlows Sphere4 π_f Hs ∧
+      f ∘ ⇑d_exact = f ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff S4PositiveVolumeForm.Ω =
+        S4PositiveVolumeForm.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_exact S4PositiveVolumeForm.μ S4PositiveVolumeForm.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : Sphere4 → Sphere4) ≠ id ∧
+      S4PositiveVolumeForm.μ = TauCeti.RoughForm.measure S4PositiveVolumeForm.Ω.1 := by
+  let W : MoserVolume S4PositiveVolumeForm s4AlignedPositiveVolume :=
+    MoserVolume.ofPositivelyCooriented S4PositiveVolumeForm s4AlignedPositiveVolume
+      (fun x ↦ alignedVolumeForm_pos_cooriented Sphere4 x)
+  let C_cmpp : HasCMPPCantorCirculationHamiltonians := universalReversibleSimulator_cmpp
+  let _ : HasTuringCompleteAreaPreservingDiskIsotopy :=
+    @instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP C_cmpp
+  let Hs₀ : List C^∞⟮𝓡 4, Sphere4; ℝ⟯ :=
+    C_cmpp.generators.map (liftPlanarHamiltonianTo4Manifold Sphere4)
+  let Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯ := Hs₀.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩
+  have hcomp₀ :
+      s4TuringDiffeomorph = composePoissonStructureTimeOneFlows Sphere4 s4AdaptedPoisson Hs₀ := by
+    change leafwiseBumpDiffeomorph Sphere4 =
+      composePoissonStructureTimeOneFlows Sphere4 (adaptedJacobianPoisson Sphere4) Hs₀
+    rw [composePoissonStructureTimeOneFlows_adaptedJacobianPoisson]
+    exact (composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq Sphere4
+      C_cmpp.r₀_mem_Ioo universalReversibleSimulator_cmpp_isAutonomous).symm
+  have hcomp :
+      W.conjDiffeomorph s4TuringDiffeomorph =
+        composePoissonStructureTimeOneFlows Sphere4
+          (W.pullbackJacobianPoisson s4Fibration contMDiff_s4Fibration) Hs := by
+    rw [W.composePoissonStructureTimeOneFlows_map_comp s4Fibration contMDiff_s4Fibration Hs₀,
+      show jacobianPoissonOfPositiveVolume s4AlignedPositiveVolume S2VolumeForm s4Fibration
+          contMDiff_s4Fibration = s4AdaptedPoisson from rfl,
+      ← hcomp₀]
+  exact ⟨W.pullbackJacobianPoisson s4Fibration contMDiff_s4Fibration,
+    s4Fibration ∘ ⇑W.ψ, Hs, W.conjDiffeomorph s4TuringDiffeomorph,
+    contMDiff_s4Fibration.comp W.ψ.contMDiff,
+    W.isUnimodularWithVolume_pullbackJacobianPoisson s4Fibration contMDiff_s4Fibration,
+    (W.isGenericallyRankTwo_pullbackJacobianPoisson_iff s4Fibration contMDiff_s4Fibration).mpr
+      isGenericallyRankTwo_s4AdaptedPoisson,
+    hcomp,
+    W.fibration_comp_conjDiffeomorph (fibration_comp_leafwiseBumpDiffeomorph Sphere4),
+    W.isPoissonMap_conjDiffeomorph s4Fibration contMDiff_s4Fibration
+      (isPoissonMap_leafwiseBumpDiffeomorph Sphere4),
+    W.mpullback_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm Sphere4),
+    W.measurePreserving_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph Sphere4)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm Sphere4),
+    W.isTuringComplete_conjDiffeomorph (isTuringComplete_leafwiseBumpDiffeomorph Sphere4),
+    W.conjDiffeomorph_ne_id (isTuringComplete_leafwiseBumpDiffeomorph Sphere4),
+    rfl⟩
+
+/-- **Exact-`V_M` Poisson–Hamiltonian Realization over `PurelyWrinkledFibration` (`SC-R2` +
+`SC-R3`)**:
+Combines `ofPurelyWrinkled` with componentwise Moser conjugation (`W.ψ`, zero `[ConnectedSpace M]`
+assumption!) to obtain a `PurelyWrinkledFibration` `P_exact`, a **generically rank-2** Poisson
+structure `π_f` unimodular with **`V_M.Ω` itself**, and a finite list `Hs` of smooth Hamiltonians
+whose composed time-`1` flow `d_exact` preserves `P_exact.toFun`, `π_f`, **`V_M.Ω`**, and
+**`V_M.μ`**, and satisfies `IsTuringComplete ⇑d_exact` (`≠ id`). -/
+-- tier: T2
+theorem exists_exactVolumePreserving_poisson_hamiltonian_realization_of_purelyWrinkled
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M] [T2Space M]
+    (V_M : PositiveVolumeForm (𝓡 4) M)
+    (F : Type) [TopologicalSpace F] [ChartedSpace (EuclideanSpace ℝ (Fin 2)) F]
+    [IsManifold (𝓡 2) ∞ F] [T2Space F] [CompactSpace F] [Nonempty F]
+    [MeasurableSpace F] [BorelSpace F]
+    (P : PurelyWrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 F)
+    (V_F : PositiveVolumeForm (𝓡 2) F)
+    (hpos : ∀ u : P.toRegularDiskFibration.preimageOpen, ∃ c : ℝ, 0 < c ∧
+      (TauCeti.SmoothForm.mpullback P.trivialization P.trivialization.contMDiff
+          (TauCeti.SmoothForm.wedge
+            (TauCeti.SmoothForm.mpullback Prod.snd contMDiff_snd V_F.Ω)
+            (TauCeti.SmoothForm.mpullback (Subtype.val ∘ Prod.fst)
+              (contMDiff_subtype_val.comp contMDiff_fst) S2VolumeForm))).1 u =
+        c • (TauCeti.SmoothForm.mpullback Subtype.val contMDiff_subtype_val V_M.Ω).1 u) :
+    ∃ (P_exact : PurelyWrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 F)
+      (π_f : PoissonStructure (𝓡 4) M)
+      (Hs : List C^∞⟮𝓡 4, M; ℝ⟯)
+      (d_exact : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M),
+      π_f.IsUnimodularWithVolume V_M.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
+      d_exact = composePoissonStructureTimeOneFlows M π_f Hs ∧
+      P_exact.toFun ∘ ⇑d_exact = P_exact.toFun ∧
+      SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
+        d_exact d_exact.contMDiff ∧
+      TauCeti.SmoothForm.mpullback d_exact d_exact.contMDiff V_M.Ω = V_M.Ω ∧
+      MeasureTheory.MeasurePreserving ⇑d_exact V_M.μ V_M.μ ∧
+      IsTuringComplete ⇑d_exact ∧
+      (⇑d_exact : M → M) ≠ id := by
+  let A : AdmitsWrinkledOrBrokenLefschetzFibration M :=
+    AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled V_M F P V_F hpos
+  let _ : AdmitsWrinkledOrBrokenLefschetzFibration M := A
+  let W : MoserVolume V_M (alignedPositiveVolume M) :=
+    MoserVolume.ofPositivelyCooriented V_M (alignedPositiveVolume M)
+      (fun x ↦ alignedVolumeForm_pos_cooriented M x)
+  let C_cmpp : HasCMPPCantorCirculationHamiltonians := universalReversibleSimulator_cmpp
+  let _ : HasTuringCompleteAreaPreservingDiskIsotopy :=
+    @instHasTuringCompleteAreaPreservingDiskIsotopyOfCMPP C_cmpp
+  let Hs₀ : List C^∞⟮𝓡 4, M; ℝ⟯ := C_cmpp.generators.map (liftPlanarHamiltonianTo4Manifold M)
+  let Hs : List C^∞⟮𝓡 4, M; ℝ⟯ := Hs₀.map fun h ↦ h.comp ⟨W.ψ, W.ψ.contMDiff⟩
+  have hcomp₀ :
+      leafwiseBumpDiffeomorph M =
+        composePoissonStructureTimeOneFlows M (adaptedJacobianPoisson M) Hs₀ := by
+    rw [composePoissonStructureTimeOneFlows_adaptedJacobianPoisson]
+    exact (composePoissonHamiltonianTimeOneFlows_map_liftPlanarHamiltonian_eq M C_cmpp.r₀_mem_Ioo
+      universalReversibleSimulator_cmpp_isAutonomous).symm
+  have hcomp :
+      W.conjDiffeomorph (leafwiseBumpDiffeomorph M) =
+        composePoissonStructureTimeOneFlows M
+          (W.pullbackJacobianPoisson P.toFun P.contMDiff_toFun) Hs := by
+    rw [W.composePoissonStructureTimeOneFlows_map_comp P.toFun P.contMDiff_toFun Hs₀,
+      show jacobianPoissonOfPositiveVolume (alignedPositiveVolume M) S2VolumeForm P.toFun
+          P.contMDiff_toFun = adaptedJacobianPoisson M from rfl,
+      ← hcomp₀]
+  exact ⟨P.compDiffeomorph W.ψ, W.pullbackJacobianPoisson P.toFun P.contMDiff_toFun, Hs,
+    W.conjDiffeomorph (leafwiseBumpDiffeomorph M),
+    W.isUnimodularWithVolume_pullbackJacobianPoisson P.toFun P.contMDiff_toFun,
+    (W.isGenericallyRankTwo_pullbackJacobianPoisson_iff P.toFun P.contMDiff_toFun).mpr
+      (isGenericallyRankTwo_adaptedJacobianPoisson M),
+    hcomp,
+    W.fibration_comp_conjDiffeomorph (fibration_comp_leafwiseBumpDiffeomorph M),
+    W.isPoissonMap_conjDiffeomorph P.toFun P.contMDiff_toFun
+      (isPoissonMap_leafwiseBumpDiffeomorph M),
+    W.mpullback_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph M)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M),
+    W.measurePreserving_conjDiffeomorph (connectedComponent_leafwiseBumpDiffeomorph M)
+      (mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M),
+    W.isTuringComplete_conjDiffeomorph (isTuringComplete_leafwiseBumpDiffeomorph M),
+    W.conjDiffeomorph_ne_id (isTuringComplete_leafwiseBumpDiffeomorph M)⟩
 
 section Sanity
 
