@@ -103,7 +103,7 @@
           
           <li><a href="chap_fibrations.html#lem_s4_instance">Lemma 4.6</a></li>
           
-          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.6</a></li>
+          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.7</a></li>
           
           <li><a href="chap_universal.html#thm_cmpp_instance">Theorem 7.5</a></li>
           
@@ -160,7 +160,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_main_s4">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000027"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000028"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -180,11 +180,13 @@
           
           <li><a href="chap_lift.html#thm_pi_f">Theorem 5.3</a></li>
           
-          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.5</a></li>
+          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.6</a></li>
           
-          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.6</a></li>
+          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.7</a></li>
           
           <li><a href="chap_interfaces.html#lem_tc_ne_id">Lemma 2.3</a></li>
+          
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
           
         </ul>
     
@@ -206,6 +208,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4</a></li>
+          
         </ul>
     
       </div>
@@ -215,11 +219,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    There are a positive volume form \(V\), a unimodular Jacobian Poisson structure \(\pi _f\) of rank \(2\) off the nonempty circle \(\mathrm{Crit}(f)\) and rank \(0\) on it, and a diffeomorphism \(\overline{d}\) of \(S^4\) preserving \(f\), \(\pi _f\), \(V\) and its measure, acting as an area-preserving diffeomorphism on every regular leaf, and Turing complete. </p>
+  <p>    There are a positive volume form \(V\) (with \(V.\mu \) equal to the measure of \(V.\Omega \), and an exact round-volume companion for \(\Omega _{S^4}\) via <a href="chap_lift.html#thm_moser_volume">theorem 5.4</a>), a generically rank-\(2\) unimodular Jacobian Poisson structure \(\pi _f\) of rank \(2\) off the nonempty circle \(\mathrm{Crit}(f)\) and rank \(0\) on it, and a diffeomorphism \(\overline{d}\) of \(S^4\) preserving \(f\), \(\pi _f\), \(V\) and its measure, acting as an area-preserving diffeomorphism on every regular leaf, and Turing complete. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000027">
+<div class="proof_wrapper" id="a0000000028">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -227,7 +231,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Specialize the lift to \(M=S^4\) with the CMPP instance. </p>
+  <p>Specialize the lift and Moser conjugation to \(M=S^4\) with the CMPP instance. </p>
 
   </div>
 </div>
@@ -247,7 +251,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_s4_short">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000028"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -285,6 +289,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_S4" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_S4</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_diffeomorph_S4" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_diffeomorph_S4</a></li>
+          
         </ul>
     
       </div>
@@ -294,11 +300,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    There exists a Turing complete, volume-preserving diffeomorphism of \(S^4\). </p>
+  <p>    There exists a Turing complete diffeomorphism of \(S^4\) preserving the standard round volume form \(\Omega _{S^4}\) (as well as the aligned volume form). </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000028">
+<div class="proof_wrapper" id="a0000000029">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -326,7 +332,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_undecidable_s4">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000030"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -344,9 +350,9 @@
           
           <li><a href="chap_main.html#def_s4_structures">Definition 8.1</a></li>
           
-          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.6</a></li>
+          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.7</a></li>
           
-          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.5</a></li>
+          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.6</a></li>
           
         </ul>
     
@@ -377,11 +383,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    For \(\overline{d}\) there is a nonempty open \(U\subset S^4\) such that reaching \(U\) from computable points is r.e. but not decidable. </p>
+  <p>    For \(\overline{d}\) there is a nonempty open tube \(U\subset S^4\) generated by a computable sequence of rational boxes such that reaching \(U\) from computable points is r.e. but not decidable. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000029">
+<div class="proof_wrapper" id="a0000000030">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -389,7 +395,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p><a href="chap_lift.html#thm_lift_tc">theorem 5.6</a> on \(S^4\). </p>
+  <p><a href="chap_lift.html#thm_lift_tc">theorem 5.7</a> on \(S^4\). </p>
 
   </div>
 </div>
@@ -399,7 +405,7 @@
     Theorem
     </span>
     <span class="theorem_thmlabel">8.5</span>
-    <span class="theorem_thmtitle">Corollary 2, formal version</span>
+    <span class="theorem_thmtitle">Corollary 2, parametric generically rank-\(2\) version</span>
     <div class="thm_header_extras">
 
     
@@ -409,7 +415,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_cor2">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000030"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000031"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -429,9 +435,9 @@
           
           <li><a href="chap_lift.html#thm_pi_f">Theorem 5.3</a></li>
           
-          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.5</a></li>
+          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.6</a></li>
           
-          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.6</a></li>
+          <li><a href="chap_lift.html#thm_lift_tc">Theorem 5.7</a></li>
           
           <li><a href="chap_universal.html#thm_cmpp_instance">Theorem 7.5</a></li>
           
@@ -464,11 +470,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    Every compact Hausdorff smooth \(4\)-manifold with an <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> structure carries the same package as in <a href="chap_main.html#thm_main_s4">theorem 8.2</a> (fibers of any genus). </p>
+  <p>    Every compact Hausdorff smooth \(4\)-manifold with an <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> structure carries a generically rank-\(2\) unimodular Jacobian Poisson structure and the full package of <a href="chap_main.html#thm_main_s4">theorem 8.2</a> (fibers of any genus). </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000030">
+<div class="proof_wrapper" id="a0000000031">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -476,17 +482,17 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Same construction, through a Darboux disk in the fiber. </p>
+  <p>Same construction, through a Darboux disk in the fiber, plus <a href="chap_lift.html#thm_pi_f">theorem 5.3</a> for rank-\(2\) density. </p>
 
   </div>
 </div>
-<div class="corollary_thmwrapper theorem-style-plain" id="cor_paper_all">
-  <div class="corollary_thmheading">
-    <span class="corollary_thmcaption">
-    Corollary
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_cor2_purely_wrinkled">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
     </span>
-    <span class="corollary_thmlabel">8.6</span>
-    <span class="corollary_thmtitle">Corollary 2, unconditional on closed \(4\)-manifolds (Track&#160;B)</span>
+    <span class="theorem_thmlabel">8.6</span>
+    <span class="theorem_thmtitle">Corollary 2 over purely wrinkled and broken Lefschetz fibrations (Track&#160;A)</span>
     <div class="thm_header_extras">
 
     
@@ -494,9 +500,9 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap_main.html#cor_paper_all">#</a>
+    <a class="icon proof" href="chap_main.html#thm_cor2_purely_wrinkled">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000031"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000032"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -514,9 +520,11 @@
           
           <li><a href="chap_main.html#thm_cor2">Theorem 8.5</a></li>
           
-          <li><a href="chap_fibrations.html#ext_fibration_existence">Theorem 4.10</a></li>
+          <li><a href="chap_fibrations.html#thm_lekili_moves">Theorem 4.8</a></li>
           
-          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.9</a></li>
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
+          
+          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.10</a></li>
           
         </ul>
     
@@ -536,13 +544,108 @@
         
         <ul class="uses">
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_purelyWrinkled" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_purelyWrinkled</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_brokenLefschetz" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_of_brokenLefschetz</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_of_purelyWrinkled" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_of_purelyWrinkled</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.undecidable_orbit_reachability_of_purelyWrinkled" class="lean_decl">S4TuringPoisson.Main.undecidable_orbit_reachability_of_purelyWrinkled</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_poisson_hamiltonian_realization_of_purelyWrinkled" class="lean_decl">S4TuringPoisson.exists_poisson_hamiltonian_realization_of_purelyWrinkled</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    Every compact Hausdorff smooth \(4\)-manifold \((M,V_M)\) equipped with a positively co-oriented <span class="ttfamily">PurelyWrinkledFibration</span> or <span class="ttfamily">BrokenLefschetzFibration</span> carries a generically rank-\(2\) unimodular Jacobian Poisson structure (open dense rank-\(2\) locus), autonomous Poisson–Hamiltonian realization, undecidable reachability, and an exact \(V_M\)-preserving Moser conjugate. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000032">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Wrinkle any broken Lefschetz fibration via <a href="chap_fibrations.html#thm_lekili_moves">theorem 4.8</a>, instantiate <a href="chap_main.html#thm_cor2">theorem 8.5</a> via <span class="ttfamily">ofPurelyWrinkled</span>, and conjugate by <a href="chap_lift.html#thm_moser_volume">theorem 5.4</a>. </p>
+
+  </div>
+</div>
+<div class="corollary_thmwrapper theorem-style-plain" id="cor_paper_all">
+  <div class="corollary_thmheading">
+    <span class="corollary_thmcaption">
+    Corollary
+    </span>
+    <span class="corollary_thmlabel">8.7</span>
+    <span class="corollary_thmtitle">Corollary 2, unconditional exact-volume form on closed \(4\)-manifolds</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_main.html#cor_paper_all">#</a>
+    
+    <a class="icon proof" href="chap_main.html#a0000000033"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_main.html#thm_cor2">Theorem 8.5</a></li>
+          
+          <li><a href="chap_fibrations.html#ext_fibration_existence">Theorem 4.10</a></li>
+          
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
+          
+          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.10</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_diffeomorph_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_diffeomorph_closedFourManifold</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_closedFourManifold</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.undecidable_orbit_reachability_exactVolumePreserving_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.undecidable_orbit_reachability_exactVolumePreserving_closedFourManifold</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_closedFourManifold" class="lean_decl">S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_closedFourManifold</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold</a></li>
-          
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_volumePreserving_diffeomorph_closedFourManifold</a></li>
-          
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.undecidable_orbit_reachability_closedFourManifold" class="lean_decl">S4TuringPoisson.Main.undecidable_orbit_reachability_closedFourManifold</a></li>
-          
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_poisson_hamiltonian_realization_closedFourManifold" class="lean_decl">S4TuringPoisson.exists_poisson_hamiltonian_realization_closedFourManifold</a></li>
           
         </ul>
     
@@ -553,11 +656,11 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>    Every nonempty compact Hausdorff smooth \(4\)-manifold \(M\) equipped with a positive volume \(4\)-form \(V_M\) carries a positively co-oriented volume form \(V\), a compatible Jacobian Poisson structure, and a volume-preserving Turing complete Poisson diffeomorphism realized by finitely many Poisson–Hamiltonian time-one flows, with undecidable forward-orbit reachability. </p>
+  <p>    Every nonempty compact Hausdorff smooth \(4\)-manifold \(M\) equipped with a positive volume \(4\)-form \(V_M\) admits a \(C^\infty \) diffeomorphism \(d_{\mathrm{exact}}\) preserving \(V_M.\Omega \) and \(V_M.\mu \) <em>identically</em>, realized as a composition of Poisson–Hamiltonian time-one flows of a local coordinate-ball Jacobian Poisson structure, that is Turing complete with undecidable reachability. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000031">
+<div class="proof_wrapper" id="a0000000033">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -565,7 +668,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Instantiate <a href="chap_main.html#thm_cor2">theorem 8.5</a> and <a href="chap_main.html#thm_flow_eq">theorem 8.9</a> with <a href="chap_fibrations.html#ext_fibration_existence">theorem 4.10</a>. </p>
+  <p>Combine <a href="chap_fibrations.html#ext_fibration_existence">theorem 4.10</a>, the leafwise lift, <a href="chap_main.html#thm_flow_eq">theorem 8.10</a>, and componentwise Moser volume conjugation (<a href="chap_lift.html#thm_moser_volume">theorem 5.4</a>). </p>
 
   </div>
 </div>
@@ -574,7 +677,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">8.7</span>
+    <span class="theorem_thmlabel">8.8</span>
     <span class="theorem_thmtitle">Theorem 1 for the ADK broken Lefschetz fibration on \(S^4\) (Track&#160;A)</span>
     <div class="thm_header_extras">
 
@@ -585,7 +688,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_main_s4_adk">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000032"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000034"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -605,7 +708,9 @@
           
           <li><a href="chap_main.html#thm_cor2">Theorem 8.5</a></li>
           
-          <li><a href="chap_main.html#thm_r5">Theorem 8.10</a></li>
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
+          
+          <li><a href="chap_main.html#thm_r5">Theorem 8.11</a></li>
           
         </ul>
     
@@ -627,7 +732,13 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK" class="lean_decl">S4TuringPoisson.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4_ADK" class="lean_decl">S4TuringPoisson.Main.exists_turingComplete_exactVolumePreserving_poissonDiffeomorph_S4_ADK</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.undecidable_orbit_reachability_S4_ADK" class="lean_decl">S4TuringPoisson.undecidable_orbit_reachability_S4_ADK</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_poisson_hamiltonian_realization_S4_ADK" class="lean_decl">S4TuringPoisson.exists_poisson_hamiltonian_realization_S4_ADK</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_S4_ADK" class="lean_decl">S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_S4_ADK</a></li>
           
         </ul>
     
@@ -638,11 +749,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    On \(S^4\) equipped with the global ADK broken Lefschetz fibration (<a href="chap_fibrations.html#thm_adk_s4">theorem 4.9</a>), all conclusions of Theorem&#160;1 and R5 hold unconditionally, with \(\mathrm{Crit}(f_{\mathrm{ADK}})\) consisting solely of indefinite quadratic folds separating regular \(S^2\) and \(T^2\) fibers. </p>
+  <p>    On \(S^4\) equipped with the global ADK broken Lefschetz fibration (<a href="chap_fibrations.html#thm_adk_s4">theorem 4.9</a>), all conclusions of Theorem&#160;1, undecidability, R5, generic rank \(2\), and exact round-volume preservation hold unconditionally, with \(\mathrm{Crit}(f_{\mathrm{ADK}})\) consisting solely of indefinite quadratic folds separating embedded \(S^2\) and \(T^2\) fibers. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000032">
+<div class="proof_wrapper" id="a0000000034">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -650,7 +761,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Instantiate <a href="chap_main.html#thm_cor2">theorem 8.5</a> and <a href="chap_main.html#thm_r5">theorem 8.10</a> with <span class="ttfamily">s4ADKAdmits</span> from <a href="chap_fibrations.html#thm_adk_s4">theorem 4.9</a>. </p>
+  <p>Instantiate <a href="chap_main.html#thm_cor2">theorem 8.5</a>, <a href="chap_main.html#thm_r5">theorem 8.11</a>, and <a href="chap_lift.html#thm_moser_volume">theorem 5.4</a> with <span class="ttfamily">s4ADKAdmits</span>. </p>
 
   </div>
 </div>
@@ -659,7 +770,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">8.8</span>
+    <span class="definition_thmlabel">8.9</span>
     <span class="definition_thmtitle">Time-one flows of Poisson-Hamiltonian vector fields</span>
     <div class="thm_header_extras">
 
@@ -731,7 +842,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">8.9</span>
+    <span class="theorem_thmlabel">8.10</span>
     <span class="theorem_thmtitle">Leafwise lift equals a Poisson-Hamiltonian flow</span>
     <div class="thm_header_extras">
 
@@ -742,7 +853,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_flow_eq">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000033"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000035"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -758,9 +869,9 @@
         
         <ul class="uses">
           
-          <li><a href="chap_main.html#def_poisson_flows">Definition 8.8</a></li>
+          <li><a href="chap_main.html#def_poisson_flows">Definition 8.9</a></li>
           
-          <li><a href="chap_lift.html#def_leafwise">Definition 5.4</a></li>
+          <li><a href="chap_lift.html#def_leafwise">Definition 5.5</a></li>
           
           <li><a href="chap_lift.html#lem_eq1">Lemma 5.2</a></li>
           
@@ -805,7 +916,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000033">
+<div class="proof_wrapper" id="a0000000035">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -822,8 +933,8 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">8.10</span>
-    <span class="theorem_thmtitle">R5: Poisson-Hamiltonian realization on \(S^4\)</span>
+    <span class="theorem_thmlabel">8.11</span>
+    <span class="theorem_thmtitle">R5: Poisson-Hamiltonian realization on \(S^4\) and \(4\)-manifolds</span>
     <div class="thm_header_extras">
 
     
@@ -833,7 +944,7 @@
 
     <a class="icon proof" href="chap_main.html#thm_r5">#</a>
     
-    <a class="icon proof" href="chap_main.html#a0000000034"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_main.html#a0000000036"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -849,9 +960,11 @@
         
         <ul class="uses">
           
-          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.9</a></li>
+          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.10</a></li>
           
           <li><a href="chap_main.html#thm_main_s4">Theorem 8.2</a></li>
+          
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
           
           <li><a href="chap_universal.html#thm_cmpp_instance">Theorem 7.5</a></li>
           
@@ -877,6 +990,10 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_poisson_hamiltonian_realization_S4" class="lean_decl">S4TuringPoisson.exists_poisson_hamiltonian_realization_S4</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_S4" class="lean_decl">S4TuringPoisson.exists_exactVolumePreserving_poisson_hamiltonian_realization_S4</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.MoserVolume.composePoissonStructureTimeOneFlows_map_comp" class="lean_decl">S4TuringPoisson.MoserVolume.composePoissonStructureTimeOneFlows_map_comp</a></li>
+          
         </ul>
     
       </div>
@@ -886,11 +1003,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    There are finitely many smooth \(\tilde H_j\colon S^4\to \mathbb {R}\) such that the composition \(\overline{d}\) of the time-one flows of \(X_{\tilde H_j}\) (for \(\pi _f\)) preserves \(f\), \(\pi _f\), the volume form and measure, is Turing complete, and is not the identity. </p>
+  <p>    There are finitely many smooth \(\tilde H_j\colon S^4\to \mathbb {R}\) such that the composition \(\overline{d}\) of the time-one flows of \(X_{\tilde H_j}\) preserves \(f\), \(\pi _f\), the volume form (including the exact round volume \(\Omega _{S^4}\) after Moser conjugation) and measure, is Turing complete, and is not the identity. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000034">
+<div class="proof_wrapper" id="a0000000036">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -898,7 +1015,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Lift the autonomous CMPP generators and apply <a href="chap_main.html#thm_flow_eq">theorem 8.9</a>. </p>
+  <p>Lift the autonomous CMPP generators, apply <a href="chap_main.html#thm_flow_eq">theorem 8.10</a>, and push forward along Moser’s diffeomorphism. </p>
 
   </div>
 </div>

@@ -76,7 +76,7 @@
     Definition
     </span>
     <span class="definition_thmlabel">4.1</span>
-    <span class="definition_thmtitle">Local singular models</span>
+    <span class="definition_thmtitle">Local singular models and chirality</span>
     <div class="thm_header_extras">
 
     
@@ -103,6 +103,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsRealLefschetzAt" class="lean_decl">S4TuringPoisson.IsRealLefschetzAt</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsChiralRealLefschetzAt" class="lean_decl">S4TuringPoisson.IsChiralRealLefschetzAt</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.IsWrinkledCuspAt" class="lean_decl">S4TuringPoisson.IsWrinkledCuspAt</a></li>
           
         </ul>
@@ -114,7 +116,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   Indefinite quadratic fold, real Lefschetz, and wrinkled cusp singularities, defined through local charts. </p>
+  <p>   Indefinite quadratic fold, achiral/general real Lefschetz, orientation-preserving chiral real Lefschetz, and wrinkled cusp singularities, defined through smooth local charts. </p>
 
   </div>
 </div>
@@ -124,7 +126,7 @@
     Definition
     </span>
     <span class="definition_thmlabel">4.2</span>
-    <span class="definition_thmtitle">Wrinkled, broken Lefschetz, and purely wrinkled fibrations</span>
+    <span class="definition_thmtitle">Regular-disk, broken Lefschetz, and purely wrinkled fibrations</span>
     <div class="thm_header_extras">
 
     
@@ -167,7 +169,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.WrinkledFibration" class="lean_decl">S4TuringPoisson.WrinkledFibration</a></li>
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.RegularDiskFibration" class="lean_decl">S4TuringPoisson.RegularDiskFibration</a></li>
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.BrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.BrokenLefschetzFibration</a></li>
           
@@ -182,7 +184,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    A <span class="ttfamily">WrinkledFibration</span> is a smooth map \(f\colon M\to N\) with a disk-shaped open region of regular values over which \(f\) is smoothly trivial with compact surface fiber. It places no constraint on critical points; <span class="ttfamily">BrokenLefschetzFibration</span> requires every critical point to be a real Lefschetz point or an indefinite fold, while <span class="ttfamily">PurelyWrinkledFibration</span> requires every critical point to be an indefinite fold or a wrinkled cusp. </p>
+  <p>    A <span class="ttfamily">RegularDiskFibration</span> is a smooth map \(f\colon M\to N\) with a disk-shaped open region of regular values over which \(f\) is smoothly trivial with compact surface fiber (imposing no critical-locus normal form). <span class="ttfamily">BrokenLefschetzFibration</span> extends it by requiring every critical point on \(M\) to be a real Lefschetz point or an indefinite fold; <span class="ttfamily">PurelyWrinkledFibration</span> requires every critical point on \(M\) to be an indefinite fold or a wrinkled cusp. </p>
 
   </div>
 </div>
@@ -237,7 +239,7 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4Fibration" class="lean_decl">S4TuringPoisson.s4Fibration</a></li>
           
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4WrinkledFibration" class="lean_decl">S4TuringPoisson.s4WrinkledFibration</a></li>
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4RegularDiskFibration" class="lean_decl">S4TuringPoisson.s4RegularDiskFibration</a></li>
           
         </ul>
     
@@ -248,7 +250,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    \(f(x_0,\dots ,x_4)=\sigma ^{-1}(x_0,x_1)\), with \(\sigma ^{-1}\) the inverse stereographic projection from the south pole, packaged as a <span class="ttfamily">WrinkledFibration</span> with fiber \(S^2\). </p>
+  <p>    \(f(x_0,\dots ,x_4)=\sigma ^{-1}(x_0,x_1)\), with \(\sigma ^{-1}\) the inverse stereographic projection from the south pole, packaged as a <span class="ttfamily">RegularDiskFibration</span> with fiber \(S^2\). </p>
 
   </div>
 </div>
@@ -319,7 +321,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>    \(f\) is smooth and \(\mathrm{Crit}(f)=\{ x_2=x_3=x_4=0\} \), a nonempty circle on which the fibers collapse to points (a definite fold, proved unable to lift to <span class="ttfamily">BrokenLefschetzFibration</span> or <span class="ttfamily">PurelyWrinkledFibration</span>). </p>
+  <p>    \(f\) is smooth and \(\mathrm{Crit}(f)=\{ x_2=x_3=x_4=0\} \), a nonempty circle with dense complement on which the fibers collapse to points (a definite fold, proved unable to lift to <span class="ttfamily">BrokenLefschetzFibration</span> or <span class="ttfamily">PurelyWrinkledFibration</span>). </p>
 
   </div>
 </div>
@@ -341,7 +343,7 @@
     Definition
     </span>
     <span class="definition_thmlabel">4.5</span>
-    <span class="definition_thmtitle">Fibration structure on a \(4\)-manifold</span>
+    <span class="definition_thmtitle">Regular-disk vs. wrinkled/broken Lefschetz fibration classes</span>
     <div class="thm_header_extras">
 
     
@@ -386,7 +388,11 @@
         
         <ul class="uses">
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsRegularDiskFibration" class="lean_decl">S4TuringPoisson.AdmitsRegularDiskFibration</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofBrokenLefschetz" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofBrokenLefschetz</a></li>
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPurelyWrinkled</a></li>
           
@@ -399,7 +405,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>    A class packaging an ambient volume form, a <span class="ttfamily">WrinkledFibration</span> \(M\to S^2\) with compact fiber \(F\), an area form on \(F\), and positive co-orientation of the trivialization, together with constructors from broken Lefschetz and purely wrinkled fibrations. </p>
+  <p>    <span class="ttfamily">AdmitsRegularDiskFibration</span> packages an ambient volume form, a <span class="ttfamily">RegularDiskFibration</span> \(M\to S^2\) with compact fiber \(F\), an area form on \(F\), and positive co-orientation of the trivialization; <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> extends it by enforcing that every critical point on \(M\) is an indefinite fold, wrinkled cusp, or real Lefschetz point. </p>
 
   </div>
 </div>
@@ -409,7 +415,7 @@
     Lemma
     </span>
     <span class="lemma_thmlabel">4.6</span>
-    <span class="lemma_thmtitle">\(S^4\) carries the fibration structure</span>
+    <span class="lemma_thmtitle">\(S^4\) carries the regular-disk fibration structure</span>
     <div class="thm_header_extras">
 
     
@@ -457,7 +463,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4" class="lean_decl">S4TuringPoisson.instAdmitsWrinkledOrBrokenLefschetzFibrationSphere4</a></li>
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.instAdmitsRegularDiskFibrationSphere4" class="lean_decl">S4TuringPoisson.instAdmitsRegularDiskFibrationSphere4</a></li>
           
         </ul>
     
@@ -468,7 +474,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>    \(S^4\) is an instance, with fiber \(S^2\) and the round volume forms. </p>
+  <p>    \(S^4\) is an instance of <span class="ttfamily">AdmitsRegularDiskFibration</span>, with fiber \(S^2\) and the round volume forms. </p>
 
   </div>
 </div>
@@ -553,7 +559,7 @@
     Theorem
     </span>
     <span class="theorem_thmlabel">4.8</span>
-    <span class="theorem_thmtitle">Lekili planar moves and broken-to-wrinkled smoothing (Track&#160;A)</span>
+    <span class="theorem_thmtitle">Lekili local moves and compactly supported broken-to-wrinkled homotopy (Track&#160;A)</span>
     <div class="thm_header_extras">
 
     
@@ -603,6 +609,10 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.singularities_lekiliMove1" class="lean_decl">S4TuringPoisson.singularities_lekiliMove1</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.singularities_lekiliMove4_pos" class="lean_decl">S4TuringPoisson.singularities_lekiliMove4_pos</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.singularities_lekiliMove4_neg" class="lean_decl">S4TuringPoisson.singularities_lekiliMove4_neg</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.gate52_lekiliMove1_three_cusps" class="lean_decl">S4TuringPoisson.gate52_lekiliMove1_three_cusps</a></li>
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.BrokenLefschetzFibration.exists_purelyWrinkledFibration" class="lean_decl">S4TuringPoisson.BrokenLefschetzFibration.exists_purelyWrinkledFibration</a></li>
@@ -616,7 +626,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    Explicit smooth homotopies realize Lekili’s Moves&#160;1–4: Move&#160;1 resolves a real Lefschetz singularity into a \(3\)-cusp deltoid circle of indefinite folds with cusps at \(\theta \in \{ 0,2\pi /3,4\pi /3\} \). Shrinking the regular base disk and gluing compactly supported Move&#160;1 bumps deforms every <span class="ttfamily">BrokenLefschetzFibration</span> on a compact Hausdorff \(4\)-manifold to a <span class="ttfamily">PurelyWrinkledFibration</span>. </p>
+  <p>    Explicit smooth \(1\)-parameter families \(\mathbb {R}^4\to \mathbb {R}^2\) model Lekili’s Moves&#160;1–4 with closed-form indefinite-fold and wrinkled-cusp charts (including the swallowtail flip Move&#160;4). Shrinking the regular base disk and gluing compactly supported Move&#160;1 bumps deforms every <span class="ttfamily">BrokenLefschetzFibration</span> \(B\) on a compact Hausdorff \(4\)-manifold via a smooth global homotopy \(H\colon \mathbb {R}\times M\to \mathrm{Base}\) supported in a compact neighborhood \(K\) of the real Lefschetz points (disjoint from all regular and fold points) to a <span class="ttfamily">PurelyWrinkledFibration</span> \(P\). </p>
 
   </div>
 </div>
@@ -628,7 +638,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Classify cusps by Weierstrass preparation (\(d=3\)) and indefinite folds by implicit chart inversion (\(d=2\)), prove finite isolation of real Lefschetz critical points by compactness, shrink <span class="ttfamily">baseRegion</span> to half radius, and eliminate Lefschetz points inductively while fixing the regular product region. </p>
+  <p>Classify cusps by Weierstrass preparation (\(d=3\)) and indefinite folds by implicit chart inversion (\(d=2\)), prove finite isolation of real Lefschetz critical points by compactness, shrink <span class="ttfamily">baseRegion</span> to half radius, and eliminate Lefschetz points via pairwise-disjoint compactly supported homotopies \(t\mapsto \mathrm{compactLefschetzWrinkle}(t s_0)\). </p>
 
   </div>
 </div>
@@ -690,7 +700,13 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4BrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.s4BrokenLefschetzFibration</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKTorusBrokenLefschetzFibration" class="lean_decl">S4TuringPoisson.s4ADKTorusBrokenLefschetzFibration</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4PurelyWrinkledFibration" class="lean_decl">S4TuringPoisson.s4PurelyWrinkledFibration</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKNorthFiberDiffeomorph" class="lean_decl">S4TuringPoisson.s4ADKNorthFiberDiffeomorph</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKTorusFiberDiffeomorph" class="lean_decl">S4TuringPoisson.s4ADKTorusFiberDiffeomorph</a></li>
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.s4ADKAdmits" class="lean_decl">S4TuringPoisson.s4ADKAdmits</a></li>
           
@@ -703,7 +719,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    There is an explicit global <span class="ttfamily">BrokenLefschetzFibration</span> and <span class="ttfamily">PurelyWrinkledFibration</span> \(f_{\mathrm{ADK}}\colon S^4\to S^2\) realizing the round-handle decomposition of Auroux–Donaldson–Katzarkov, with regular \(S^2\) and \(T^2\) fibers separated by a single equatorial circle \(\{ x_2=x_3=x_4=0\} \) of indefinite quadratic folds, positively co-oriented with the round volume forms on \(S^4\) and \(S^2\). </p>
+  <p>    There is an explicit global <span class="ttfamily">BrokenLefschetzFibration</span> and <span class="ttfamily">PurelyWrinkledFibration</span> \(f_{\mathrm{ADK}}\colon S^4\to S^2\) realizing the round-handle decomposition of Auroux–Donaldson–Katzarkov, with critical set equal to the equatorial circle \(\{ x_2=x_3=x_4=0\} \) of indefinite quadratic folds, embedded \(C^\infty \) regular fibers diffeomorphic to \(S^2\) (north) and \(T^2=S^1\times S^1\) (south), and explicit smooth bundle trivializations over both hemispheres. </p>
 
   </div>
 </div>
@@ -715,7 +731,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Project \(S^4\subset \mathbb {R}^5\) via the \(\mathrm{SO}(3)\)-equivariant homogeneous map \((x_0x_2+x_1x_3,\,  x_0x_3-x_1x_2,\,  \tfrac {1}{4}-(x_0^2+x_1^2))\) normalized to \(S^2\), certify critical points and indefinite-fold normal forms, and trivialize over an open regular disk around the north pole. </p>
+  <p>Normalize the \(\mathrm{SO}(3)\)-equivariant map to \(S^2\), certify critical points and indefinite-fold normal forms, equip regular level fibers with TauCeti’s submanifold structure, and trivialize over regular disks around both poles. </p>
 
   </div>
 </div>
@@ -725,7 +741,7 @@
     Theorem
     </span>
     <span class="theorem_thmlabel">4.10</span>
-    <span class="theorem_thmtitle">Existence of the fibration structure on closed \(4\)-manifolds (Track&#160;B)</span>
+    <span class="theorem_thmtitle">Local regular-disk fibration and Track&#160;B separation on closed \(4\)-manifolds</span>
     <div class="thm_header_extras">
 
     
@@ -773,9 +789,13 @@
         
         <ul class="uses">
           
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.closedManifoldWrinkledFibration" class="lean_decl">S4TuringPoisson.closedManifoldWrinkledFibration</a></li>
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.closedManifoldRegularDiskFibration" class="lean_decl">S4TuringPoisson.closedManifoldRegularDiskFibration</a></li>
           
-          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm" class="lean_decl">S4TuringPoisson.AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm</a></li>
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.AdmitsRegularDiskFibration.ofPositiveVolumeForm" class="lean_decl">S4TuringPoisson.AdmitsRegularDiskFibration.ofPositiveVolumeForm</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.not_isGenericallyRankTwo_closedManifoldLocal" class="lean_decl">S4TuringPoisson.not_isGenericallyRankTwo_closedManifoldLocal</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.not_admitsWrinkledOrBrokenLefschetzFibration_closedManifoldLocal" class="lean_decl">S4TuringPoisson.not_admitsWrinkledOrBrokenLefschetzFibration_closedManifoldLocal</a></li>
           
         </ul>
     
@@ -786,7 +806,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    Every nonempty compact Hausdorff smooth \(4\)-manifold \(M\) equipped with a positive volume \(4\)-form \(V_M\) admits a positively co-oriented <span class="ttfamily">WrinkledFibration</span> \(M\to S^2\) with fiber \(S^2\) (an instance of <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> constructed locally inside an orientation-preserving coordinate ball without global definite-fold elimination). </p>
+  <p>    Every nonempty compact Hausdorff smooth \(4\)-manifold \(M\) equipped with a positive volume \(4\)-form \(V_M\) admits a positively co-oriented <span class="ttfamily">RegularDiskFibration</span> \(M\to S^2\) with fiber \(S^2\) (<span class="ttfamily">ofPositiveVolumeForm</span>, Track&#160;B), constructed locally inside an orientation-preserving coordinate ball and constant outside it (hence proved <em>not</em> generically rank \(2\) and unable to inhabit <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span>). </p>
 
   </div>
 </div>
@@ -798,7 +818,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Compose an orientation-preserving coordinate-ball chart \(B^4(0,2)\hookrightarrow M\) with a radial cut-off blend of <span class="ttfamily">s4Fibration</span> that collapses the exterior to the south pole outside <span class="ttfamily">s4BaseRegion</span>, and pull back \(S^2\times \mathbb {R}^2\) product co-orientation. </p>
+  <p>Compose an orientation-preserving coordinate-ball chart into \(M\) with a radial cut-off blend of <span class="ttfamily">s4Fibration</span> collapsing the exterior to a single point outside <span class="ttfamily">s4BaseRegion</span>; compactness of \(M\) implies the exterior has nonempty interior inside \(\mathrm{Crit}(f)\). </p>
 
   </div>
 </div>

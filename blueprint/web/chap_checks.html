@@ -75,7 +75,7 @@
     Lemma
     </span>
     <span class="lemma_thmlabel">9.1</span>
-    <span class="lemma_thmtitle">Halting/looping separation on \(S^4\)</span>
+    <span class="lemma_thmtitle">Halting/looping separation, target boxes, and periodic-map refutation</span>
     <div class="thm_header_extras">
 
     
@@ -85,7 +85,7 @@
 
     <a class="icon proof" href="chap_checks.html#lem_gate6">#</a>
     
-    <a class="icon proof" href="chap_checks.html#a0000000035"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_checks.html#a0000000037"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -105,7 +105,9 @@
           
           <li><a href="chap_main.html#thm_cor2">Theorem 8.5</a></li>
           
-          <li><a href="chap_main.html#thm_r5">Theorem 8.10</a></li>
+          <li><a href="chap_main.html#thm_r5">Theorem 8.11</a></li>
+          
+          <li><a href="chap_interfaces.html#lem_tc_ne_id">Lemma 2.3</a></li>
           
         </ul>
     
@@ -133,6 +135,10 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate6_poisson_hamiltonian_realization_S4" class="lean_decl">S4TuringPoisson.Checks.gate6_poisson_hamiltonian_realization_S4</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.periodic_rotation_not_isTuringComplete" class="lean_decl">S4TuringPoisson.Checks.periodic_rotation_not_isTuringComplete</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.sphere4_undecidable_targetBoxes_witness" class="lean_decl">S4TuringPoisson.Checks.sphere4_undecidable_targetBoxes_witness</a></li>
+          
         </ul>
     
       </div>
@@ -142,11 +148,11 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>    For concrete halting and looping two-state machines, the \(S^4\) diffeomorphism has an orbit that enters a positive-measure open set and another that never does. </p>
+  <p>    For concrete halting and looping two-state machines, the \(S^4\) diffeomorphism separates halting from looping, emits positive-measure computable rational target boxes, and is non-periodic; by contrast, the period-\(2\) disk rotation \((x,y)\mapsto (-x,-y)\) is refuted as non-Turing complete. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000035">
+<div class="proof_wrapper" id="a0000000037">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -154,7 +160,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>Instantiate the witness on the two machines. </p>
+  <p>Instantiate the witness on the two machines and apply <a href="chap_interfaces.html#lem_tc_ne_id">lemma 2.3</a> at \(p=2\). </p>
 
   </div>
 </div>
@@ -174,7 +180,7 @@
 
     <a class="icon proof" href="chap_checks.html#lem_concrete">#</a>
     
-    <a class="icon proof" href="chap_checks.html#a0000000036"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_checks.html#a0000000038"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -194,9 +200,9 @@
           
           <li><a href="chap_universal.html#thm_simulator">Theorem 7.4</a></li>
           
-          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.9</a></li>
+          <li><a href="chap_main.html#thm_flow_eq">Theorem 8.10</a></li>
           
-          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.5</a></li>
+          <li><a href="chap_lift.html#thm_leafwise_props">Theorem 5.6</a></li>
           
         </ul>
     
@@ -237,7 +243,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000036">
+<div class="proof_wrapper" id="a0000000038">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -255,7 +261,7 @@
     Lemma
     </span>
     <span class="lemma_thmlabel">9.3</span>
-    <span class="lemma_thmtitle">Definite-fold exclusion, Lekili surgery, ADK and closed-manifold witnesses</span>
+    <span class="lemma_thmtitle">Gates G5.1–G5.4, Track&#160;B separation, ADK \(C^\infty \) fibers, and exact Moser witnesses</span>
     <div class="thm_header_extras">
 
     
@@ -265,7 +271,7 @@
 
     <a class="icon proof" href="chap_checks.html#lem_gate5_adk_lekili">#</a>
     
-    <a class="icon proof" href="chap_checks.html#a0000000037"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_checks.html#a0000000039"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -283,9 +289,11 @@
           
           <li><a href="chap_fibrations.html#thm_lekili_moves">Theorem 4.8</a></li>
           
-          <li><a href="chap_main.html#thm_main_s4_adk">Theorem 8.7</a></li>
+          <li><a href="chap_main.html#thm_main_s4_adk">Theorem 8.8</a></li>
           
-          <li><a href="chap_main.html#cor_paper_all">Corollary 8.6</a></li>
+          <li><a href="chap_main.html#cor_paper_all">Corollary 8.7</a></li>
+          
+          <li><a href="chap_lift.html#thm_moser_volume">Theorem 5.4</a></li>
           
           <li><a href="chap_fibrations.html#lem_s4_crit">Lemma 4.4</a></li>
           
@@ -313,6 +321,12 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate53_adk_s4_topology_and_turing_witness" class="lean_decl">S4TuringPoisson.Checks.gate53_adk_s4_topology_and_turing_witness</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.gate54_lekili_moves_234_witness" class="lean_decl">S4TuringPoisson.Checks.gate54_lekili_moves_234_witness</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.closedManifoldLocal_not_genericallyRankTwo" class="lean_decl">S4TuringPoisson.Checks.closedManifoldLocal_not_genericallyRankTwo</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.exact_moser_volume_S4_and_closedFourManifold_witness" class="lean_decl">S4TuringPoisson.Checks.exact_moser_volume_S4_and_closedFourManifold_witness</a></li>
+          
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.Checks.unconditional_corollary2_closedFourManifold_on_S4_check" class="lean_decl">S4TuringPoisson.Checks.unconditional_corollary2_closedFourManifold_on_S4_check</a></li>
           
         </ul>
@@ -324,11 +338,11 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>    Gates G5.1–G5.3 and the unconditional closed-\(4\)-manifold check: <span class="ttfamily">s4Fibration</span> fails to lift to broken Lefschetz or purely wrinkled; Lekili Move&#160;1 has three distinct cusps and an indefinite fold and smooths <span class="ttfamily">s4BrokenLefschetzFibration</span>; the ADK fibration exhibits regular \(S^2\) and \(T^2\) fibers and a Turing complete Poisson diffeomorphism; unconditional Corollary&#160;2 instantiates cleanly on \((S^4,\Omega _{S^4})\). </p>
+  <p>    Gates G5.1–G5.4 and Moser checks: <span class="ttfamily">s4Fibration</span> fails to lift to broken Lefschetz or purely wrinkled; Lekili Moves&#160;1–4 exhibit \(3\)-cusp wrinkling, \(2\)-cusp birth, cusp-merge, swallowtail flip, chiral vs. achiral Lefschetz separation, and compactly supported homotopy; the ADK fibration exhibits \(C^\infty \) \(S^2\) and \(T^2\) fiber diffeomorphisms and two-sided trivializations; Track&#160;B’s local map is proved non-generically rank \(2\); and Moser conjugation preserves \(\Omega _{S^4}\) identically. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000037">
+<div class="proof_wrapper" id="a0000000039">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof

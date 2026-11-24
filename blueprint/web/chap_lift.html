@@ -225,7 +225,7 @@
     Theorem
     </span>
     <span class="theorem_thmlabel">5.3</span>
-    <span class="theorem_thmtitle">Unimodularity and rank of \(\pi _f\)</span>
+    <span class="theorem_thmtitle">Unimodularity, rank, and generic density of \(\pi _f\)</span>
     <div class="thm_header_extras">
 
     
@@ -283,6 +283,8 @@
           
           <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_mem_criticalPoints" class="lean_decl">S4TuringPoisson.rankAt_adaptedJacobianPoisson_of_mem_criticalPoints</a></li>
           
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.isGenericallyRankTwo_adaptedJacobianPoisson" class="lean_decl">S4TuringPoisson.isGenericallyRankTwo_adaptedJacobianPoisson</a></li>
+          
         </ul>
     
       </div>
@@ -292,7 +294,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    \(\pi _f\) is unimodular with respect to the aligned volume form, of rank \(2\) off \(\mathrm{Crit}(f)\) and rank \(0\) on \(\mathrm{Crit}(f)\). </p>
+  <p>    \(\pi _f\) is unimodular with respect to the aligned volume form, of rank \(2\) off \(\mathrm{Crit}(f)\) and rank \(0\) on \(\mathrm{Crit}(f)\), and is generically rank \(2\) (open dense rank-\(2\) locus) whenever <span class="ttfamily">AdmitsWrinkledOrBrokenLefschetzFibration</span> holds. </p>
 
   </div>
 </div>
@@ -304,7 +306,90 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>\(\mathcal L_{X_h}\Omega =d(dh\wedge f^*\mu )=0\); the rank is read off from \(df_x\). </p>
+  <p>\(\mathcal L_{X_h}\Omega =d(dh\wedge f^*\mu )=0\); rank follows from \(df_x\), and normal-form charts provide regular points arbitrarily close to every fold, cusp, or Lefschetz point. </p>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm_moser_volume">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">5.4</span>
+    <span class="theorem_thmtitle">Componentwise Moser volume conjugation on compact \(4\)-manifolds</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="chap_lift.html#thm_moser_volume">#</a>
+    
+    <a class="icon proof" href="chap_lift.html#a0000000014"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="chap_interfaces.html#def_volume">Definition 2.6</a></li>
+          
+          <li><a href="chap_poisson.html#def_jacobian">Definition 3.3</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.MoserVolume" class="lean_decl">S4TuringPoisson.MoserVolume</a></li>
+          
+          <li><a href="https://leanprover-community.github.io/mathlib4_docs/find/#doc/S4TuringPoisson.MoserVolume.ofPositivelyCooriented" class="lean_decl">S4TuringPoisson.MoserVolume.ofPositivelyCooriented</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>    For any two positively co-oriented smooth positive volume forms \(V_0,V_1\) on a nonempty compact Hausdorff smooth \(4\)-manifold \(M\) (without assuming connectedness), there is a diffeomorphism \(\psi \colon M\simeq _m M\) preserving each connected component \(C\) with \(\psi ^*V_1|_C = c_C\cdot V_0|_C\) (\(c_C{\gt}0\)); conjugating any component-preserving \(V_1\)-preserving diffeomorphism \(\overline{d}\) to \(d_{\mathrm{exact}}=\psi ^{-1}\circ \overline{d}\circ \psi \) preserves \(V_0.\Omega \) and \(V_0.\mu \) identically. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000014">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>Apply TauCeti’s top-degree de Rham integration isomorphism and time-dependent Moser flow on each clopen connected component of \(M\). </p>
 
   </div>
 </div>
@@ -313,7 +398,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">5.4</span>
+    <span class="definition_thmlabel">5.5</span>
     <span class="definition_thmtitle">Leafwise bump diffeomorphism</span>
     <div class="thm_header_extras">
 
@@ -383,7 +468,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">5.5</span>
+    <span class="theorem_thmlabel">5.6</span>
     <span class="theorem_thmtitle">Properties of the leafwise lift</span>
     <div class="thm_header_extras">
 
@@ -394,7 +479,7 @@
 
     <a class="icon proof" href="chap_lift.html#thm_leafwise_props">#</a>
     
-    <a class="icon proof" href="chap_lift.html#a0000000014"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_lift.html#a0000000015"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -410,7 +495,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap_lift.html#def_leafwise">Definition 5.4</a></li>
+          <li><a href="chap_lift.html#def_leafwise">Definition 5.5</a></li>
           
           <li><a href="chap_lift.html#lem_eq1">Lemma 5.2</a></li>
           
@@ -455,7 +540,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000014">
+<div class="proof_wrapper" id="a0000000015">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -472,7 +557,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">5.6</span>
+    <span class="theorem_thmlabel">5.7</span>
     <span class="theorem_thmtitle">Turing completeness of the lift</span>
     <div class="thm_header_extras">
 
@@ -483,7 +568,7 @@
 
     <a class="icon proof" href="chap_lift.html#thm_lift_tc">#</a>
     
-    <a class="icon proof" href="chap_lift.html#a0000000015"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="chap_lift.html#a0000000016"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -499,7 +584,7 @@
         
         <ul class="uses">
           
-          <li><a href="chap_lift.html#def_leafwise">Definition 5.4</a></li>
+          <li><a href="chap_lift.html#def_leafwise">Definition 5.5</a></li>
           
           <li><a href="chap_interfaces.html#lem_transfer">Lemma 2.5</a></li>
           
@@ -542,7 +627,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000015">
+<div class="proof_wrapper" id="a0000000016">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
