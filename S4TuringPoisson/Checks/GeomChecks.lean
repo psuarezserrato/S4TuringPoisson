@@ -1307,7 +1307,8 @@ theorem gate52_lekili_astroid_and_surgery_witness :
         P.baseRegion.1 ⊆ s4ADKBaseRegion.1 ∧
         ∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = s4ADKFibration x := by
   obtain ⟨h0, h23, h43, _, hpi_ne, hd1, hd2, hd3⟩ := gate52_lekiliMove1_three_cusps 1 one_ne_zero
-  obtain ⟨P, _, hsub, hval⟩ := s4BrokenLefschetzFibration.exists_purelyWrinkledFibration
+  obtain ⟨P, _, _, _, hsub, _, _, _, _, hval, _, _, _, _⟩ :=
+    s4BrokenLefschetzFibration.exists_purelyWrinkledFibration
   exact ⟨⟨h0, h23, h43, hpi_ne, hd1, hd2, hd3⟩,
     isIndefiniteFoldAt_lekiliMove1_pi one_ne_zero,
     singularities_lekiliMove1 one_ne_zero,

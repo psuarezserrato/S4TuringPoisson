@@ -23,24 +23,29 @@ public import Mathlib.Analysis.Analytic.Order
 public import Mathlib.Analysis.Calculus.BumpFunction.Basic
 public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+public import Mathlib.Geometry.Manifold.Algebra.Structures
 
 /-!
 # Lekili's Four Moves, 3-Cusp Deltoid Witness, and Chart Wrinkling (`Lekili 2009`)
 
-This module formalizes the four local singular-fibration moves of Lekili (`Geom. Topol.` 13,
-2009), together with:
-1. **Move 1 (`lekiliMove1`) & Gate 5.2**: Wrinkling an isolated real Lefschetz point
-   `(z₁, z₂) ↦ z₁² + z₂² + 2s z̄₁` into a circle of singularities with **three distinct cusps**
-   at `θ = 0, 2π/3, 4π/3` (`deriv = 0`) and regular immersion elsewhere (`deriv ≠ 0` at `θ = π`),
-   plus `IsWrinkledCuspAt` and `IsIndefiniteFoldAt` local normal-form equivalences.
-2. **Moves 2–4 (`lekiliMove2`–`lekiliMove4`)**: Birth/death of a 2-cusp eye (`t, x₁³ +
-   3(t² - s) x₁ + Q`), cusp-merge (`t, x₁³ - 3(t² - s) x₁ + Q`), and flip/swallowtail
-   (`t, x₁⁴/4 + s x₁²/2 - t x₁ + Q`), with exact `HasFDerivAt`, `criticalPoints`, and
-   closed-form fold/cusp charts.
-3. **Compactly Supported Chart Wrinkling (`compactLefschetzWrinkle`, `wrinkleRealLefschetzChart`)**:
-   A radial bump modification (`rIn = 1, rOut = 2`) with an explicit quantitative collar
-   right-inverse bound and smooth chart surgery replacing an isolated `IsRealLefschetzAt` point
-   outside `baseRegion` while preserving `WrinkledFibration`, culminating in
+This module formalizes the four explicit local `ℝ⁴ → ℝ²` 1-parameter singular-fibration normal-form
+families of Lekili (`Geom. Topol.` 13, 2009, §3.1–§3.2), together with global chart surgery (§4 /
+Theorem 4):
+1. **Move 1 (`lekiliMove1`, §3.1) & Gate 5.2**: Local `ℝ⁴ → ℝ²` wrinkling of an isolated real
+   Lefschetz point `(z₁, z₂) ↦ z₁² + z₂² + 2s z̄₁` into a circle of singularities with **three
+   distinct cusps** at `θ = 0, 2π/3, 4π/3` (`deriv = 0`) and regular immersion elsewhere
+   (`deriv ≠ 0` at `θ = π`), plus `IsWrinkledCuspAt` and `IsIndefiniteFoldAt` local normal-form
+   equivalences.
+2. **Moves 2–4 (`lekiliMove2`–`lekiliMove4`, §3.2)**: Explicit local `ℝ⁴ → ℝ²` 1-parameter families
+   for birth/death of a 2-cusp eye (`t, x₁³ + 3(t² - s) x₁ + Q`), cusp-merge
+   (`t, x₁³ - 3(t² - s) x₁ + Q`), and flip/swallowtail (`t, x₁⁴/4 + s x₁²/2 - t x₁ + Q`), with
+   exact `HasFDerivAt`, `criticalPoints`, and `IsIndefiniteFoldAt` / `IsWrinkledCuspAt` normal-form
+   classifications for all four moves.
+3. **Compactly Supported Chart Wrinkling & Global Surgery (`compactLefschetzWrinkle`,
+   §4 / Theorem 4)**: Globalizes Move 1 onto manifolds via a radial bump modification
+   (`rIn = 1, rOut = 2`) with an explicit quantitative collar right-inverse bound, replacing
+   isolated `IsRealLefschetzAt` points outside `closure P.baseRegion` while preserving
+   `WrinkledFibration` and exporting compact surgery support `K` and smooth global homotopy `H` in
    `BrokenLefschetzFibration.exists_purelyWrinkledFibration`.
 -/
 
@@ -4053,6 +4058,1002 @@ theorem hasDerivAt_lekiliMove4CritValue (s x : ℝ) :
     ring
   exact hasDerivAt_vec2 h0 h1
 
+/-- Every point on `lekiliMove4CritCurve s` lies in `criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s)`. -/
+-- tier: T1
+theorem lekiliMove4CritCurve_mem_criticalPoints (s x : ℝ) :
+    lekiliMove4CritCurve s x ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s) := by
+  rw [criticalPoints_lekiliMove4]
+  exact ⟨rfl, rfl, rfl⟩
+
+/-- Closed-form `IsIndefiniteFoldAt` along `lekiliMove4CritCurve s x` whenever
+`3 * x ^ 2 + s ≠ 0` (`Lekili 2009`, §3.2 Move 4). -/
+-- tier: T2
+theorem isIndefiniteFoldAt_lekiliMove4 (s x : ℝ) (hx : 3 * x ^ 2 + s ≠ 0) :
+    IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 s) (lekiliMove4CritCurve s x) := by
+  let p_star := lekiliMove4CritCurve s x
+  let t₀ : ℝ := x ^ 3 + s * x
+  let a : ℝ := 3 * x ^ 2 + s
+  have ha_ne : a ≠ 0 := hx
+  let h : ℝ → ℝ := fun u ↦ u ^ 3 + s * u
+  have hh_diff : ContDiffOn ℝ ∞ h Set.univ :=
+    ((contDiff_id.pow 3).add (contDiff_const.mul contDiff_id)).contDiffOn
+  let eh : ℝ ≃L[ℝ] ℝ :=
+    { toFun v := a * v
+      invFun v := v / a
+      map_add' u v := by ring
+      map_smul' r v := by simp only [smul_eq_mul, RingHom.id_apply]; ring
+      left_inv v := by field_simp [ha_ne]
+      right_inv v := by field_simp [ha_ne]
+      continuous_toFun := continuous_const.mul continuous_id
+      continuous_invFun := continuous_id.div_const a }
+  have heh : (eh : ℝ →L[ℝ] ℝ) = fderiv ℝ h x := by
+    have hder : HasDerivAt h a x := by
+      have hid := hasDerivAt_id x
+      refine ((hid.pow 3).add (hid.const_mul s)).congr_deriv ?_
+      dsimp only [id_eq, a]; ring
+    rw [hder.hasFDerivAt.fderiv]
+    apply ContinuousLinearMap.ext_ring
+    simp [eh]
+  obtain ⟨Θ, hΘ_coe, hx_Θ, _, hΘ_symm⟩ :=
+    TauCeti.ContDiffOn.exists_openPartialHomeomorph hh_diff isOpen_univ (Set.mem_univ x)
+      (by simp) heh
+  let r : ℝ → ℝ := Θ.symm
+  let V₀ : Set ℝ := Θ.target
+  have hV₀_open : IsOpen V₀ := Θ.open_target
+  have ht₀_eq : Θ x = t₀ := by rw [hΘ_coe]
+  have ht₀_V₀ : t₀ ∈ V₀ := ht₀_eq ▸ Θ.map_source hx_Θ
+  have hr_t₀ : r t₀ = x := by rw [← ht₀_eq]; exact Θ.left_inv hx_Θ
+  have hr_eq : ∀ t ∈ V₀, r t ^ 3 + s * r t = t := fun t ht ↦ by
+    change h (Θ.symm t) = t
+    rw [← hΘ_coe]
+    exact Θ.right_inv ht
+  have hr_contOn : ContinuousOn r V₀ := hΘ_symm.continuousOn
+  let ε : ℝ := if 0 < a then 1 else -1
+  have hε2 : ε ^ 2 = 1 := by by_cases hpos : 0 < a <;> simp [ε, hpos]
+  have hε_a : 0 < ε * a := by
+    by_cases hpos : 0 < a
+    · simp [ε, hpos]
+    · have hneg : a < 0 := lt_of_le_of_ne (not_lt.mp hpos) ha_ne
+      simp only [ε, hpos, ↓reduceIte, neg_one_mul, Left.neg_pos_iff]
+      exact hneg
+  let R : EuclideanSpace ℝ (Fin 4) → ℝ :=
+    fun q ↦ ε * ((q 1 ^ 2 + 2 * r (q 0) * q 1 + 3 * r (q 0) ^ 2 + 2 * s) / 2)
+  have hRp : R p_star = ε * a := by
+    have hp0 : p_star 0 = t₀ := rfl
+    have hp1 : p_star 1 = x := rfl
+    simp only [R, hp0, hp1, hr_t₀, a]
+    ring
+  have hRp_pos : 0 < R p_star := hRp ▸ hε_a
+  let U_tgt : Set EuclideanPlane := {w | w 0 ∈ V₀}
+  have hU_tgt_open : IsOpen U_tgt := hV₀_open.preimage (euclidProj 0).continuous
+  have hfp_tgt : lekiliMove4 s p_star ∈ U_tgt := ht₀_V₀
+  let preV₀ : Set (EuclideanSpace ℝ (Fin 4)) := {q | q 0 ∈ V₀}
+  have hpreV₀_open : IsOpen preV₀ := hV₀_open.preimage (euclidProj 0).continuous
+  have hR_contOn : ContinuousOn R preV₀ := by
+    have hr_q : ContinuousOn (fun q : EuclideanSpace ℝ (Fin 4) ↦ r (q 0)) preV₀ :=
+      hr_contOn.comp (euclidProj 0).continuous.continuousOn (fun _ hq ↦ hq)
+    have hq1 : ContinuousOn (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 1) preV₀ :=
+      (euclidProj 1).continuous.continuousOn
+    exact continuousOn_const.mul
+      (((((hq1.pow 2).add ((continuousOn_const.mul hr_q).mul hq1)).add
+        (continuousOn_const.mul (hr_q.pow 2))).add continuousOn_const).div_const 2)
+  let U_dom : Set (EuclideanSpace ℝ (Fin 4)) := {q ∈ preV₀ | 0 < R q}
+  have hU_dom_open : IsOpen U_dom := hR_contOn.isOpen_inter_preimage hpreV₀_open isOpen_Ioi
+  have hp_dom : p_star ∈ U_dom := ⟨ht₀_V₀, hRp_pos⟩
+  have hR_contDiff : ContDiffOn ℝ ∞ R U_dom := by
+    have hq0 : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 0) U_dom :=
+      (euclidProj 0).contDiff.contDiffOn
+    have hq1 : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 1) U_dom :=
+      (euclidProj 1).contDiff.contDiffOn
+    have hr_q : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ r (q 0)) U_dom :=
+      hΘ_symm.comp hq0 (fun _ hq ↦ hq.1)
+    exact contDiff_const.contDiffOn.mul
+      (((((hq1.pow 2).add ((contDiff_const.contDiffOn.mul hr_q).mul hq1)).add
+        (contDiff_const.contDiffOn.mul (hr_q.pow 2))).add
+        contDiff_const.contDiffOn).div_const 2)
+  let posCoord : EuclideanSpace ℝ (Fin 4) → ℝ := fun q ↦ if 0 < a then q 3 else q 2
+  let negCoord : EuclideanSpace ℝ (Fin 4) → ℝ := fun q ↦ if 0 < a then q 2 else q 3
+  let posProj : EuclideanSpace ℝ (Fin 4) →L[ℝ] ℝ :=
+    if 0 < a then euclidProj (3 : Fin 4) else euclidProj (2 : Fin 4)
+  let negProj : EuclideanSpace ℝ (Fin 4) →L[ℝ] ℝ :=
+    if 0 < a then euclidProj (2 : Fin 4) else euclidProj (3 : Fin 4)
+  have hpos_cont : ContDiff ℝ ∞ posCoord := by
+    by_cases hpos : 0 < a <;> simpa [posCoord, hpos] using (euclidProj _).contDiff
+  have hneg_cont : ContDiff ℝ ∞ negCoord := by
+    by_cases hpos : 0 < a <;> simpa [negCoord, hpos] using (euclidProj _).contDiff
+  let cCrit : ℝ → ℝ := fun t ↦ -3 / 4 * r t ^ 4 - s / 2 * r t ^ 2
+  have hcCrit_diff : ContDiffOn ℝ ∞ cCrit V₀ :=
+    ((contDiff_const.contDiffOn.mul (hΘ_symm.pow 4)).sub
+      (contDiff_const.contDiffOn.mul (hΘ_symm.pow 2)))
+  let Φ : EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 4) := fun q ↦
+    vec4 (posCoord q) ((q 1 - r (q 0)) * Real.sqrt (R q))
+      (Real.sqrt 2 * negCoord q) (q 0 - t₀)
+  let Ψ : EuclideanPlane → EuclideanPlane := fun w ↦
+    vec2 (-ε * (w 1 - cCrit (w 0))) (w 0 - t₀)
+  have hΦ_diff : ContDiffOn ℝ ∞ Φ U_dom := by
+    have hq0 : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 0) U_dom :=
+      (euclidProj 0).contDiff.contDiffOn
+    have hq1 : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 1) U_dom :=
+      (euclidProj 1).contDiff.contDiffOn
+    have hr_q : ContDiffOn ℝ ∞ (fun q : EuclideanSpace ℝ (Fin 4) ↦ r (q 0)) U_dom :=
+      hΘ_symm.comp hq0 (fun _ hq ↦ hq.1)
+    have hR_sqrt : ContDiffOn ℝ ∞ (fun q ↦ Real.sqrt (R q)) U_dom :=
+      hR_contDiff.sqrt fun _ hq ↦ hq.2.ne'
+    exact contDiffOn_vec4 hpos_cont.contDiffOn ((hq1.sub hr_q).mul hR_sqrt)
+      (contDiff_const.mul hneg_cont).contDiffOn (hq0.sub contDiff_const.contDiffOn)
+  have hΨ_diff : ContDiffOn ℝ ∞ Ψ U_tgt := by
+    have hw0 : ContDiffOn ℝ ∞ (fun w : EuclideanPlane ↦ w 0) U_tgt :=
+      (euclidProj 0).contDiff.contDiffOn
+    have hw1 : ContDiffOn ℝ ∞ (fun w : EuclideanPlane ↦ w 1) U_tgt :=
+      (euclidProj 1).contDiff.contDiffOn
+    have hc_w : ContDiffOn ℝ ∞ (fun w : EuclideanPlane ↦ cCrit (w 0)) U_tgt :=
+      hcCrit_diff.comp hw0 (fun _ hw ↦ hw)
+    exact contDiffOn_vec2 (contDiff_const.contDiffOn.mul (hw1.sub hc_w))
+      (hw0.sub contDiff_const.contDiffOn)
+  have hr_diffAt : DifferentiableAt ℝ r t₀ :=
+    (hΘ_symm.contDiffAt (hV₀_open.mem_nhds ht₀_V₀)).differentiableAt (by simp)
+  let dr : ℝ := deriv r t₀
+  have hr_fderiv : HasFDerivAt r (dr • ContinuousLinearMap.id ℝ ℝ) t₀ := by
+    refine hr_diffAt.hasDerivAt.hasFDerivAt.congr_fderiv ?_
+    apply ContinuousLinearMap.ext_ring
+    simp [dr]
+  have hcCrit_diffAt : DifferentiableAt ℝ cCrit t₀ :=
+    (hcCrit_diff.contDiffAt (hV₀_open.mem_nhds ht₀_V₀)).differentiableAt (by simp)
+  let dc : ℝ := deriv cCrit t₀
+  have hcCrit_fderiv : HasFDerivAt cCrit (dc • ContinuousLinearMap.id ℝ ℝ) t₀ := by
+    refine hcCrit_diffAt.hasDerivAt.hasFDerivAt.congr_fderiv ?_
+    apply ContinuousLinearMap.ext_ring
+    simp [dc]
+  let k : ℝ := Real.sqrt (R p_star)
+  have hk_ne : k ≠ 0 := (Real.sqrt_pos.mpr hRp_pos).ne'
+  have hrt2_ne : Real.sqrt 2 ≠ 0 := (Real.sqrt_pos.mpr (by norm_num)).ne'
+  let eΦ : EuclideanSpace ℝ (Fin 4) ≃L[ℝ] EuclideanSpace ℝ (Fin 4) :=
+    { toFun v := vec4 (posProj v) (k * (v 1 - dr * v 0)) (Real.sqrt 2 * negProj v) (v 0)
+      invFun u := if 0 < a then
+          vec4 (u 3) (u 1 / k + dr * u 3) (u 2 / Real.sqrt 2) (u 0)
+        else
+          vec4 (u 3) (u 1 / k + dr * u 3) (u 0) (u 2 / Real.sqrt 2)
+      map_add' u v := by
+        refine ext_vec4 ?_ ?_ ?_ ?_ <;>
+          simp only [vec4_zero, vec4_one, vec4_two, vec4_three, map_add, PiLp.add_apply] <;> ring
+      map_smul' r0 v := by
+        refine ext_vec4 ?_ ?_ ?_ ?_ <;>
+          simp only [vec4_zero, vec4_one, vec4_two, vec4_three, map_smul, PiLp.smul_apply,
+            smul_eq_mul, RingHom.id_apply] <;> ring
+      left_inv v := by
+        by_cases hpos : 0 < a
+        · refine ext_vec4 ?_ ?_ ?_ ?_
+          · simp [hpos, vec4_zero, posProj, euclidProj]
+          · simp only [hpos, ↓reduceIte, vec4_zero, vec4_one, vec4_three]; field_simp [hk_ne]; ring
+          · simp only [hpos, ↓reduceIte, vec4_two, negProj, euclidProj, EuclideanSpace.proj,
+              PiLp.proj_apply]
+            exact mul_div_cancel_left₀ _ hrt2_ne
+          · simp [posProj, hpos, euclidProj]
+        · refine ext_vec4 ?_ ?_ ?_ ?_
+          · simp [hpos, vec4_zero, posProj, euclidProj]
+          · simp only [hpos, ↓reduceIte, vec4_zero, vec4_one, vec4_three]; field_simp [hk_ne]; ring
+          · simp [posProj, hpos, euclidProj]
+          · simp only [hpos, ↓reduceIte, vec4_two, negProj, euclidProj, EuclideanSpace.proj,
+              PiLp.proj_apply]
+            exact mul_div_cancel_left₀ _ hrt2_ne
+      right_inv u := by
+        by_cases hpos : 0 < a
+        · refine ext_vec4 ?_ ?_ ?_ ?_
+          · simp [hpos, posProj, euclidProj]
+          · simp only [hpos, ↓reduceIte, vec4_zero, vec4_one]; field_simp [hk_ne]; ring
+          · simp only [hpos, ↓reduceIte, negProj, euclidProj, EuclideanSpace.proj,
+              PiLp.proj_apply, vec4_two]
+            exact mul_div_cancel₀ _ hrt2_ne
+          · simp [hpos]
+        · refine ext_vec4 ?_ ?_ ?_ ?_
+          · simp [hpos, posProj, euclidProj]
+          · simp only [hpos, ↓reduceIte, vec4_zero, vec4_one]; field_simp [hk_ne]; ring
+          · simp only [hpos, ↓reduceIte, negProj, euclidProj, EuclideanSpace.proj,
+              PiLp.proj_apply, vec4_three]
+            exact mul_div_cancel₀ _ hrt2_ne
+          · simp [hpos]
+      continuous_toFun := continuous_vec4 posProj.continuous
+        (continuous_const.mul ((euclidProj 1).continuous.sub
+          (continuous_const.mul (euclidProj 0).continuous)))
+        (continuous_const.mul negProj.continuous) (euclidProj 0).continuous
+      continuous_invFun := by
+        by_cases hpos : 0 < a
+        · simp only [hpos, ↓reduceIte]
+          exact continuous_vec4 (euclidProj 3).continuous
+            (((euclidProj 1).continuous.div_const k).add
+              (continuous_const.mul (euclidProj 3).continuous))
+            ((euclidProj 2).continuous.div_const (Real.sqrt 2)) (euclidProj 0).continuous
+        · simp only [hpos, ↓reduceIte]
+          exact continuous_vec4 (euclidProj 3).continuous
+            (((euclidProj 1).continuous.div_const k).add
+              (continuous_const.mul (euclidProj 3).continuous))
+            (euclidProj 0).continuous ((euclidProj 2).continuous.div_const (Real.sqrt 2)) }
+  let eΨ : EuclideanPlane ≃L[ℝ] EuclideanPlane :=
+    { toFun v := vec2 (-ε * (v 1 - dc * v 0)) (v 0)
+      invFun u := vec2 (u 1) (-ε * u 0 + dc * u 1)
+      map_add' u v := by
+        refine ext_vec2 ?_ (by simp)
+        simp only [vec2_zero, PiLp.add_apply]; ring
+      map_smul' r0 v := by
+        refine ext_vec2 ?_ (by simp)
+        simp only [vec2_zero, PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; ring
+      left_inv v := by
+        refine ext_vec2 rfl ?_
+        simp only [vec2_zero, vec2_one]
+        calc
+          -ε * (-ε * (v 1 - dc * v 0)) + dc * v 0
+            = ε ^ 2 * (v 1 - dc * v 0) + dc * v 0 := by ring
+          _ = v 1 := by rw [hε2, one_mul]; ring
+      right_inv u := by
+        refine ext_vec2 ?_ rfl
+        simp only [vec2_zero, vec2_one]
+        calc
+          -ε * (-ε * u 0 + dc * u 1 - dc * u 1) = ε ^ 2 * u 0 := by ring
+          _ = u 0 := by rw [hε2, one_mul]
+      continuous_toFun := continuous_vec2
+        (continuous_const.mul ((euclidProj 1).continuous.sub
+          (continuous_const.mul (euclidProj 0).continuous)))
+        (euclidProj 0).continuous
+      continuous_invFun := continuous_vec2 (euclidProj 1).continuous
+        ((continuous_const.mul (euclidProj 0).continuous).add
+          (continuous_const.mul (euclidProj 1).continuous)) }
+  have heΦ : (eΦ : EuclideanSpace ℝ (Fin 4) →L[ℝ] EuclideanSpace ℝ (Fin 4)) =
+      fderiv ℝ Φ p_star := by
+    have hq (i : Fin 4) : HasFDerivAt (fun z : EuclideanSpace ℝ (Fin 4) ↦ z i)
+        (euclidProj i) p_star := (euclidProj i).hasFDerivAt
+    have hpos_der : HasFDerivAt posCoord posProj p_star := by
+      by_cases hpos : 0 < a <;> simp only [posCoord, posProj, hpos, ↓reduceIte] <;> exact hq _
+    have hneg_der : HasFDerivAt negCoord negProj p_star := by
+      by_cases hpos : 0 < a <;> simp only [negCoord, negProj, hpos, ↓reduceIte] <;> exact hq _
+    have hp0_eq : p_star 0 = t₀ := rfl
+    have hdiff_der : HasFDerivAt (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 1 - r (q 0))
+        (euclidProj (1 : Fin 4) - dr • euclidProj (0 : Fin 4)) p_star := by
+      refine ((hq 1).sub ((hp0_eq ▸ hr_fderiv).comp p_star (hq 0))).congr_fderiv ?_
+      ext v; simp [sub_apply, smul_apply]
+    have hR_sqrt_diff : DifferentiableAt ℝ (fun q ↦ Real.sqrt (R q)) p_star :=
+      ((hR_contDiff.sqrt fun _ hqU ↦ hqU.2.ne').contDiffAt
+        (hU_dom_open.mem_nhds hp_dom)).differentiableAt (by simp)
+    have h1_der : HasFDerivAt (fun q ↦ (q 1 - r (q 0)) * Real.sqrt (R q))
+        (k • (euclidProj (1 : Fin 4) - dr • euclidProj (0 : Fin 4))) p_star := by
+      have hm := hdiff_der.mul hR_sqrt_diff.hasFDerivAt
+      refine hm.congr_fderiv ?_
+      ext v
+      have hp_zero : p_star 1 - r (p_star 0) = 0 := by
+        simp [p_star, lekiliMove4CritCurve, hr_t₀, t₀]
+      simp only [smul_apply, sub_apply, hp_zero, zero_smul, zero_add, k, smul_eq_mul]
+    have h2_der : HasFDerivAt (fun q ↦ Real.sqrt 2 * negCoord q)
+        ((Real.sqrt 2) • negProj) p_star := hneg_der.const_mul (Real.sqrt 2)
+    have h3_der : HasFDerivAt (fun q : EuclideanSpace ℝ (Fin 4) ↦ q 0 - t₀)
+        (euclidProj (0 : Fin 4)) p_star := (hq 0).sub_const t₀
+    rw [(hasFDerivAt_vec4' hpos_der h1_der h2_der h3_der).fderiv]
+    ext v i
+    fin_cases i <;>
+      simp only [eΦ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec4_apply,
+        smul_apply, sub_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+  have heΨ : (eΨ : EuclideanPlane →L[ℝ] EuclideanPlane) =
+      fderiv ℝ Ψ (lekiliMove4 s p_star) := by
+    have hw (i : Fin 2) : HasFDerivAt (fun z : EuclideanPlane ↦ z i)
+        (euclidProj i) (lekiliMove4 s p_star) := (euclidProj i).hasFDerivAt
+    have hc_der : HasFDerivAt (fun w : EuclideanPlane ↦ cCrit (w 0))
+        (dc • euclidProj (0 : Fin 2)) (lekiliMove4 s p_star) := by
+      refine (hcCrit_fderiv.comp (lekiliMove4 s p_star) (hw 0)).congr_fderiv ?_
+      ext v; simp [smul_apply]
+    have h0_der : HasFDerivAt (fun w : EuclideanPlane ↦ -ε * (w 1 - cCrit (w 0)))
+        ((-ε) • (euclidProj (1 : Fin 2) - dc • euclidProj (0 : Fin 2)))
+        (lekiliMove4 s p_star) :=
+      ((hw 1).sub hc_der).const_mul (-ε)
+    have h1_der : HasFDerivAt (fun w : EuclideanPlane ↦ w 0 - t₀)
+        (euclidProj (0 : Fin 2)) (lekiliMove4 s p_star) := (hw 0).sub_const t₀
+    rw [(hasFDerivAt_vec2 h0_der h1_der).fderiv]
+    ext v i
+    fin_cases i <;>
+      simp only [eΨ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec2_apply,
+        smul_apply, sub_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+  have hΦ_p : Φ p_star = 0 := by
+    refine ext_vec4 ?_ ?_ ?_ ?_
+    · by_cases hpos : 0 < a <;> simp [Φ, posCoord, hpos, p_star, lekiliMove4CritCurve]
+    · simp [Φ, p_star, lekiliMove4CritCurve, hr_t₀, t₀]
+    · by_cases hpos : 0 < a <;> simp [Φ, negCoord, hpos, p_star, lekiliMove4CritCurve]
+    · simp [Φ, p_star, lekiliMove4CritCurve, t₀]
+  have hΨ_fp : Ψ (lekiliMove4 s p_star) = indefiniteFoldMap 0 := by
+    refine ext_vec2 ?_ ?_
+    · simp only [Ψ, lekiliMove4, p_star, lekiliMove4CritCurve, cCrit, indefiniteFoldMap,
+        vec2_zero, vec2_one, vec4_zero, vec4_one, vec4_two, vec4_three, PiLp.zero_apply,
+        t₀, hr_t₀]
+      ring
+    · simp [Ψ, lekiliMove4, p_star, lekiliMove4CritCurve, indefiniteFoldMap, t₀]
+  refine isLocallyModeledOn_of_contDiff_maps hU_dom_open hp_dom hU_tgt_open hfp_tgt
+    hΦ_diff hΨ_diff eΦ heΦ eΨ heΨ hΦ_p hΨ_fp ?_
+    (contDiff_lekiliMove4 s).continuous.continuousAt
+  filter_upwards [hU_dom_open.mem_nhds hp_dom] with q hq
+  have hq_tgt : lekiliMove4 s q ∈ U_tgt := hq.1
+  refine ⟨hq_tgt, ?_⟩
+  have hq0_eq : q 0 = r (q 0) ^ 3 + s * r (q 0) := (hr_eq (q 0) hq.1).symm
+  have hR_sq : Real.sqrt (R q) ^ 2 = R q := Real.sq_sqrt hq.2.le
+  have hrt2_sq : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  refine ext_vec2 ?_ rfl
+  simp only [Ψ, Φ, lekiliMove4, indefiniteFoldMap, cCrit, vec2_zero, vec2_one,
+    vec4_zero, vec4_one, vec4_two]
+  have hsq1 : ((q 1 - r (q 0)) * Real.sqrt (R q)) ^ 2 = (q 1 - r (q 0)) ^ 2 * R q := by
+    rw [mul_pow, hR_sq]
+  have hsq2 : (Real.sqrt 2 * negCoord q) ^ 2 = 2 * negCoord q ^ 2 := by
+    rw [mul_pow, hrt2_sq]
+  rw [hsq1, hsq2]
+  dsimp only [cCrit, R]
+  generalize r (q 0) = rq at hq0_eq ⊢
+  rw [hq0_eq]
+  by_cases hpos : 0 < a
+  · simp only [ε, posCoord, negCoord, hpos, ↓reduceIte]
+    ring
+  · simp only [ε, posCoord, negCoord, hpos, ↓reduceIte]
+    ring
+
+/-- Every critical point `p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s)` with
+`3 * p 1 ^ 2 + s ≠ 0` is an indefinite quadratic fold. -/
+-- tier: T1
+theorem isIndefiniteFoldAt_lekiliMove4_of_mem_criticalPoints (s : ℝ)
+    {p : EuclideanSpace ℝ (Fin 4)}
+    (hp : p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s)) (hx : 3 * p 1 ^ 2 + s ≠ 0) :
+    IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 s) p := by
+  rw [criticalPoints_lekiliMove4, Set.mem_ofPred_eq] at hp
+  have hp_eq : p = lekiliMove4CritCurve s (p 1) :=
+    ext_vec4 hp.1 rfl hp.2.1 hp.2.2
+  rw [hp_eq]
+  exact isIndefiniteFoldAt_lekiliMove4 s (p 1) hx
+
+private noncomputable def flipMove4Tgt : EuclideanPlane ≃L[ℝ] EuclideanPlane where
+  toFun w := vec2 (-w 0) (w 1)
+  invFun w := vec2 (-w 0) (w 1)
+  map_add' u v := by refine ext_vec2 ?_ ?_ <;> simp [add_comm]
+  map_smul' r v := by refine ext_vec2 ?_ ?_ <;> simp
+  left_inv v := by refine ext_vec2 ?_ ?_ <;> simp
+  right_inv v := by refine ext_vec2 ?_ ?_ <;> simp
+  continuous_toFun := continuous_vec2 (euclidProj 0).continuous.neg (euclidProj 1).continuous
+  continuous_invFun := continuous_vec2 (euclidProj 0).continuous.neg (euclidProj 1).continuous
+
+private theorem flipMove4Tgt_lekiliMove4 (s : ℝ) (p : EuclideanSpace ℝ (Fin 4)) :
+    flipMove4Tgt (lekiliMove4 s p) = lekiliMove4 s (flipSignDom p) := by
+  refine ext_vec2 ?_ ?_
+  · simp [flipMove4Tgt, flipSignDom_apply, lekiliMove4]
+  · simp only [flipMove4Tgt, ContinuousLinearEquiv.coe_mk, LinearEquiv.coe_mk,
+      LinearMap.coe_mk, AddHom.coe_mk, flipSignDom_apply, lekiliMove4,
+      vec2_one, vec4_zero, vec4_one, vec4_two, vec4_three]
+    ring
+
+/-- Positive-cusp normal form (`IsWrinkledCuspAt`) at `x = +√(-s/3)` (`s < 0`) for
+`lekiliMove4 s` via real Weierstrass preparation factoring `x_* u³ + u⁴/4 = u³ (x_* + u/4)`. -/
+-- tier: T2
+theorem isWrinkledCuspAt_lekiliMove4_pos {s : ℝ} (hs : s < 0) :
+    IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 s)
+      (lekiliMove4CritCurve s (Real.sqrt (-s / 3))) := by
+  let x_star : ℝ := Real.sqrt (-s / 3)
+  have hx_arg_pos : 0 < -s / 3 := by linarith
+  have hx_star_pos : 0 < x_star := Real.sqrt_pos.mpr hx_arg_pos
+  have hx_star_ne : x_star ≠ 0 := hx_star_pos.ne'
+  have hx_star_sq : x_star ^ 2 = -s / 3 := Real.sq_sqrt hx_arg_pos.le
+  have hs_eq : s = -3 * x_star ^ 2 := by linarith
+  let p_star := lekiliMove4CritCurve s x_star
+  let t_star : ℝ := x_star ^ 3 + s * x_star
+  have ht_star_eq : t_star = -2 * x_star ^ 3 := by
+    dsimp only [t_star]; rw [hs_eq]; ring
+  let G : (Fin 2 → ℝ) × ℝ → ℝ :=
+    fun q ↦ x_star * q.2 ^ 3 + q.2 ^ 4 / 4 - q.1 0 * q.2 - q.1 1
+  have hG_an : AnalyticAt ℝ G ((0 : Fin 2 → ℝ), (0 : ℝ)) := by
+    have hq10 : AnalyticAt ℝ (fun q : (Fin 2 → ℝ) × ℝ ↦ q.1 0) (0, 0) :=
+      ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 2 ↦ ℝ) 0).analyticAt _).comp
+        analyticAt_fst
+    have hq11 : AnalyticAt ℝ (fun q : (Fin 2 → ℝ) × ℝ ↦ q.1 1) (0, 0) :=
+      ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 2 ↦ ℝ) 1).analyticAt _).comp
+        analyticAt_fst
+    have hq2 : AnalyticAt ℝ (fun q : (Fin 2 → ℝ) × ℝ ↦ q.2) (0, 0) := analyticAt_snd
+    exact (((analyticAt_const.mul (hq2.pow 3)).add
+      ((hq2.pow 4).div analyticAt_const (by norm_num))).sub (hq10.mul hq2)).sub hq11
+  have hG_slice : (fun y : ℝ ↦ G (0, y)) =ᶠ[𝓝 0] fun y ↦ y ^ 3 * (x_star + y / 4) :=
+    Eventually.of_forall fun y ↦ by dsimp only [G]; simp only [Pi.zero_apply]; ring
+  have hord : analyticOrderAt (fun y : ℝ ↦ G (0, y)) 0 = (3 : ℕ) := by
+    rw [analyticOrderAt_congr hG_slice]
+    have hq_an : AnalyticAt ℝ (fun y : ℝ ↦ x_star + y / 4) 0 :=
+      analyticAt_const.add (analyticAt_id.div analyticAt_const (by norm_num))
+    have hq_ne : (x_star + (0 : ℝ) / 4) ≠ 0 := by simp [hx_star_ne]
+    have hpow_an : AnalyticAt ℝ ((id : ℝ → ℝ) ^ 3) 0 := analyticAt_id.pow 3
+    have hmul : analyticOrderAt (((id : ℝ → ℝ) ^ 3) * (fun y : ℝ ↦ x_star + y / 4)) 0 =
+        analyticOrderAt ((id : ℝ → ℝ) ^ 3) 0 +
+          analyticOrderAt (fun y : ℝ ↦ x_star + y / 4) 0 :=
+      analyticOrderAt_mul hpow_an hq_an
+    change analyticOrderAt (((id : ℝ → ℝ) ^ 3) * (fun y : ℝ ↦ x_star + y / 4)) 0 = (3 : ℕ)
+    rw [hmul, analyticOrderAt_pow analyticAt_id 3, analyticOrderAt_id,
+      (hq_an.analyticOrderAt_eq_zero).2 hq_ne]
+    simp
+  obtain ⟨c, u, hc_an, hc0, hu_an, _, heq_wp⟩ :=
+    hG_an.exists_weierstrassPreparation_real hord
+  have hu_val : u (0, 0) = x_star := by
+    have hcomb : (fun y : ℝ ↦ y ^ 3 * u (0, y)) =ᶠ[𝓝 0] fun y ↦ y ^ 3 * (x_star + y / 4) := by
+      have hslice_ev : (fun y : ℝ ↦ G (0, y)) =ᶠ[𝓝 0] fun y ↦ y ^ 3 * u (0, y) := by
+        have ht : Tendsto (fun y : ℝ ↦ ((0 : Fin 2 → ℝ), y)) (𝓝 0) (𝓝 (0, 0)) :=
+          ContinuousAt.tendsto (continuousAt_const.prodMk continuousAt_id)
+        filter_upwards [ht.eventually heq_wp] with y hy
+        rw [hy, TauCeti.Polynomial.eval_monicOfCoeff, Fin.sum_univ_three]
+        simp [hc0, sub_zero]
+      exact hslice_ev.symm.trans hG_slice
+    have hu_eq : (fun y : ℝ ↦ u (0, y)) =ᶠ[𝓝[≠] 0] fun y ↦ x_star + y / 4 := by
+      filter_upwards [nhdsWithin_le_nhds hcomb, self_mem_nhdsWithin] with y hy hy0
+      exact mul_left_cancel₀ (pow_ne_zero 3 hy0) hy
+    have ht1 : Tendsto (fun y : ℝ ↦ u (0, y)) (𝓝[≠] 0) (𝓝 (u (0, 0))) :=
+      (hu_an.continuousAt.comp (continuousAt_const.prodMk continuousAt_id)).mono_left
+        nhdsWithin_le_nhds
+    have ht2 : Tendsto (fun y : ℝ ↦ x_star + y / 4) (𝓝[≠] 0) (𝓝 (x_star + (0 : ℝ) / 4)) :=
+      ((continuousAt_const.add (continuousAt_id.div_const 4)).tendsto).mono_left nhdsWithin_le_nhds
+    have hlim := tendsto_nhds_unique ht1 (ht2.congr' hu_eq.symm)
+    simpa using hlim
+  have hu_pos : 0 < u (0, 0) := hu_val ▸ hx_star_pos
+  have hc0_fderiv : fderiv ℝ (c 0) 0 = (-x_star⁻¹) • ContinuousLinearMap.proj 1 := by
+    have hprod_ev : (fun w : Fin 2 → ℝ ↦ c 0 w * u (w, 0)) =ᶠ[𝓝 0] fun w ↦ -w 1 := by
+      have ht : Tendsto (fun w : Fin 2 → ℝ ↦ (w, (0 : ℝ))) (𝓝 0) (𝓝 (0, 0)) :=
+        ContinuousAt.tendsto (continuousAt_id.prodMk continuousAt_const)
+      filter_upwards [ht.eventually heq_wp] with w hw
+      have hG0 : G (w, 0) = -w 1 := by simp [G]
+      rw [← hG0, hw, TauCeti.Polynomial.eval_monicOfCoeff, Fin.sum_univ_three]
+      simp
+    have h1 : HasFDerivAt (fun w : Fin 2 → ℝ ↦ c 0 w * u (w, 0))
+        (u (0, 0) • fderiv ℝ (c 0) 0) 0 := by
+      have hc0d : HasFDerivAt (c 0) (fderiv ℝ (c 0) 0) 0 :=
+        (hc_an 0).differentiableAt.hasFDerivAt
+      have hud : HasFDerivAt (fun w : Fin 2 → ℝ ↦ u (w, (0 : ℝ)))
+          (fderiv ℝ (fun w : Fin 2 → ℝ ↦ u (w, (0 : ℝ))) 0) 0 := by
+        have hmap : AnalyticAt ℝ (fun w : Fin 2 → ℝ ↦ (w, (0 : ℝ))) 0 :=
+          (analyticAt_id (𝕜 := ℝ) (E := Fin 2 → ℝ)).prod
+            (analyticAt_const (𝕜 := ℝ) (v := (0 : ℝ)))
+        exact (hu_an.comp_of_eq hmap rfl).differentiableAt.hasFDerivAt
+      refine (hc0d.mul hud).congr_fderiv ?_
+      ext v
+      simp [smul_apply, hc0 0, zero_smul]
+    have h2 : HasFDerivAt (fun w : Fin 2 → ℝ ↦ -w 1)
+        (-(ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 2 ↦ ℝ) 1)) 0 :=
+      ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin 2 ↦ ℝ) 1).hasFDerivAt).neg
+    have hfeq := h1.unique (h2.congr_of_eventuallyEq hprod_ev)
+    rw [hu_val] at hfeq
+    ext v
+    have hv := congrArg (fun F : (Fin 2 → ℝ) →L[ℝ] ℝ ↦ x_star⁻¹ * F v) hfeq
+    simp only [smul_apply, neg_apply, ContinuousLinearMap.proj_apply, smul_eq_mul] at hv ⊢
+    calc
+      fderiv ℝ (c 0) 0 v = x_star⁻¹ * (x_star * fderiv ℝ (c 0) 0 v) := by
+        field_simp [hx_star_ne]
+      _ = x_star⁻¹ * -v 1 := hv
+      _ = -x_star⁻¹ * v 1 := by ring
+  let v₀ : Fin 2 → ℝ := ![1, 0]
+  have hc1_v0 : (fderiv ℝ (c 1) 0) v₀ = -x_star⁻¹ := by
+    have hG_t_eq : ∀ᶠ ty in 𝓝 ((0 : ℝ), (0 : ℝ)),
+        G (ty.1 • v₀, ty.2) =
+          (ty.2 ^ 3 + ∑ i : Fin 3, c i (ty.1 • v₀) * ty.2 ^ (i : ℕ)) * u (ty.1 • v₀, ty.2) ∧
+          AnalyticAt ℝ u (ty.1 • v₀, ty.2) := by
+      have ht1 : ContinuousAt (fun ty : ℝ × ℝ ↦ (ty.1 • v₀, ty.2)) (0, 0) :=
+        (continuousAt_fst.smul continuousAt_const).prodMk continuousAt_snd
+      have h00 : ((0 : ℝ) • v₀, (0 : ℝ)) = ((0 : Fin 2 → ℝ), (0 : ℝ)) := by simp
+      filter_upwards [ht1.tendsto.eventually (h00 ▸ heq_wp),
+        ht1.tendsto.eventually (h00 ▸ hu_an.eventually_analyticAt)] with ty hty1 hty2
+      refine ⟨?_, hty2⟩
+      rw [hty1, TauCeti.Polynomial.eval_monicOfCoeff, sub_zero]
+    obtain ⟨r, hr_pos, hr_sub⟩ := Metric.eventually_nhds_iff.mp hG_t_eq
+    have hc_deriv (i : Fin 3) :
+        HasDerivAt (fun t : ℝ ↦ c i (t • v₀)) ((fderiv ℝ (c i) 0) v₀) 0 := by
+      rw [hasDerivAt_iff_hasFDerivAt]
+      have h0v : (0 : ℝ) • v₀ = 0 := zero_smul _ _
+      have hf := (hc_an i).differentiableAt.hasFDerivAt
+      rw [← h0v] at hf
+      refine (hf.comp (0 : ℝ) ((hasFDerivAt_id (0 : ℝ)).smul_const v₀)).congr_fderiv ?_
+      apply ContinuousLinearMap.ext_ring
+      simp [one_smul]
+    have hc0_v0 : (fderiv ℝ (c 0) 0) v₀ = 0 := by simp [hc0_fderiv, v₀]
+    have hu_cont_t : ContinuousAt (fun y : ℝ ↦ (fderiv ℝ u (0, y)) (v₀, 0)) 0 := by
+      have hudiff : ContinuousAt (fderiv ℝ u) (0, 0) :=
+        ((hu_an.contDiffAt (n := ∞)).fderiv_right (m := 0) (by simp)).continuousAt
+      have hev_eval : ContinuousAt
+          (fun F : (Fin 2 → ℝ) × ℝ →L[ℝ] ℝ ↦ F (v₀, 0)) (fderiv ℝ u (0, 0)) :=
+        (ContinuousLinearMap.apply ℝ ℝ (v₀, (0 : ℝ))).continuous.continuousAt
+      exact hev_eval.tendsto.comp
+        (hudiff.tendsto.comp (continuousAt_const.prodMk continuousAt_id).tendsto)
+    have hderiv_eq : (fun _ : ℝ ↦ (-1 : ℝ)) =ᶠ[𝓝[≠] 0] fun y : ℝ ↦
+        ((fderiv ℝ (c 2) 0) v₀ * y + (fderiv ℝ (c 1) 0) v₀) * u (0, y) +
+          y ^ 2 * (fderiv ℝ u (0, y)) (v₀, 0) := by
+      have hball : Metric.ball (0 : ℝ) (r / 2) ∈ 𝓝 (0 : ℝ) :=
+        Metric.ball_mem_nhds 0 (half_pos hr_pos)
+      filter_upwards [nhdsWithin_le_nhds hball, self_mem_nhdsWithin] with y hy hy0
+      have hy_abs : |y| < r / 2 := by simpa [Metric.mem_ball, Real.dist_eq] using hy
+      have h0y_ball : dist ((0 : ℝ), y) (0, 0) < r := by
+        calc
+          dist ((0 : ℝ), y) (0, 0) = |y| := by simp [Prod.dist_eq]
+          _ < r / 2 := hy_abs
+          _ < r := by linarith
+      have hu_y_an : AnalyticAt ℝ u (0, y) := by simpa using (hr_sub h0y_ball).2
+      have h_ty_eq : (fun t : ℝ ↦ G (t • v₀, y)) =ᶠ[𝓝 0] fun t : ℝ ↦
+          (y ^ 3 + (c 0 (t • v₀) * 1 + c 1 (t • v₀) * y + c 2 (t • v₀) * y ^ 2)) *
+            u (t • v₀, y) := by
+        filter_upwards [Metric.ball_mem_nhds (0 : ℝ) (half_pos hr_pos)] with t ht
+        have ht_abs : |t| < r / 2 := by simpa [Metric.mem_ball, Real.dist_eq] using ht
+        have hty_ball : dist (t, y) (0, 0) < r := by
+          rw [Prod.dist_eq]
+          exact max_lt (by simpa [Real.dist_eq] using ht_abs.trans (by linarith))
+            (by simpa [Real.dist_eq] using hy_abs.trans (by linarith))
+        have h1 := (hr_sub hty_ball).1
+        rw [Fin.sum_univ_three] at h1
+        simpa [pow_zero, pow_one] using h1
+      have hL : HasDerivAt (fun t : ℝ ↦ G (t • v₀, y)) (-y) 0 := by
+        have hg0 : (fun t : ℝ ↦ G (t • v₀, y)) =
+            fun t : ℝ ↦ (x_star * y ^ 3 + y ^ 4 / 4) - t * y := by
+          funext t; simp [G, v₀]
+        rw [hg0]
+        refine (((hasDerivAt_id (0 : ℝ)).mul_const y).const_sub _).congr_deriv ?_
+        ring
+      have hpoly : HasDerivAt
+          (fun t : ℝ ↦ y ^ 3 + (c 0 (t • v₀) * 1 + c 1 (t • v₀) * y + c 2 (t • v₀) * y ^ 2))
+          ((fderiv ℝ (c 1) 0) v₀ * y + (fderiv ℝ (c 2) 0) v₀ * y ^ 2) 0 := by
+        have hp1 := ((hc_deriv 0).mul_const 1).add ((hc_deriv 1).mul_const y)
+        have hp2 := (hp1.add ((hc_deriv 2).mul_const (y ^ 2))).const_add (y ^ 3)
+        refine hp2.congr_deriv ?_
+        rw [hc0_v0]; ring
+      have hu_t : HasDerivAt (fun t : ℝ ↦ u (t • v₀, y)) ((fderiv ℝ u (0, y)) (v₀, 0)) 0 := by
+        rw [hasDerivAt_iff_hasFDerivAt]
+        have h0vy : ((0 : ℝ) • v₀, y) = ((0 : Fin 2 → ℝ), y) := by simp
+        have hpath : HasFDerivAt (fun t : ℝ ↦ (t • v₀, y))
+            (((ContinuousLinearMap.id ℝ ℝ).smulRight v₀).prod (0 : ℝ →L[ℝ] ℝ)) 0 :=
+          ((hasFDerivAt_id (0 : ℝ)).smul_const v₀).prodMk (hasFDerivAt_const y (0 : ℝ))
+        have hu_f := hu_y_an.differentiableAt.hasFDerivAt
+        rw [← h0vy] at hu_f
+        refine (hu_f.comp (0 : ℝ) hpath).congr_fderiv ?_
+        apply ContinuousLinearMap.ext_ring; simp
+      have hR := (hpoly.mul hu_t).congr_of_eventuallyEq h_ty_eq
+      have heq_d := hL.unique hR
+      simp only [zero_smul, hc0, zero_mul, add_zero] at heq_d
+      apply mul_left_cancel₀ hy0
+      linear_combination heq_d
+    have ht_rhs : Tendsto
+        (fun y : ℝ ↦
+          ((fderiv ℝ (c 2) 0) v₀ * y + (fderiv ℝ (c 1) 0) v₀) * u (0, y) +
+            y ^ 2 * (fderiv ℝ u (0, y)) (v₀, 0))
+        (𝓝[≠] 0)
+        (𝓝 (((fderiv ℝ (c 2) 0) v₀ * 0 + (fderiv ℝ (c 1) 0) v₀) * u (0, 0) +
+          0 ^ 2 * (fderiv ℝ u (0, 0)) (v₀, 0))) := by
+      have hcu : ContinuousAt (fun y : ℝ ↦ u (0, y)) 0 :=
+        hu_an.continuousAt.comp (continuousAt_const.prodMk continuousAt_id)
+      have hc_lin : ContinuousAt (fun y : ℝ ↦ (fderiv ℝ (c 2) 0) v₀ * y + (fderiv ℝ (c 1) 0) v₀)
+          0 := by fun_prop
+      have hc_sq : ContinuousAt (fun y : ℝ ↦ y ^ 2) 0 := by fun_prop
+      exact ((hc_lin.mul hcu).add (hc_sq.mul hu_cont_t)).tendsto.mono_left nhdsWithin_le_nhds
+    have hlim := tendsto_nhds_unique tendsto_const_nhds (ht_rhs.congr' hderiv_eq.symm)
+    rw [hu_val] at hlim
+    have hlim' : -1 = (fderiv ℝ (c 1) 0) v₀ * x_star := by simpa using hlim
+    calc
+      (fderiv ℝ (c 1) 0) v₀ = ((fderiv ℝ (c 1) 0) v₀ * x_star) * x_star⁻¹ := by
+        field_simp [hx_star_ne]
+      _ = (-1) * x_star⁻¹ := by rw [← hlim']
+      _ = -x_star⁻¹ := by ring
+  let dwShift : EuclideanPlane →L[ℝ] (Fin 2 → ℝ) :=
+    ContinuousLinearMap.pi
+      ![euclidProj (0 : Fin 2), euclidProj (1 : Fin 2) + x_star • euclidProj (0 : Fin 2)]
+  have hdwShift_decomp (w : EuclideanPlane) :
+      dwShift w = w 0 • v₀ + (w 1 + x_star * w 0) • ![0, 1] := by
+    ext i; fin_cases i <;> simp [dwShift, v₀, euclidProj]
+  let wShift : EuclideanPlane → (Fin 2 → ℝ) :=
+    fun w ↦ ![w 0 - t_star, w 1 - (3 / 4 * x_star ^ 4 - x_star * (w 0 - t_star))]
+  have hwShift_pstar : wShift (lekiliMove4 s p_star) = 0 := by
+    ext i
+    fin_cases i
+    · dsimp only [wShift, p_star, lekiliMove4CritCurve, lekiliMove4, t_star]
+      simp [vec2_zero, vec4_zero]
+    · dsimp only [wShift, p_star, lekiliMove4CritCurve, lekiliMove4, t_star]
+      simp only [Fin.mk_one, Matrix.cons_val_one, Matrix.cons_val_zero, Pi.zero_apply,
+        vec2_zero, vec2_one, vec4_zero, vec4_one, vec4_two, vec4_three, hs_eq]
+      ring
+  have hwShift_diff : ContDiff ℝ ∞ wShift := by
+    refine contDiff_pi.mpr fun i ↦ ?_
+    fin_cases i
+    · exact (euclidProj 0).contDiff.sub contDiff_const
+    · exact (euclidProj 1).contDiff.sub
+        (contDiff_const.sub (contDiff_const.mul ((euclidProj 0).contDiff.sub contDiff_const)))
+  have hwShift_fderiv (w : EuclideanPlane) : HasFDerivAt wShift dwShift w := by
+    refine hasFDerivAt_pi.mpr fun i ↦ ?_
+    fin_cases i
+    · simpa [dwShift] using ((euclidProj (0 : Fin 2)).hasFDerivAt (x := w)).sub_const t_star
+    · have hw0 := ((euclidProj (0 : Fin 2)).hasFDerivAt (x := w)).sub_const t_star
+      have hm := (hw0.const_mul x_star).const_sub (3 / 4 * x_star ^ 4)
+      refine (((euclidProj (1 : Fin 2)).hasFDerivAt (x := w)).sub hm).congr_fderiv ?_
+      ext v
+      simp only [Fin.mk_one, Matrix.cons_val_one, Matrix.cons_val_zero, sub_apply, neg_apply,
+        add_apply, smul_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      ring
+  have hev_c : ∀ᶠ w : Fin 2 → ℝ in 𝓝 0,
+      AnalyticAt ℝ (c 0) w ∧ AnalyticAt ℝ (c 1) w ∧ AnalyticAt ℝ (c 2) w :=
+    (hc_an 0).eventually_analyticAt.and
+      ((hc_an 1).eventually_analyticAt.and (hc_an 2).eventually_analyticAt)
+  obtain ⟨U_c, hU_c_sub, hU_c_open, h0_Uc⟩ := _root_.eventually_nhds_iff.mp hev_c
+  have hc_contDiff (i : Fin 3) : ContDiffOn ℝ ∞ (c i) U_c := fun w hw ↦ by
+    have ha : AnalyticAt ℝ (c i) w := by
+      fin_cases i
+      · exact (hU_c_sub w hw).1
+      · exact (hU_c_sub w hw).2.1
+      · exact (hU_c_sub w hw).2.2
+    exact ha.contDiffAt.contDiffWithinAt
+  obtain ⟨U_u, hU_u_sub, hU_u_open, h0_Uu⟩ :=
+    _root_.eventually_nhds_iff.mp hu_an.eventually_analyticAt
+  have hu_contDiff : ContDiffOn ℝ ∞ u U_u := fun q hq ↦ (hU_u_sub q hq).contDiffAt.contDiffWithinAt
+  let TFn : EuclideanPlane → ℝ := fun w ↦ c 2 (wShift w) ^ 2 / 9 - c 1 (wShift w) / 3
+  let WFn : EuclideanPlane → ℝ := fun w ↦
+    -(c 0 (wShift w) - c 1 (wShift w) * c 2 (wShift w) / 3 + 2 * c 2 (wShift w) ^ 3 / 27)
+  let QFn : EuclideanSpace ℝ (Fin 4) → ℝ :=
+    fun p ↦ (p 1 - x_star) + c 2 (wShift (lekiliMove4 s p)) / 3
+  let invSqrtU : EuclideanSpace ℝ (Fin 4) → ℝ :=
+    fun p ↦ (Real.sqrt (u (wShift (lekiliMove4 s p), p 1 - x_star)))⁻¹
+  let Φ : EuclideanSpace ℝ (Fin 4) → EuclideanSpace ℝ (Fin 4) := fun p ↦
+    vec4 (TFn (lekiliMove4 s p)) (QFn p) (p 2 * invSqrtU p) (p 3 * invSqrtU p)
+  let Ψ : EuclideanPlane → EuclideanPlane := fun w ↦ vec2 (TFn w) (WFn w)
+  let U_tgt : Set EuclideanPlane := wShift ⁻¹' U_c
+  have hU_tgt_open : IsOpen U_tgt := hU_c_open.preimage hwShift_diff.continuous
+  have hfp_tgt : lekiliMove4 s p_star ∈ U_tgt := by simpa [U_tgt, hwShift_pstar] using h0_Uc
+  let pairFn : EuclideanSpace ℝ (Fin 4) → (Fin 2 → ℝ) × ℝ :=
+    fun p ↦ (wShift (lekiliMove4 s p), p 1 - x_star)
+  have hpair_diff : ContDiff ℝ ∞ pairFn :=
+    (hwShift_diff.comp (contDiff_lekiliMove4 s)).prodMk ((euclidProj 1).contDiff.sub contDiff_const)
+  let U_dom : Set (EuclideanSpace ℝ (Fin 4)) :=
+    {p | lekiliMove4 s p ∈ U_tgt ∧ pairFn p ∈ U_u ∧ 0 < u (pairFn p)}
+  have hU_dom_open : IsOpen U_dom := by
+    have h1 : IsOpen (lekiliMove4 s ⁻¹' U_tgt) :=
+      hU_tgt_open.preimage (contDiff_lekiliMove4 s).continuous
+    have h2 : IsOpen (pairFn ⁻¹' U_u) := hU_u_open.preimage hpair_diff.continuous
+    have hu_c : ContinuousOn (fun p ↦ u (pairFn p)) (pairFn ⁻¹' U_u) :=
+      hu_contDiff.continuousOn.comp hpair_diff.continuous.continuousOn (fun _ hx ↦ hx)
+    have h3 : IsOpen {p ∈ pairFn ⁻¹' U_u | 0 < u (pairFn p)} :=
+      hu_c.isOpen_inter_preimage h2 isOpen_Ioi
+    have heq : U_dom = (lekiliMove4 s ⁻¹' U_tgt) ∩ {p ∈ pairFn ⁻¹' U_u | 0 < u (pairFn p)} := by
+      ext p; simp [U_dom]
+    rw [heq]; exact h1.inter h3
+  have hp_pair0 : pairFn p_star = (0, 0) :=
+    Prod.ext hwShift_pstar (by simp [pairFn, p_star, lekiliMove4CritCurve])
+  have hp_dom : p_star ∈ U_dom :=
+    ⟨hfp_tgt, hp_pair0.symm ▸ h0_Uu, hp_pair0.symm ▸ hu_pos⟩
+  have hc_comp_diff (i : Fin 3) : ContDiffOn ℝ ∞ (fun w ↦ c i (wShift w)) U_tgt :=
+    (hc_contDiff i).comp hwShift_diff.contDiffOn (fun _ hw ↦ hw)
+  have hΨ_diff : ContDiffOn ℝ ∞ Ψ U_tgt :=
+    contDiffOn_vec2
+      ((((hc_comp_diff 2).pow 2).div_const 9).sub ((hc_comp_diff 1).div_const 3))
+      ((((hc_comp_diff 0).sub (((hc_comp_diff 1).mul (hc_comp_diff 2)).div_const 3)).add
+        ((contDiff_const.contDiffOn.mul ((hc_comp_diff 2).pow 3)).div_const 27))).neg
+  have hu_comp_cd : ContDiffOn ℝ ∞ (fun p ↦ u (pairFn p)) U_dom :=
+    hu_contDiff.comp hpair_diff.contDiffOn (fun _ hp ↦ hp.2.1)
+  have hinv_cd : ContDiffOn ℝ ∞ invSqrtU U_dom :=
+    (hu_comp_cd.sqrt fun _ hp ↦ hp.2.2.ne').inv fun _ hp ↦ (Real.sqrt_pos.mpr hp.2.2).ne'
+  have hΦ_diff : ContDiffOn ℝ ∞ Φ U_dom := by
+    have hL_cd : ContDiffOn ℝ ∞ (lekiliMove4 s) U_dom := (contDiff_lekiliMove4 s).contDiffOn
+    have hp_cd (i : Fin 4) : ContDiffOn ℝ ∞ (fun p : EuclideanSpace ℝ (Fin 4) ↦ p i) U_dom :=
+      (euclidProj i).contDiff.contDiffOn
+    have hT_cd : ContDiffOn ℝ ∞ (fun p ↦ TFn (lekiliMove4 s p)) U_dom :=
+      ((((hc_comp_diff 2).pow 2).div_const 9).sub ((hc_comp_diff 1).div_const 3)).comp
+        hL_cd (fun _ hp ↦ hp.1)
+    have hc2_cd : ContDiffOn ℝ ∞ (fun p ↦ c 2 (wShift (lekiliMove4 s p))) U_dom :=
+      (hc_comp_diff 2).comp hL_cd (fun _ hp ↦ hp.1)
+    exact contDiffOn_vec4 hT_cd
+      (((hp_cd 1).sub contDiff_const.contDiffOn).add (hc2_cd.div_const 3))
+      ((hp_cd 2).mul hinv_cd) ((hp_cd 3).mul hinv_cd)
+  let k₁₁ : ℝ := (fderiv ℝ (c 1) 0) ![0, 1]
+  let c₂₀ : ℝ := (fderiv ℝ (c 2) 0) v₀
+  let rtu : ℝ := Real.sqrt (u (0, 0))
+  have hrtu_ne : rtu ≠ 0 := (Real.sqrt_pos.mpr hu_pos).ne'
+  let eΨ : EuclideanPlane ≃L[ℝ] EuclideanPlane :=
+    { toFun v := vec2 (v 0 / (3 * x_star) - k₁₁ / 3 * (v 1 + x_star * v 0))
+        ((v 1 + x_star * v 0) / x_star)
+      invFun z :=
+        let v0 := 3 * x_star * z 0 + k₁₁ * x_star ^ 2 * z 1
+        vec2 v0 (x_star * z 1 - x_star * v0)
+      map_add' u v := by
+        refine ext_vec2 ?_ ?_ <;> (simp only [vec2_zero, vec2_one, PiLp.add_apply]; ring)
+      map_smul' r0 v := by
+        refine ext_vec2 ?_ ?_ <;>
+          (simp only [vec2_zero, vec2_one, PiLp.smul_apply, smul_eq_mul, RingHom.id_apply]; ring)
+      left_inv v := by
+        refine ext_vec2 ?_ ?_ <;>
+          (simp only [vec2_zero, vec2_one]; field_simp [hx_star_ne]; ring)
+      right_inv z := by
+        refine ext_vec2 ?_ ?_ <;>
+          (simp only [vec2_zero, vec2_one]; field_simp [hx_star_ne]; ring)
+      continuous_toFun := continuous_vec2
+        (((euclidProj 0).continuous.div_const (3 * x_star)).sub
+          (continuous_const.mul ((euclidProj 1).continuous.add
+            (continuous_const.mul (euclidProj 0).continuous))))
+        (((euclidProj 1).continuous.add
+          (continuous_const.mul (euclidProj 0).continuous)).div_const x_star)
+      continuous_invFun := continuous_vec2
+        ((continuous_const.mul (euclidProj 0).continuous).add
+          (continuous_const.mul (euclidProj 1).continuous))
+        ((continuous_const.mul (euclidProj 1).continuous).sub
+          (continuous_const.mul ((continuous_const.mul (euclidProj 0).continuous).add
+            (continuous_const.mul (euclidProj 1).continuous)))) }
+  let eΦ : EuclideanSpace ℝ (Fin 4) ≃L[ℝ] EuclideanSpace ℝ (Fin 4) :=
+    { toFun v := vec4 (v 0 / (3 * x_star)) (v 1 + (c₂₀ / 3) * v 0) (v 2 / rtu) (v 3 / rtu)
+      invFun a :=
+        let v0 := 3 * x_star * a 0
+        vec4 v0 (a 1 - (c₂₀ / 3) * v0) (rtu * a 2) (rtu * a 3)
+      map_add' u v := by
+        refine ext_vec4 ?_ ?_ ?_ ?_ <;>
+          (simp only [vec4_zero, vec4_one, vec4_two, vec4_three, PiLp.add_apply]; ring)
+      map_smul' r0 v := by
+        refine ext_vec4 ?_ ?_ ?_ ?_ <;>
+          (simp only [vec4_zero, vec4_one, vec4_two, vec4_three, PiLp.smul_apply,
+             smul_eq_mul, RingHom.id_apply]; ring)
+      left_inv v := by
+        refine ext_vec4 ?_ ?_ ?_ ?_
+        · simp only [vec4_zero]; field_simp [hx_star_ne]
+        · simp only [vec4_zero, vec4_one]; field_simp [hx_star_ne]; ring
+        · simp only [vec4_two]; field_simp [hrtu_ne]
+        · simp only [vec4_three]; field_simp [hrtu_ne]
+      right_inv a := by
+        refine ext_vec4 ?_ ?_ ?_ ?_
+        · simp only [vec4_zero]; field_simp [hx_star_ne]
+        · simp only [vec4_zero, vec4_one]; field_simp [hx_star_ne]; ring
+        · simp only [vec4_two]; field_simp [hrtu_ne]
+        · simp only [vec4_three]; field_simp [hrtu_ne]
+      continuous_toFun := continuous_vec4
+        ((euclidProj 0).continuous.div_const (3 * x_star))
+        ((euclidProj 1).continuous.add (continuous_const.mul (euclidProj 0).continuous))
+        ((euclidProj 2).continuous.div_const rtu)
+        ((euclidProj 3).continuous.div_const rtu)
+      continuous_invFun := continuous_vec4
+        (continuous_const.mul (euclidProj 0).continuous)
+        ((euclidProj 1).continuous.sub
+          (continuous_const.mul (continuous_const.mul (euclidProj 0).continuous)))
+        (continuous_const.mul (euclidProj 2).continuous)
+        (continuous_const.mul (euclidProj 3).continuous) }
+  have hc_w_hasFDeriv (i : Fin 3) (w : EuclideanPlane) (hw : w ∈ U_tgt) :
+      HasFDerivAt (fun z ↦ c i (wShift z))
+        ((fderiv ℝ (c i) (wShift w)).comp dwShift) w := by
+    have hci : AnalyticAt ℝ (c i) (wShift w) := by
+      have hw' : wShift w ∈ U_c := hw
+      fin_cases i
+      · exact (hU_c_sub _ hw').1
+      · exact (hU_c_sub _ hw').2.1
+      · exact (hU_c_sub _ hw').2.2
+    exact (hci.differentiableAt.hasFDerivAt).comp w (hwShift_fderiv w)
+  have hT_hasFDeriv_wstar : HasFDerivAt TFn
+      ((-1 / 3 : ℝ) • ((fderiv ℝ (c 1) 0).comp dwShift)) (lekiliMove4 s p_star) := by
+    have h2 := hc_w_hasFDeriv 2 (lekiliMove4 s p_star) hfp_tgt
+    have h1 := hc_w_hasFDeriv 1 (lekiliMove4 s p_star) hfp_tgt
+    rw [hwShift_pstar] at h2 h1
+    have h2_sq : HasFDerivAt (fun w : EuclideanPlane ↦ c 2 (wShift w) ^ 2 / 9)
+        (0 : EuclideanPlane →L[ℝ] ℝ) (lekiliMove4 s p_star) := by
+      have heq : (fun w ↦ c 2 (wShift w) ^ 2 / 9) = fun w ↦ c 2 (wShift w) ^ 2 * (1 / 9 : ℝ) := by
+        funext w; ring
+      rw [heq]
+      refine ((h2.pow 2).mul_const (1 / 9 : ℝ)).congr_fderiv ?_
+      ext v; simp [hwShift_pstar, hc0 2]
+    have h1_div : HasFDerivAt (fun w ↦ c 1 (wShift w) / 3)
+        ((1 / 3 : ℝ) • ((fderiv ℝ (c 1) 0).comp dwShift)) (lekiliMove4 s p_star) := by
+      have heq : (fun w ↦ c 1 (wShift w) / 3) = fun w ↦ c 1 (wShift w) * (1 / 3 : ℝ) := by
+        funext w; ring
+      rw [heq]
+      refine (h1.mul_const (1 / 3 : ℝ)).congr_fderiv ?_
+      ext v; simp [smul_apply, smul_eq_mul]
+    refine (h2_sq.sub h1_div).congr_fderiv ?_
+    ext v; simp [smul_apply]; ring
+  have hW_hasFDeriv_wstar : HasFDerivAt WFn
+      (-((fderiv ℝ (c 0) 0).comp dwShift)) (lekiliMove4 s p_star) := by
+    have h0 := hc_w_hasFDeriv 0 (lekiliMove4 s p_star) hfp_tgt
+    have h1 := hc_w_hasFDeriv 1 (lekiliMove4 s p_star) hfp_tgt
+    have h2 := hc_w_hasFDeriv 2 (lekiliMove4 s p_star) hfp_tgt
+    rw [hwShift_pstar] at h0 h1 h2
+    have h12 : HasFDerivAt (fun w : EuclideanPlane ↦ c 1 (wShift w) * c 2 (wShift w) / 3)
+        (0 : EuclideanPlane →L[ℝ] ℝ) (lekiliMove4 s p_star) := by
+      have heq : (fun w : EuclideanPlane ↦ c 1 (wShift w) * c 2 (wShift w) / 3) =
+          fun w ↦ (c 1 (wShift w) * c 2 (wShift w)) * (1 / 3 : ℝ) := by funext w; ring
+      rw [heq]
+      refine ((h1.mul h2).mul_const (1 / 3 : ℝ)).congr_fderiv ?_
+      ext v; simp [hwShift_pstar, hc0 1, hc0 2]
+    have h2c : HasFDerivAt (fun w : EuclideanPlane ↦ 2 * c 2 (wShift w) ^ 3 / 27)
+        (0 : EuclideanPlane →L[ℝ] ℝ) (lekiliMove4 s p_star) := by
+      have heq : (fun w : EuclideanPlane ↦ 2 * c 2 (wShift w) ^ 3 / 27) =
+          fun w ↦ (2 * c 2 (wShift w) ^ 3) * (1 / 27 : ℝ) := by funext w; ring
+      rw [heq]
+      refine (((h2.pow 3).const_mul 2).mul_const (1 / 27 : ℝ)).congr_fderiv ?_
+      ext v; simp [hwShift_pstar, hc0 2]
+    exact (((h0.sub h12).add h2c).neg).congr_fderiv (by ext v; simp)
+  have heΨ : (eΨ : EuclideanPlane →L[ℝ] EuclideanPlane) =
+      fderiv ℝ Ψ (lekiliMove4 s p_star) := by
+    rw [(hasFDerivAt_vec2 hT_hasFDeriv_wstar hW_hasFDeriv_wstar).fderiv]
+    refine ContinuousLinearMap.ext fun v ↦ ext_vec2 ?_ ?_
+    · simp only [eΨ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec2_apply, vec2_zero,
+        smul_apply, ContinuousLinearMap.comp_apply, smul_eq_mul]
+      rw [hdwShift_decomp v, map_add, map_smul, map_smul, hc1_v0]
+      simp only [k₁₁, smul_eq_mul]
+      field_simp [hx_star_ne]; ring
+    · simp only [eΨ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec2_apply, vec2_one,
+        neg_apply, ContinuousLinearMap.comp_apply, hc0_fderiv, smul_apply,
+        ContinuousLinearMap.proj_apply, dwShift, ContinuousLinearMap.pi_apply,
+        Matrix.cons_val_one, Matrix.cons_val_zero, add_apply, euclidProj,
+        EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      field_simp [hx_star_ne]
+  have heΦ : (eΦ : EuclideanSpace ℝ (Fin 4) →L[ℝ] EuclideanSpace ℝ (Fin 4)) =
+      fderiv ℝ Φ p_star := by
+    have hp (i : Fin 4) : HasFDerivAt (fun q : EuclideanSpace ℝ (Fin 4) ↦ q i)
+        (euclidProj i) p_star := (euclidProj i).hasFDerivAt
+    have hL_fderiv := hasFDerivAt_lekiliMove4 s p_star
+    have hdw_L (v : EuclideanSpace ℝ (Fin 4)) :
+        dwShift (lekiliMove4FDerivCLM s p_star v) = v 0 • v₀ := by
+      ext j
+      fin_cases j
+      · simp [dwShift, lekiliMove4FDerivCLM_apply, v₀, euclidProj]
+      · simp only [Fin.mk_one, dwShift, ContinuousLinearMap.pi_apply, Matrix.cons_val_one,
+          Matrix.cons_val_zero, add_apply, smul_apply, euclidProj, EuclideanSpace.proj,
+          PiLp.proj_apply, lekiliMove4FDerivCLM_apply, vec2_zero, vec2_one, p_star,
+          lekiliMove4CritCurve, vec4_zero, vec4_one, vec4_two, vec4_three, v₀, Pi.smul_apply,
+          smul_eq_mul]
+        ring
+    have hT_p_der : HasFDerivAt (fun q ↦ TFn (lekiliMove4 s q))
+        ((1 / (3 * x_star)) • euclidProj (0 : Fin 4)) p_star := by
+      refine (hT_hasFDeriv_wstar.comp p_star hL_fderiv).congr_fderiv ?_
+      ext v
+      simp only [smul_apply, ContinuousLinearMap.comp_apply, smul_eq_mul, hdw_L v,
+        map_smul, hc1_v0, euclidProj, EuclideanSpace.proj, PiLp.proj_apply]
+      field_simp [hx_star_ne]
+    have hc2_p_der : HasFDerivAt (fun q ↦ c 2 (wShift (lekiliMove4 s q)))
+        (c₂₀ • euclidProj (0 : Fin 4)) p_star := by
+      have h2 := hc_w_hasFDeriv 2 (lekiliMove4 s p_star) hfp_tgt
+      rw [hwShift_pstar] at h2
+      refine (h2.comp p_star hL_fderiv).congr_fderiv ?_
+      ext v
+      simp only [smul_apply, ContinuousLinearMap.comp_apply, hdw_L v, map_smul, c₂₀,
+        euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      ring
+    have hQ_p_der : HasFDerivAt QFn
+        (euclidProj (1 : Fin 4) + (c₂₀ / 3) • euclidProj (0 : Fin 4)) p_star := by
+      have heq_Q : QFn =
+          fun q ↦ (q 1 - x_star) + c 2 (wShift (lekiliMove4 s q)) * (1 / 3 : ℝ) := by
+        funext q; dsimp only [QFn]; ring
+      rw [heq_Q]
+      refine (((hp 1).sub_const x_star).add (hc2_p_der.mul_const (1 / 3 : ℝ))).congr_fderiv ?_
+      ext v; simp [add_apply, smul_apply, smul_eq_mul]; ring
+    have hinv_diffAt : DifferentiableAt ℝ invSqrtU p_star :=
+      (hinv_cd.contDiffAt (hU_dom_open.mem_nhds hp_dom)).differentiableAt (by simp)
+    have hinv_val : invSqrtU p_star = rtu⁻¹ := by
+      change (Real.sqrt (u (pairFn p_star)))⁻¹ = rtu⁻¹
+      rw [hp_pair0]
+    have h2_der : HasFDerivAt (fun q ↦ q 2 * invSqrtU q)
+        (rtu⁻¹ • euclidProj (2 : Fin 4)) p_star := by
+      refine ((hp 2).mul hinv_diffAt.hasFDerivAt).congr_fderiv ?_
+      ext v
+      have hp20 : p_star 2 = 0 := rfl
+      simp only [smul_apply, hp20, zero_smul, zero_add, hinv_val, smul_eq_mul]
+    have h3_der : HasFDerivAt (fun q ↦ q 3 * invSqrtU q)
+        (rtu⁻¹ • euclidProj (3 : Fin 4)) p_star := by
+      refine ((hp 3).mul hinv_diffAt.hasFDerivAt).congr_fderiv ?_
+      ext v
+      have hp30 : p_star 3 = 0 := rfl
+      simp only [smul_apply, hp30, zero_smul, zero_add, hinv_val, smul_eq_mul]
+    rw [(hasFDerivAt_vec4' hT_p_der hQ_p_der h2_der h3_der).fderiv]
+    refine ContinuousLinearMap.ext fun v ↦ ext_vec4 ?_ ?_ ?_ ?_
+    · simp only [eΦ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec4_apply, vec4_zero,
+        smul_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      ring
+    · simp only [eΦ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec4_apply, vec4_one,
+        add_apply, smul_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+    · simp only [eΦ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec4_apply, vec4_two,
+        smul_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      ring
+    · simp only [eΦ, ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.coe_mk,
+        LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk, clmVec4_apply, vec4_three,
+        smul_apply, euclidProj, EuclideanSpace.proj, PiLp.proj_apply, smul_eq_mul]
+      ring
+  have hΦ_p : Φ p_star = 0 := by
+    refine ext_vec4 ?_ ?_ ?_ ?_
+    · simp only [Φ, TFn, hwShift_pstar, hc0 1, hc0 2, vec4_zero, PiLp.zero_apply]; ring
+    · dsimp only [Φ, QFn]
+      rw [vec4_one, hwShift_pstar, hc0 2]
+      simp [p_star, lekiliMove4CritCurve]
+    · simp [Φ, p_star, lekiliMove4CritCurve]
+    · simp [Φ, p_star, lekiliMove4CritCurve]
+  have hΨ_fp : Ψ (lekiliMove4 s p_star) = wrinkledCuspMap 0 := by
+    refine ext_vec2 ?_ ?_
+    · simp only [Ψ, TFn, hwShift_pstar, hc0 1, hc0 2, wrinkledCuspMap, vec2_zero,
+        PiLp.zero_apply]; ring
+    · simp only [Ψ, WFn, hwShift_pstar, hc0 0, hc0 1, hc0 2, wrinkledCuspMap, vec2_one,
+        PiLp.zero_apply]; ring
+  refine isLocallyModeledOn_of_contDiff_maps hU_dom_open hp_dom hU_tgt_open hfp_tgt
+    hΦ_diff hΨ_diff eΦ heΦ eΨ heΨ hΦ_p hΨ_fp ?_
+    (contDiff_lekiliMove4 s).continuous.continuousAt
+  have hG_at : ∀ᶠ q in 𝓝 p_star,
+      G (pairFn q) =
+        (QFn q ^ 3 - 3 * TFn (lekiliMove4 s q) * QFn q - WFn (lekiliMove4 s q)) *
+          u (pairFn q) := by
+    filter_upwards [hpair_diff.continuous.continuousAt.tendsto.eventually (hp_pair0 ▸ heq_wp)]
+      with q hq
+    rw [hq, TauCeti.Polynomial.eval_monicOfCoeff, Fin.sum_univ_three]
+    dsimp only [pairFn, QFn, TFn, WFn]
+    simp only [sub_zero, Fin.val_zero, pow_zero, mul_one, Fin.val_one, pow_one, Fin.val_two]
+    ring
+  filter_upwards [hU_dom_open.mem_nhds hp_dom, hG_at] with q hq hG
+  refine ⟨hq.1, ?_⟩
+  have hu_q_pos : 0 < u (pairFn q) := hq.2.2
+  have hu_q_ne : u (pairFn q) ≠ 0 := hu_q_pos.ne'
+  have hG_poly : G (pairFn q) = q 3 ^ 2 - q 2 ^ 2 := by
+    dsimp only [G, pairFn, wShift, lekiliMove4]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, vec2_zero, vec2_one, ht_star_eq, hs_eq]
+    ring
+  have hinv_sq : invSqrtU q ^ 2 = (u (pairFn q))⁻¹ := by
+    dsimp only [invSqrtU, pairFn]
+    rw [inv_pow, Real.sq_sqrt hu_q_pos.le]
+  have h2 : QFn q ^ 3 - 3 * TFn (lekiliMove4 s q) * QFn q - WFn (lekiliMove4 s q) =
+      (q 3 ^ 2 - q 2 ^ 2) * invSqrtU q ^ 2 := by
+    rw [hinv_sq, ← div_eq_mul_inv, eq_div_iff hu_q_ne, ← hG, hG_poly]
+  refine ext_vec2 rfl ?_
+  simp only [Ψ, Φ, wrinkledCuspMap, vec2_one, vec4_zero, vec4_one, vec4_two, vec4_three]
+  rw [mul_pow, mul_pow]
+  linear_combination -h2
+
+/-- `IsWrinkledCuspAt` at both cusps `x = ±√(-s/3)` (`σ = ±1`, `s < 0`) of `lekiliMove4 s`
+(`Lekili 2009`, §3.2 Move 4). -/
+-- tier: T2
+theorem isWrinkledCuspAt_lekiliMove4 {s σ : ℝ} (hs : s < 0) (hσ : σ = 1 ∨ σ = -1) :
+    IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 s)
+      (lekiliMove4CritCurve s (σ * Real.sqrt (-s / 3))) := by
+  rcases hσ with rfl | rfl
+  · simpa only [one_mul] using isWrinkledCuspAt_lekiliMove4_pos hs
+  · have hpos := isWrinkledCuspAt_lekiliMove4_pos hs
+    have hflip :
+        flipSignDom (lekiliMove4CritCurve s ((-1) * Real.sqrt (-s / 3))) =
+          lekiliMove4CritCurve s (Real.sqrt (-s / 3)) := by
+      refine ext_vec4 ?_ ?_ ?_ ?_
+      · simp only [flipSignDom_apply, lekiliMove4CritCurve, vec4_zero]; ring
+      · simp only [flipSignDom_apply, lekiliMove4CritCurve, vec4_one]; ring
+      · simp [flipSignDom_apply, lekiliMove4CritCurve]
+      · simp [flipSignDom_apply, lekiliMove4CritCurve]
+    exact isLocallyModeledOn_comp_equiv flipSignDom flipMove4Tgt
+      (flipMove4Tgt_lekiliMove4 s) (hflip ▸ hpos)
+
+/-- Negative-cusp normal form (`IsWrinkledCuspAt`) at `x = -√(-s/3)` (`s < 0`) for
+`lekiliMove4 s`. -/
+-- tier: T1
+theorem isWrinkledCuspAt_lekiliMove4_neg {s : ℝ} (hs : s < 0) :
+    IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 s)
+      (lekiliMove4CritCurve s (-Real.sqrt (-s / 3))) := by
+  simpa only [neg_one_mul] using isWrinkledCuspAt_lekiliMove4 hs (Or.inr rfl)
+
+/-- For `0 < s`, every critical point of `lekiliMove4 s` is an indefinite quadratic fold
+(`0` cusps). -/
+-- tier: T1
+theorem singularities_lekiliMove4_pos {s : ℝ} (hs : 0 < s) :
+    ∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s),
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 s) p := by
+  intro p hp
+  refine isIndefiniteFoldAt_lekiliMove4_of_mem_criticalPoints s hp ?_
+  nlinarith [sq_nonneg (p 1)]
+
+/-- For `s < 0`, every critical point of `lekiliMove4 s` is either an indefinite quadratic fold
+(`3 p₁² + s ≠ 0`) or one of the two wrinkled cusps (`p₁ = ±√(-s/3)`). -/
+-- tier: T1
+theorem singularities_lekiliMove4_neg {s : ℝ} (hs : s < 0) :
+    ∀ p ∈ criticalPoints (𝓡 4) (𝓡 2) (lekiliMove4 s),
+      IsIndefiniteFoldAt (𝓡 4) (𝓡 2) (lekiliMove4 s) p ∨
+        IsWrinkledCuspAt (𝓡 4) (𝓡 2) (lekiliMove4 s) p := by
+  intro p hp
+  by_cases hx : 3 * p 1 ^ 2 + s ≠ 0
+  · exact Or.inl (isIndefiniteFoldAt_lekiliMove4_of_mem_criticalPoints s hp hx)
+  · push Not at hx
+    right
+    rw [criticalPoints_lekiliMove4, Set.mem_ofPred_eq] at hp
+    have hp_eq : p = lekiliMove4CritCurve s (p 1) :=
+      ext_vec4 hp.1 rfl hp.2.1 hp.2.2
+    have hsq : p 1 ^ 2 = (Real.sqrt (-s / 3)) ^ 2 := by
+      rw [Real.sq_sqrt (by linarith)]
+      linarith
+    rcases sq_eq_sq_iff_eq_or_eq_neg.mp hsq with hp1 | hp1
+    · rw [hp_eq, hp1]
+      exact isWrinkledCuspAt_lekiliMove4_pos hs
+    · rw [hp_eq, hp1]
+      exact isWrinkledCuspAt_lekiliMove4_neg hs
+
 end Moves234
 
 /-! ## 4. Compactly Supported Lefschetz Wrinkling & `BrokenToWrinkled` -/
@@ -4078,6 +5079,24 @@ private theorem compactLefschetzWrinkle_eq_add_smul (s : ℝ) (p : EuclideanSpac
   refine ext_vec2 ?_ ?_ <;>
     (simp only [compactLefschetzWrinkle, lekiliBumpPerturb, PiLp.add_apply, PiLp.smul_apply,
       smul_eq_mul, vec2_zero, vec2_one]; ring)
+
+private theorem contDiff_lekiliBumpPerturb : ContDiff ℝ ∞ lekiliBumpPerturb := by
+  have hp (i : Fin 4) : ContDiff ℝ ∞ (fun p : EuclideanSpace ℝ (Fin 4) ↦ p i) :=
+    (euclidProj i).contDiff
+  exact lekiliWrinkleBump.contDiff.smul
+    (contDiff_vec2 (contDiff_const.mul (hp 0)) (contDiff_const.mul (hp 1)))
+
+/-- Joint smoothness (`ContDiff ℝ ∞`) of `(s, p) ↦ compactLefschetzWrinkle s p` on `ℝ × ℝ⁴`. -/
+-- tier: T2
+theorem contDiff_compactLefschetzWrinkle_uncurry :
+    ContDiff ℝ ∞
+      (fun q : ℝ × EuclideanSpace ℝ (Fin 4) ↦ compactLefschetzWrinkle q.1 q.2) := by
+  have heq : (fun q : ℝ × EuclideanSpace ℝ (Fin 4) ↦ compactLefschetzWrinkle q.1 q.2) =
+      fun q ↦ realLefschetzMap q.2 + q.1 • lekiliBumpPerturb q.2 := by
+    funext q; exact compactLefschetzWrinkle_eq_add_smul q.1 q.2
+  rw [heq]
+  exact (contDiff_realLefschetzMap.comp contDiff_snd).add
+    (contDiff_fst.smul (contDiff_lekiliBumpPerturb.comp contDiff_snd))
 
 /-- Smoothness (`ContDiff ℝ ∞`) of `compactLefschetzWrinkle s`. -/
 theorem contDiff_compactLefschetzWrinkle (s : ℝ) :
@@ -4415,7 +5434,10 @@ private theorem partialDiffeomorph_mfderiv_bijective
     rwa [hleft] at hs
   exact ⟨hinj, hsurj⟩
 
-private theorem mem_criticalPoints_iff_of_partialDiffeomorph_conj
+/-- Local chart conjugacy by `C^∞` partial diffeomorphisms `(φ, ψ)` transports critical points
+of `f : M → Base` onto critical points of `g : ℝ⁴ → ℝ²`. -/
+-- tier: T2
+theorem mem_criticalPoints_iff_of_partialDiffeomorph_conj
     {E_M H_M E_B H_B M Base : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     {I_M : ModelWithCorners ℝ E_M H_M}
@@ -4458,7 +5480,10 @@ private theorem mem_criticalPoints_iff_of_partialDiffeomorph_conj
   rw [mem_criticalPoints_iff, mem_criticalPoints_iff]
   exact not_congr (h1.trans ((surjective_mfderiv_congr_of_eventuallyEq hev).trans h2))
 
-private theorem isLocallyModeledOn_of_partialDiffeomorph_conj
+/-- Pulls back a local normal form `IsLocallyModeledOn` for `g` at `φ q` along a `C^∞` partial
+diffeomorphism conjugacy `ψ (f z) = g (φ z)`. -/
+-- tier: T2
+theorem isLocallyModeledOn_of_partialDiffeomorph_conj
     {E_M H_M E_B H_B M Base : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     {I_M : ModelWithCorners ℝ E_M H_M}
@@ -4571,6 +5596,97 @@ private theorem coe_restrOpen {E H E' H' M N : Type*}
   rw [PartialDiffeomorph.restrOpen_toPartialEquiv]
   rfl
 
+private noncomputable def concatSmoothHomotopy {M Base : Type*}
+    (H₁ H₂ : ℝ → M → Base) (t : ℝ) (x : M) : Base :=
+  if t ≤ 1 / 2 then H₁ (Real.smoothTransition (3 * t)) x
+  else H₂ (Real.smoothTransition (3 * t - 2)) x
+
+private theorem concatSmoothHomotopy_zero {M Base : Type*}
+    (H₁ H₂ : ℝ → M → Base) (x : M) :
+    concatSmoothHomotopy H₁ H₂ 0 x = H₁ 0 x := by
+  simp [concatSmoothHomotopy]
+
+private theorem concatSmoothHomotopy_one {M Base : Type*}
+    (H₁ H₂ : ℝ → M → Base) (x : M) :
+    concatSmoothHomotopy H₁ H₂ 1 x = H₂ 1 x := by
+  dsimp only [concatSmoothHomotopy]
+  split_ifs with h
+  · norm_num at h
+  · rw [show (3 : ℝ) * 1 - 2 = 1 by norm_num, Real.smoothTransition.one]
+
+private theorem concatSmoothHomotopy_stationary {M Base : Type*}
+    {H₁ H₂ : ℝ → M → Base} {f₀ f₁ : M → Base} {K₁ K₂ : Set M}
+    (h₁_stat : ∀ t : ℝ, ∀ x ∉ K₁, H₁ t x = f₀ x)
+    (h₂_stat : ∀ t : ℝ, ∀ x ∉ K₂, H₂ t x = f₁ x)
+    (hf₁_out : ∀ x ∉ K₁, f₁ x = f₀ x) (t : ℝ) {x : M} (hx : x ∉ K₁ ∪ K₂) :
+    concatSmoothHomotopy H₁ H₂ t x = f₀ x := by
+  have hx₁ : x ∉ K₁ := fun hm ↦ hx (Set.mem_union_left K₂ hm)
+  have hx₂ : x ∉ K₂ := fun hm ↦ hx (Set.mem_union_right K₁ hm)
+  dsimp only [concatSmoothHomotopy]
+  split_ifs
+  · exact h₁_stat _ x hx₁
+  · exact (h₂_stat _ x hx₂).trans (hf₁_out x hx₁)
+
+private theorem contMDiff_uncurry_concatSmoothHomotopy
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [TopologicalSpace M] [ChartedSpace H_M M]
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace Base] [ChartedSpace H_B Base]
+    {H₁ H₂ : ℝ → M → Base}
+    (hH₁ : ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H₁))
+    (hH₂ : ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H₂))
+    (hjoin : ∀ x : M, H₁ 1 x = H₂ 0 x) :
+    ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞
+      (Function.uncurry (concatSmoothHomotopy H₁ H₂)) := by
+  have hst : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ∞ Real.smoothTransition :=
+    (Real.smoothTransition.contDiff (n := ⊤)).contMDiff
+  have hτ₁_md : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ∞ (fun t : ℝ ↦ Real.smoothTransition (3 * t)) :=
+    hst.comp (contDiff_const.mul contDiff_id).contMDiff
+  have hτ₂_md : ContMDiff 𝓘(ℝ, ℝ) 𝓘(ℝ, ℝ) ∞ (fun t : ℝ ↦ Real.smoothTransition (3 * t - 2)) :=
+    hst.comp ((contDiff_const.mul contDiff_id).sub contDiff_const).contMDiff
+  let g₁ : ℝ × M → Base :=
+    fun p ↦ Function.uncurry H₁ (Real.smoothTransition (3 * p.1), p.2)
+  let g₂ : ℝ × M → Base :=
+    fun p ↦ Function.uncurry H₂ (Real.smoothTransition (3 * p.1 - 2), p.2)
+  have hg₁_md : ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ g₁ :=
+    hH₁.comp ((hτ₁_md.comp contMDiff_fst).prodMk contMDiff_snd)
+  have hg₂_md : ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ g₂ :=
+    hH₂.comp ((hτ₂_md.comp contMDiff_fst).prodMk contMDiff_snd)
+  refine contMDiffOn_univ.mp fun p _ ↦ ?_
+  by_cases hp : p.1 < 2 / 3
+  · let U₁ : Set (ℝ × M) := {q : ℝ × M | q.1 < 2 / 3}
+    have hU₁_open : IsOpen U₁ := isOpen_Iio.preimage continuous_fst
+    have heq₁ : ∀ q ∈ U₁, Function.uncurry (concatSmoothHomotopy H₁ H₂) q = g₁ q := by
+      intro q hq
+      have hq_lt : q.1 < 2 / 3 := hq
+      dsimp only [Function.uncurry, concatSmoothHomotopy, g₁]
+      split_ifs with hle
+      · rfl
+      · rw [Real.smoothTransition.zero_of_nonpos (by linarith),
+          Real.smoothTransition.one_of_one_le (by linarith)]
+        exact (hjoin q.2).symm
+    have hev : Function.uncurry (concatSmoothHomotopy H₁ H₂) =ᶠ[𝓝 p] g₁ :=
+      _root_.eventually_nhds_iff.mpr ⟨U₁, heq₁, hU₁_open, hp⟩
+    exact (hg₁_md.contMDiffAt.congr_of_eventuallyEq hev).contMDiffWithinAt
+  · have hp_gt : (1 / 3 : ℝ) < p.1 := by linarith
+    let U₂ : Set (ℝ × M) := {q : ℝ × M | 1 / 3 < q.1}
+    have hU₂_open : IsOpen U₂ := isOpen_Ioi.preimage continuous_fst
+    have heq₂ : ∀ q ∈ U₂, Function.uncurry (concatSmoothHomotopy H₁ H₂) q = g₂ q := by
+      intro q hq
+      have hq_gt : (1 / 3 : ℝ) < q.1 := hq
+      dsimp only [Function.uncurry, concatSmoothHomotopy, g₂]
+      split_ifs with hle
+      · rw [Real.smoothTransition.one_of_one_le (by linarith),
+          Real.smoothTransition.zero_of_nonpos (by linarith)]
+        exact hjoin q.2
+      · rfl
+    have hev : Function.uncurry (concatSmoothHomotopy H₁ H₂) =ᶠ[𝓝 p] g₂ :=
+      _root_.eventually_nhds_iff.mpr ⟨U₂, heq₂, hU₂_open, hp_gt⟩
+    exact (hg₂_md.contMDiffAt.congr_of_eventuallyEq hev).contMDiffWithinAt
+
 private theorem wrinkledFibration_mem_closure_baseRegion
     {E_M H_M E_B H_B M Base Fiber : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
@@ -4589,10 +5705,20 @@ private theorem wrinkledFibration_mem_closure_baseRegion
       IsIndefiniteFoldAt I_M I_B W.toFun p ∨ IsWrinkledCuspAt I_M I_B W.toFun p ∨
         (p ∈ insert p₀ S ∧ IsRealLefschetzAt I_M I_B W.toFun p ∧
           W.toFun p ∉ closure (W.baseRegion : Set Base))) :
-    ∃ W' : WrinkledFibration I_M M I_B Base Fiber,
+    ∃ (W' : WrinkledFibration I_M M I_B Base Fiber)
+      (K₂ : Set M) (H₀ : ℝ → M → Base),
       W'.baseRegion = W.baseRegion ∧
       W'.baseDiskRadius = W.baseDiskRadius ∧
-      (∀ x ∈ W'.toFun ⁻¹' W.baseRegion.1, W'.toFun x = W.toFun x) ∧
+      W'.toFun ⁻¹' closure (W.baseRegion : Set Base) =
+        W.toFun ⁻¹' closure (W.baseRegion : Set Base) ∧
+      IsCompact K₂ ∧
+      Disjoint K₂ (W.toFun ⁻¹' closure (W.baseRegion : Set Base)) ∧
+      (∀ p ∈ criticalPoints I_M I_B W.toFun, p ∈ K₂ → p = p₀) ∧
+      (∀ x ∉ K₂, W'.toFun x = W.toFun x) ∧
+      ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H₀) ∧
+      (∀ x, H₀ 0 x = W.toFun x) ∧
+      (∀ x, H₀ 1 x = W'.toFun x) ∧
+      (∀ (t : ℝ), ∀ x ∉ K₂, H₀ t x = W.toFun x) ∧
       ∀ p ∈ criticalPoints I_M I_B W'.toFun,
         IsIndefiniteFoldAt I_M I_B W'.toFun p ∨ IsWrinkledCuspAt I_M I_B W'.toFun p ∨
           (p ∈ S ∧ IsRealLefschetzAt I_M I_B W'.toFun p ∧
@@ -4692,6 +5818,25 @@ private theorem wrinkledFibration_mem_closure_baseRegion
     (isCompact_closedBall (0 : EuclideanSpace ℝ (Fin 4)) 2).image_of_continuousOn
       ((φ.symm.contMDiffOn.continuousOn).mono (by rw [hφ_symm_src]; exact hball2_sub))
   have hK2_closed : IsClosed K₂ := hK2_compact.isClosed
+  have hK2_disj : Disjoint K₂ (W.toFun ⁻¹' closure (W.baseRegion : Set Base)) := by
+    rw [Set.disjoint_left]
+    intro q hqK2 hq_cl
+    have hmem := (hconj_old q (hK2_sub hqK2)).1
+    rw [hψ_src', hψ1_src] at hmem
+    exact hmem.2 hq_cl
+  have hp0_φ : p₀ ∈ φ.source := hφ_src'.symm ▸ hp1_φ
+  have hφ_p0 : φ p₀ = 0 := by
+    simp only [φ, PartialDiffeomorph.coe_trans, Function.comp_apply]
+    change R • φ₁ p₀ = 0
+    rw [coe_restrOpen, hφ0, smul_zero]
+  have hK2_crit : ∀ p ∈ criticalPoints I_M I_B W.toFun, p ∈ K₂ → p = p₀ := by
+    intro p hp_crit hpK2
+    have hpφ : p ∈ φ.source := hK2_sub hpK2
+    have hφp_crit : φ p ∈ criticalPoints (𝓡 4) (𝓡 2) realLefschetzMap :=
+      (mem_criticalPoints_iff_of_partialDiffeomorph_conj φ ψ W.contMDiff_toFun.contMDiffOn
+        contDiff_realLefschetzMap hconj_old hpφ).mp hp_crit
+    rw [criticalPoints_realLefschetzMap, Set.mem_singleton_iff] at hφp_crit
+    exact φ.injOn hpφ hp0_φ (hφp_crit.trans hφ_p0.symm)
   have hf'_eq_out : ∀ q ∉ K₂, f' q = W.toFun q := by
     intro q hqK2
     by_cases hqφ : q ∈ φ.source
@@ -4717,6 +5862,108 @@ private theorem wrinkledFibration_mem_closure_baseRegion
         ← (hconj_old q hq).2]
       exact ψ.map_source (hconj_old q hq).1
   have hψ_symm_src : ψ.symm.source = ψ.target := ψ.symm_source
+  let H₀ : ℝ → M → Base := fun t q ↦
+    if q ∈ φ.source then
+      ψ.symm (compactLefschetzWrinkle (Real.smoothTransition t * s₀) (φ q))
+    else
+      W.toFun q
+  have hH0_pos (t : ℝ) {q : M} (hq : q ∈ φ.source) :
+      H₀ t q = ψ.symm (compactLefschetzWrinkle (Real.smoothTransition t * s₀) (φ q)) := by
+    dsimp only [H₀]; split_ifs; rfl
+  have hH0_neg (t : ℝ) {q : M} (hq : q ∉ φ.source) : H₀ t q = W.toFun q := by
+    dsimp only [H₀]; split_ifs; rfl
+  have hH0_tgt (t : ℝ) :
+      ∀ q ∈ φ.source,
+        compactLefschetzWrinkle (Real.smoothTransition t * s₀) (φ q) ∈ ψ.target := by
+    intro q hq
+    have ht0 : 0 ≤ Real.smoothTransition t := Real.smoothTransition.nonneg t
+    have ht1 : Real.smoothTransition t ≤ 1 := Real.smoothTransition.le_one t
+    have hts_abs : |Real.smoothTransition t * s₀| ≤ 1 :=
+      abs_le.mpr ⟨by nlinarith, by nlinarith⟩
+    by_cases hnorm : ‖φ q‖ ≤ 2
+    · exact hball40_sub (Metric.mem_closedBall.mpr (by
+        rw [dist_zero_right]
+        exact norm_compactLefschetzWrinkle_le_forty hts_abs hnorm))
+    · have hge : 2 ≤ ‖φ q‖ := (not_le.mp hnorm).le
+      rw [compactLefschetzWrinkle_eq_realLefschetzMap_of_two_le_norm _ hge,
+        ← (hconj_old q hq).2]
+      exact ψ.map_source (hconj_old q hq).1
+  have hH0_eq_out (t : ℝ) : ∀ q ∉ K₂, H₀ t q = W.toFun q := by
+    intro q hqK2
+    by_cases hqφ : q ∈ φ.source
+    · have hnotin : φ q ∉ Metric.closedBall (0 : EuclideanSpace ℝ (Fin 4)) 2 := by
+        intro hmem
+        exact hqK2 ⟨φ q, hmem, φ.left_inv hqφ⟩
+      have hge : 2 ≤ ‖φ q‖ := by
+        rw [Metric.mem_closedBall, dist_zero_right, not_le] at hnotin
+        exact hnotin.le
+      rw [hH0_pos t hqφ, compactLefschetzWrinkle_eq_realLefschetzMap_of_two_le_norm _ hge,
+        ← (hconj_old q hqφ).2]
+      exact ψ.left_inv (hconj_old q hqφ).1
+    · exact hH0_neg t hqφ
+  have hH0_zero : ∀ q : M, H₀ 0 q = W.toFun q := by
+    intro q
+    by_cases hq : q ∈ φ.source
+    · rw [hH0_pos 0 hq, Real.smoothTransition.zero, zero_mul,
+        compactLefschetzWrinkle_eq_add_smul, zero_smul, add_zero, ← (hconj_old q hq).2]
+      exact ψ.left_inv (hconj_old q hq).1
+    · exact hH0_neg 0 hq
+  have hH0_one : ∀ q : M, H₀ 1 q = f' q := by
+    intro q
+    by_cases hq : q ∈ φ.source
+    · rw [hH0_pos 1 hq, Real.smoothTransition.one, one_mul, hf'_pos hq]
+    · rw [hH0_neg 1 hq, hf'_neg hq]
+  have hH0_md : ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H₀) := by
+    refine contMDiffOn_univ.mp fun p _ ↦ ?_
+    by_cases hp : p.2 ∈ φ.source
+    · have h_st : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) 𝓘(ℝ, ℝ) ∞
+          (fun z : ℝ × M ↦ Real.smoothTransition z.1 * s₀) p :=
+        (((Real.smoothTransition.contDiff (n := ⊤)).mul contDiff_const).contMDiff.comp
+          contMDiff_fst).contMDiffAt
+      have h_φ : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) (𝓡 4) ∞ (fun z : ℝ × M ↦ φ z.2) p :=
+        (φ.contMDiffOn.contMDiffAt (φ.open_source.mem_nhds hp)).comp p
+          contMDiff_snd.contMDiffAt
+      have h_rl : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) (𝓡 2) ∞
+          (fun z : ℝ × M ↦ realLefschetzMap (φ z.2)) p :=
+        contDiff_realLefschetzMap.contMDiff.contMDiffAt.comp p h_φ
+      have h_bp : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) (𝓡 2) ∞
+          (fun z : ℝ × M ↦ lekiliBumpPerturb (φ z.2)) p :=
+        contDiff_lekiliBumpPerturb.contMDiff.contMDiffAt.comp p h_φ
+      have h_wr : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) (𝓡 2) ∞
+          (fun z : ℝ × M ↦
+            compactLefschetzWrinkle (Real.smoothTransition z.1 * s₀) (φ z.2)) p := by
+        have heq_fn :
+            (fun z : ℝ × M ↦
+                compactLefschetzWrinkle (Real.smoothTransition z.1 * s₀) (φ z.2)) =
+              fun z : ℝ × M ↦
+                realLefschetzMap (φ z.2) +
+                  (Real.smoothTransition z.1 * s₀) • lekiliBumpPerturb (φ z.2) := by
+          funext z
+          exact compactLefschetzWrinkle_eq_add_smul _ _
+        rw [heq_fn]
+        exact h_rl.add (h_st.smul h_bp)
+      have h_ψ : ContMDiffAt (𝓡 2) I_B ∞ ψ.symm
+          (compactLefschetzWrinkle (Real.smoothTransition p.1 * s₀) (φ p.2)) :=
+        ψ.symm.contMDiffOn.contMDiffAt
+          (ψ.symm.open_source.mem_nhds (by rw [hψ_symm_src]; exact hH0_tgt p.1 p.2 hp))
+      have hcomp_at : ContMDiffAt (𝓘(ℝ, ℝ).prod I_M) I_B ∞
+          (fun z : ℝ × M ↦
+            ψ.symm (compactLefschetzWrinkle (Real.smoothTransition z.1 * s₀) (φ z.2))) p :=
+        h_ψ.comp p h_wr
+      have hev : Function.uncurry H₀ =ᶠ[𝓝 p]
+          (fun z : ℝ × M ↦
+            ψ.symm (compactLefschetzWrinkle (Real.smoothTransition z.1 * s₀) (φ z.2))) :=
+        _root_.eventually_nhds_iff.mpr
+          ⟨Set.univ ×ˢ φ.source, fun z hz ↦ hH0_pos z.1 hz.2,
+            isOpen_univ.prod φ.open_source, ⟨trivial, hp⟩⟩
+      exact (hcomp_at.congr_of_eventuallyEq hev).contMDiffWithinAt
+    · have hpK2 : p.2 ∈ K₂ᶜ := fun hm ↦ hp (hK2_sub hm)
+      have hev : Function.uncurry H₀ =ᶠ[𝓝 p] (fun z : ℝ × M ↦ W.toFun z.2) :=
+        _root_.eventually_nhds_iff.mpr
+          ⟨Set.univ ×ˢ K₂ᶜ, fun z hz ↦ hH0_eq_out z.1 z.2 hz.2,
+            isOpen_univ.prod hK2_closed.isOpen_compl, ⟨trivial, hpK2⟩⟩
+      exact (((W.contMDiff_toFun.comp contMDiff_snd).contMDiffAt).congr_of_eventuallyEq
+        hev).contMDiffWithinAt
   have hf'_md : ContMDiff I_M I_B ∞ f' := by
     refine contMDiffOn_univ.mp fun q _ ↦ ?_
     by_cases hq : q ∈ φ.source
@@ -4738,6 +5985,24 @@ private theorem wrinkledFibration_mem_closure_baseRegion
       have hev : f' =ᶠ[𝓝 q] W.toFun :=
         _root_.eventually_nhds_iff.mpr ⟨K₂ᶜ, hf'_eq_out, hK2_closed.isOpen_compl, hqK2⟩
       exact (W.contMDiff_toFun.contMDiffAt.congr_of_eventuallyEq hev).contMDiffWithinAt
+  have hpre_clos_eq :
+      f' ⁻¹' closure (W.baseRegion : Set Base) =
+        W.toFun ⁻¹' closure (W.baseRegion : Set Base) := by
+    ext q
+    simp only [Set.mem_preimage]
+    by_cases hq : q ∈ φ.source
+    · have hfq1 : f' q ∉ closure (W.baseRegion : Set Base) := by
+        rw [hf'_pos hq]
+        have hmem_src : ψ.symm (compactLefschetzWrinkle s₀ (φ q)) ∈ ψ.source :=
+          ψ.map_target (hf'_tgt q hq)
+        rw [hψ_src', hψ1_src] at hmem_src
+        exact hmem_src.2
+      have hw1 : W.toFun q ∉ closure (W.baseRegion : Set Base) := by
+        have hmem := (hconj_old q hq).1
+        rw [hψ_src', hψ1_src] at hmem
+        exact hmem.2
+      exact ⟨fun hm ↦ absurd hm hfq1, fun hm ↦ absurd hm hw1⟩
+    · rw [hf'_neg hq]
   have hpre_eq : f' ⁻¹' W.baseRegion.1 = W.toFun ⁻¹' W.baseRegion.1 := by
     ext q
     simp only [Set.mem_preimage]
@@ -4829,7 +6094,8 @@ private theorem wrinkledFibration_mem_closure_baseRegion
         have hval := congrArg Subtype.val hfst
         change (W.trivialization ⟨p.1, hpre_mem.mp p.2⟩).1.1 = f' p.1
         rw [hval, hpre_val p.1 p.2] }
-  refine ⟨W', rfl, rfl, hpre_val, fun p hp_crit ↦ ?_⟩
+  refine ⟨W', K₂, H₀, rfl, rfl, hpre_clos_eq, hK2_compact, hK2_disj, hK2_crit, hf'_eq_out,
+    hH0_md, hH0_zero, hH0_one, hH0_eq_out, fun p hp_crit ↦ ?_⟩
   by_cases hpφ : p ∈ φ.source
   · have hφp_crit : φ p ∈ criticalPoints (𝓡 4) (𝓡 2) (compactLefschetzWrinkle s₀) :=
       (mem_criticalPoints_iff_of_partialDiffeomorph_conj φ ψ hf'_md.contMDiffOn
@@ -4989,9 +6255,11 @@ private theorem finite_realLefschetzPoints_of_brokenLefschetz
 
 /-- **Broken-to-Purely-Wrinkled Surgery on Compact 4-Manifolds (Disjoint Closure Case)**:
 if every real Lefschetz critical point of a broken Lefschetz fibration `B` maps outside
-`closure B.baseRegion.1`, repeated compactly supported Lekili wrinkling eliminates all real
-Lefschetz points while preserving `baseRegion`, `baseDiskRadius`, and `B.toFun` on
-`B.toFun ⁻¹' B.baseRegion.1`. -/
+`closure B.baseRegion.1`, repeated compactly supported Lekili Move 1 wrinkling (`Lekili 2009`,
+§3.1 & §4 / Theorem 4) eliminates all real Lefschetz points via a smooth global homotopy
+`H : ℝ → M → Base` (`H 0 = B.toFun`, `H 1 = P.toFun`) supported inside a compact set `K ⊆ M`
+disjoint from `B.toFun ⁻¹' closure B.baseRegion.1` and from all non-Lefschetz critical points of
+`B`, while preserving `baseRegion` and `baseDiskRadius`. -/
 -- tier: T2
 theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_closure
     {E_M H_M E_B H_B M Base Fiber : Type*}
@@ -5006,49 +6274,100 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
     (B : BrokenLefschetzFibration I_M M I_B Base Fiber)
     (hdisj : ∀ p ∈ criticalPoints I_M I_B B.toFun,
       IsRealLefschetzAt I_M I_B B.toFun p → B.toFun p ∉ closure (B.baseRegion : Set Base)) :
-    ∃ P : PurelyWrinkledFibration I_M M I_B Base Fiber,
+    ∃ (P : PurelyWrinkledFibration I_M M I_B Base Fiber)
+      (K : Set M) (H : ℝ → M → Base),
       P.baseRegion = B.baseRegion ∧
       P.baseDiskRadius = B.baseDiskRadius ∧
-      ∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = B.toFun x := by
+      IsCompact K ∧
+      Disjoint K (B.toFun ⁻¹' closure (B.baseRegion : Set Base)) ∧
+      (∀ p ∈ criticalPoints I_M I_B B.toFun,
+        ¬ IsRealLefschetzAt I_M I_B B.toFun p → p ∉ K) ∧
+      (∀ x ∉ K, P.toFun x = B.toFun x) ∧
+      (∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = B.toFun x) ∧
+      ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H) ∧
+      (∀ x, H 0 x = B.toFun x) ∧
+      (∀ x, H 1 x = P.toFun x) ∧
+      ∀ (t : ℝ), ∀ x ∉ K, H t x = B.toFun x := by
   classical
   have hfin := finite_realLefschetzPoints_of_brokenLefschetz B
   have hstep :
       ∀ S : Finset M,
         ∀ W : WrinkledFibration I_M M I_B Base Fiber,
-          W.baseRegion = B.baseRegion →
-          W.baseDiskRadius = B.baseDiskRadius →
-          (∀ x ∈ W.toFun ⁻¹' B.baseRegion.1, W.toFun x = B.toFun x) →
           (∀ p ∈ criticalPoints I_M I_B W.toFun,
             IsIndefiniteFoldAt I_M I_B W.toFun p ∨ IsWrinkledCuspAt I_M I_B W.toFun p ∨
               (p ∈ S ∧ IsRealLefschetzAt I_M I_B W.toFun p ∧
                 W.toFun p ∉ closure (W.baseRegion : Set Base))) →
-          ∃ P : PurelyWrinkledFibration I_M M I_B Base Fiber,
-            P.baseRegion = B.baseRegion ∧
-            P.baseDiskRadius = B.baseDiskRadius ∧
-            ∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = B.toFun x := by
+          ∃ (P : PurelyWrinkledFibration I_M M I_B Base Fiber)
+            (K : Set M) (H : ℝ → M → Base),
+            P.baseRegion = W.baseRegion ∧
+            P.baseDiskRadius = W.baseDiskRadius ∧
+            P.toFun ⁻¹' closure (W.baseRegion : Set Base) =
+              W.toFun ⁻¹' closure (W.baseRegion : Set Base) ∧
+            IsCompact K ∧
+            Disjoint K (W.toFun ⁻¹' closure (W.baseRegion : Set Base)) ∧
+            (∀ p ∈ criticalPoints I_M I_B W.toFun,
+              ¬ IsRealLefschetzAt I_M I_B W.toFun p → p ∉ K) ∧
+            (∀ x ∉ K, P.toFun x = W.toFun x) ∧
+            ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H) ∧
+            (∀ x, H 0 x = W.toFun x) ∧
+            (∀ x, H 1 x = P.toFun x) ∧
+            ∀ (t : ℝ), ∀ x ∉ K, H t x = W.toFun x := by
     intro S
     induction S using Finset.induction with
     | empty =>
-      intro W hreg hrad hval hcrit
-      refine ⟨⟨W, fun p hp ↦ ?_⟩, hreg, hrad, fun x hx ↦ hval x (hreg ▸ hx)⟩
+      intro W hcrit
+      refine ⟨⟨W, fun p hp ↦ ?_⟩, ∅, fun _ x ↦ W.toFun x, rfl, rfl, rfl, isCompact_empty,
+        by simp, fun _ _ _ hp ↦ hp, fun _ _ ↦ rfl,
+        W.contMDiff_toFun.comp contMDiff_snd, fun _ ↦ rfl, fun _ ↦ rfl, fun _ _ _ ↦ rfl⟩
       rcases hcrit p hp with hfold | hcusp | ⟨hmem, _⟩
       · exact Or.inl hfold
       · exact Or.inr hcusp
       · exact absurd hmem (Finset.notMem_empty p)
     | @insert a S' ha ih =>
-      intro W hreg hrad hval hcrit
-      by_cases ha_cond : a ∈ criticalPoints I_M I_B W.toFun ∧ IsRealLefschetzAt I_M I_B W.toFun a ∧
+      intro W hcrit
+      by_cases ha_cond : a ∈ criticalPoints I_M I_B W.toFun ∧
+          IsRealLefschetzAt I_M I_B W.toFun a ∧
           W.toFun a ∉ closure (W.baseRegion : Set Base)
-      · obtain ⟨W', hreg', hrad', hval', hcrit'⟩ :=
+      · obtain ⟨W', K₁, H₁, hreg', hrad', hpre_clos', hK₁_comp, hK₁_disj, hK₁_crit, hW'_out,
+            hH₁_md, hH₁_0, hH₁_1, hH₁_stat, hcrit'⟩ :=
           wrinkledFibration_mem_closure_baseRegion ha ha_cond.2.1 ha_cond.2.2 hcrit
-        refine ih W' (hreg'.trans hreg) (hrad'.trans hrad) (fun x hx ↦ ?_)
-          (fun p hp ↦ by simpa only [hreg'] using hcrit' p hp)
-        have hxW' : x ∈ W'.toFun ⁻¹' W.baseRegion.1 := by
-          simpa only [Set.mem_preimage, hreg] using hx
-        have hxW : x ∈ W.toFun ⁻¹' B.baseRegion.1 := by
-          simpa only [Set.mem_preimage, hval' x hxW'] using hx
-        rw [hval' x hxW', hval x hxW]
-      · refine ih W hreg hrad hval fun p hp ↦ ?_
+        obtain ⟨P, K₂, H₂, hP_reg, hP_rad, hP_pre_clos, hK₂_comp, hK₂_disj, hK₂_crit, hP_out,
+            hH₂_md, hH₂_0, hH₂_1, hH₂_stat⟩ :=
+          ih W' (fun p hp ↦ by simpa only [hreg'] using hcrit' p hp)
+        have hK₂_disj' : Disjoint K₂ (W.toFun ⁻¹' closure (W.baseRegion : Set Base)) := by
+          rwa [hreg', hpre_clos'] at hK₂_disj
+        refine ⟨P, K₁ ∪ K₂, concatSmoothHomotopy H₁ H₂,
+          hP_reg.trans hreg', hP_rad.trans hrad', ?_,
+          hK₁_comp.union hK₂_comp, hK₁_disj.union_left hK₂_disj', ?_, ?_,
+          contMDiff_uncurry_concatSmoothHomotopy hH₁_md hH₂_md
+            (fun x ↦ (hH₁_1 x).trans (hH₂_0 x).symm),
+          fun x ↦ (concatSmoothHomotopy_zero H₁ H₂ x).trans (hH₁_0 x),
+          fun x ↦ (concatSmoothHomotopy_one H₁ H₂ x).trans (hH₂_1 x),
+          fun t x hx ↦ concatSmoothHomotopy_stationary hH₁_stat hH₂_stat hW'_out t hx⟩
+        · calc
+            P.toFun ⁻¹' closure (W.baseRegion : Set Base)
+              = P.toFun ⁻¹' closure (W'.baseRegion : Set Base) := by rw [hreg']
+            _ = W'.toFun ⁻¹' closure (W'.baseRegion : Set Base) := hP_pre_clos
+            _ = W'.toFun ⁻¹' closure (W.baseRegion : Set Base) := by rw [hreg']
+            _ = W.toFun ⁻¹' closure (W.baseRegion : Set Base) := hpre_clos'
+        · intro p hp_crit hp_not_lef
+          have hp_not_K₁ : p ∉ K₁ := fun hpK₁ ↦
+            hp_not_lef (hK₁_crit p hp_crit hpK₁ ▸ ha_cond.2.1)
+          have hev : W'.toFun =ᶠ[𝓝 p] W.toFun :=
+            _root_.eventually_nhds_iff.mpr
+              ⟨K₁ᶜ, hW'_out, hK₁_comp.isClosed.isOpen_compl, hp_not_K₁⟩
+          have hp_crit' : p ∈ criticalPoints I_M I_B W'.toFun := by
+            rw [mem_criticalPoints_iff] at hp_crit ⊢
+            exact (surjective_mfderiv_congr_of_eventuallyEq hev).not.mpr hp_crit
+          have hp_not_lef' : ¬ IsRealLefschetzAt I_M I_B W'.toFun p := fun hl ↦
+            hp_not_lef (isLocallyModeledOn_congr hev hl)
+          have hp_not_K₂ : p ∉ K₂ := hK₂_crit p hp_crit' hp_not_lef'
+          exact fun hm ↦ hm.elim hp_not_K₁ hp_not_K₂
+        · intro x hx
+          have hx₁ : x ∉ K₁ := fun hm ↦ hx (Set.mem_union_left K₂ hm)
+          have hx₂ : x ∉ K₂ := fun hm ↦ hx (Set.mem_union_right K₁ hm)
+          exact (hP_out x hx₂).trans (hW'_out x hx₁)
+      · refine ih W fun p hp ↦ ?_
         rcases hcrit p hp with hfold | hcusp | ⟨hp_mem, hp_lef, hp_out⟩
         · exact Or.inl hfold
         · exact Or.inr (Or.inl hcusp)
@@ -5056,10 +6375,21 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
             rintro rfl
             exact ha_cond ⟨hp, hp_lef, hp_out⟩
           exact Or.inr (Or.inr ⟨(Finset.mem_insert.mp hp_mem).resolve_left hp_ne, hp_lef, hp_out⟩)
-  refine hstep hfin.toFinset B.toWrinkledFibration rfl rfl (fun _ _ ↦ rfl) fun p hp ↦ ?_
-  rcases B.singularities_broken_lefschetz p hp with hp_lef | hp_fold
-  · exact Or.inr (Or.inr ⟨hfin.mem_toFinset.mpr ⟨hp, hp_lef⟩, hp_lef, hdisj p hp hp_lef⟩)
-  · exact Or.inl hp_fold
+  obtain ⟨P, K, H, hP_reg, hP_rad, hP_pre_clos, hK_comp, hK_disj, hK_crit, hP_out,
+      hH_md, hH_0, hH_1, hH_stat⟩ :=
+    hstep hfin.toFinset B.toWrinkledFibration fun p hp ↦ by
+      rcases B.singularities_broken_lefschetz p hp with hp_lef | hp_fold
+      · exact Or.inr (Or.inr ⟨hfin.mem_toFinset.mpr ⟨hp, hp_lef⟩, hp_lef, hdisj p hp hp_lef⟩)
+      · exact Or.inl hp_fold
+  refine ⟨P, K, H, hP_reg, hP_rad, hK_comp, hK_disj, hK_crit, hP_out, ?_,
+    hH_md, hH_0, hH_1, hH_stat⟩
+  intro x hx
+  have hx_cl : x ∈ P.toFun ⁻¹' closure (B.baseRegion : Set Base) :=
+    subset_closure (by simpa [hP_reg] using hx)
+  have hx_B_cl : x ∈ B.toFun ⁻¹' closure (B.baseRegion : Set Base) :=
+    hP_pre_clos ▸ hx_cl
+  have hx_not_K : x ∉ K := Set.disjoint_right.mp hK_disj hx_B_cl
+  exact hP_out x hx_not_K
 
 /-- Shrinks the regular base disk of a `WrinkledFibration` to half radius `W.baseDiskRadius / 2`,
 ensuring `closure W'.baseRegion.1 ⊆ W.baseRegion.1` (disjoint from `W.toFun '' Crit(W)`). -/
@@ -5275,10 +6605,14 @@ noncomputable def WrinkledFibration.shrinkBaseHalf
         exact h },
     rfl, rfl, hBHalf_sub, hclosure_sub⟩
 
-/-- **Lekili's Theorem (`Lekili 2009`, Theorem 1.1 / Existence of Purely Wrinkled Fibration)**:
+/-- **Lekili's Wrinkling Surgery (`Lekili 2009`, *Geom. Topol.* 13, §3.1 & §4 / Theorem 4)**:
 every broken Lefschetz fibration `B : M → Base` on a compact Hausdorff 4-manifold `M` over a
-Hausdorff surface `Base` admits a deformation to a `PurelyWrinkledFibration` `P : M → Base`
-agreeing with `B` on the preimage of `P.baseRegion` (`P.baseDiskRadius = B.baseDiskRadius / 2`). -/
+Hausdorff surface `Base` admits a smooth global homotopy `H : ℝ → M → Base` (`H 0 = B.toFun`,
+`H 1 = P.toFun`) supported inside a compact subset `K ⊆ M` (disjoint from
+`B.toFun ⁻¹' closure P.baseRegion.1` and from all non-Lefschetz critical points of `B`) to a
+`PurelyWrinkledFibration` `P : M → Base` with `P.baseDiskRadius = B.baseDiskRadius / 2` and
+`P.baseRegion.1 ⊆ B.baseRegion.1`, replacing each isolated real Lefschetz singularity by a
+3-cusped wrinkle (`Lekili 2009`, §3.1 Move 1) while leaving `B.toFun` stationary outside `K`. -/
 -- tier: T2
 theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration
     {E_M H_M E_B H_B M Base Fiber : Type*}
@@ -5291,10 +6625,20 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration
     [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber]
     (B : BrokenLefschetzFibration I_M M I_B Base Fiber) :
-    ∃ P : PurelyWrinkledFibration I_M M I_B Base Fiber,
+    ∃ (P : PurelyWrinkledFibration I_M M I_B Base Fiber)
+      (K : Set M) (H : ℝ → M → Base),
       P.baseDiskRadius = B.baseDiskRadius / 2 ∧
       P.baseRegion.1 ⊆ B.baseRegion.1 ∧
-      ∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = B.toFun x := by
+      IsCompact K ∧
+      Disjoint K (B.toFun ⁻¹' closure (P.baseRegion : Set Base)) ∧
+      (∀ p ∈ criticalPoints I_M I_B B.toFun,
+        ¬ IsRealLefschetzAt I_M I_B B.toFun p → p ∉ K) ∧
+      (∀ x ∉ K, P.toFun x = B.toFun x) ∧
+      (∀ x ∈ P.toFun ⁻¹' P.baseRegion.1, P.toFun x = B.toFun x) ∧
+      ContMDiff (𝓘(ℝ, ℝ).prod I_M) I_B ∞ (Function.uncurry H) ∧
+      (∀ x, H 0 x = B.toFun x) ∧
+      (∀ x, H 1 x = P.toFun x) ∧
+      ∀ (t : ℝ), ∀ x ∉ K, H t x = B.toFun x := by
   obtain ⟨W_half, hto, hrad, hsub, hclos⟩ := B.toWrinkledFibration.shrinkBaseHalf
   let B_half : BrokenLefschetzFibration I_M M I_B Base Fiber :=
     { toWrinkledFibration := W_half
@@ -5314,11 +6658,17 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration
     change ¬ Function.Surjective (mfderiv I_M I_B B_half.toFun p) at hp
     rw [show B_half.toFun = B.toFun from hto] at hp
     exact hp hsurj
-  obtain ⟨P, hP_reg, hP_rad, hP_val⟩ :=
+  obtain ⟨P, K, H, hP_reg, hP_rad, hK_comp, hK_disj, hK_crit, hP_out, hP_val,
+      hH_md, hH_0, hH_1, hH_stat⟩ :=
     B_half.exists_purelyWrinkledFibration_of_disjoint_closure hdisj
-  refine ⟨P, hP_rad.trans hrad, ?_, fun x hx ↦ ?_⟩
+  refine ⟨P, K, H, hP_rad.trans hrad, ?_, hK_comp, ?_, ?_, ?_, ?_, hH_md, ?_, hH_1, ?_⟩
   · simpa [hP_reg] using hsub
-  · simpa [B_half, hto] using hP_val x hx
+  · simpa [hP_reg, B_half, hto] using hK_disj
+  · simpa [B_half, hto] using hK_crit
+  · simpa [B_half, hto] using hP_out
+  · simpa [B_half, hto] using hP_val
+  · simpa [B_half, hto] using hH_0
+  · simpa [B_half, hto] using hH_stat
 
 end BrokenToWrinkled
 
