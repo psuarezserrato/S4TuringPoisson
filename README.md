@@ -1,10 +1,12 @@
 # S4TuringPoisson
 
-A Lean 4 formalization of Pablo Suárez-Serrato, *"Hamiltonian and Turing complete flows on smooth 4-manifolds"* ([S4TCdiffeo-Aug-2026.tex](S4TCdiffeo-Aug-2026.tex)), together with an unconditional formalization of the area-preserving disk smoothing theorem of Cardona–Miranda–Peralta-Salas–Presas (`CMPP21`, Theorem 5.2), explicit planar Lekili (2009) wrinkled-fibration moves and broken-to-wrinkled surgery, the global Auroux–Donaldson–Katzarkov (ADK05) broken Lefschetz fibration on $S^4$, and unconditional Corollary 2 on closed oriented smooth 4-manifolds.
+A Lean 4 formalization of Pablo Suárez-Serrato, *"Hamiltonian and Turing complete flows on smooth 4-manifolds"* ([S4TCdiffeo-Aug-2026.tex](S4TCdiffeo-Aug-2026.tex)), together with an unconditional formalization of the area-preserving disk smoothing theorem of Cardona–Miranda–Peralta-Salas–Presas (`CMPP21`, Theorem 5.2), explicit local $\mathbb{R}^4 \to \mathbb{R}^2$ Lekili (2009) wrinkled-fibration moves and broken-to-wrinkled surgery, the global Auroux–Donaldson–Katzarkov (ADK05) broken Lefschetz fibration on $S^4$, and the literal closed 4-manifold Corollary 2.
+
+This project builds on and uses the companion computability library [`https://github.com/psuarezserrato/Turing-recursive`](https://github.com/psuarezserrato/Turing-recursive) for the universal `TM0` machine `U` and partial-recursive computability foundations.
 
 - **Lean toolchain**: `leanprover/lean4:v4.36.0` (`autoImplicit = false`, `relaxedAutoImplicit = false`)
 - **Geometry library**: [`TauCeti`](https://github.com/TauCetiProject/TauCeti) (`v4.36.0` @ `d91980bdc`) + `Mathlib` (`fc4f59e5`)
-- **Computability library**: [`Turing-recursive`](https://github.com/psuarezserrato/Turing-recursive) (`../Turing-recursive`, `4120346`)
+- **Computability library**: [`https://github.com/psuarezserrato/Turing-recursive`](https://github.com/psuarezserrato/Turing-recursive) (`../Turing-recursive`, `4120346`)
 - **Verification**: `10,130` build jobs, `29` modules (`41,361` LOC), `35/35` `leanchecker` leaf modules, `54/54` green blueprint nodes (`128` tracked declarations), `0` custom axioms
 - **License**: GNU Affero General Public License v3.0 (AGPLv3) for non-commercial use ([LICENSE.md](LICENSE.md))
 
@@ -30,6 +32,7 @@ All headline theorems use exclusively Lean's three standard axioms `{propext, Cl
 
 | Directory / File | Contents |
 |---|---|
+| `../Turing-recursive/` | Companion Lean 4 computability library ([`https://github.com/psuarezserrato/Turing-recursive`](https://github.com/psuarezserrato/Turing-recursive)) that `S4TuringPoisson` builds on (`lakefile.toml`) for the universal `TM0` machine `U`, `Partrec` equivalence, and tape encodings |
 | `S4TuringPoisson/Interfaces.lean` | Core interfaces: `PositiveVolumeForm`, `FinTM0`, `HaltsWithWindow`, `IsTuringComplete` |
 | `S4TuringPoisson/Poisson/` | Smooth bivectors, modular class & unimodularity, Jacobian Poisson structures, singular circle normal forms |
 | `S4TuringPoisson/Fibration/` | Local singular models, `s4Fibration`, `PurelyWrinkledFibration`, Lekili Moves 1–4 & surgery (`LekiliMoves.lean`), global ADK $S^4$ (`ADKS4Fibration.lean`), Track B closed 4-manifold constructor (`ClosedManifoldLocal.lean`) |
@@ -45,7 +48,13 @@ All headline theorems use exclusively Lean's three standard axioms `{propext, Cl
 
 ## Local Build & Verification
 
-Because `lakefile.toml` references `TuringRecursive` via `path = "../Turing-recursive"`, clone both repositories side by side in the same parent directory:
+`S4TuringPoisson` builds on and uses [`https://github.com/psuarezserrato/Turing-recursive`](https://github.com/psuarezserrato/Turing-recursive) (`path = "../Turing-recursive"` in `lakefile.toml`). Clone both repositories side by side in the same parent directory:
+
+```text
+.
+├── Turing-recursive/   # https://github.com/psuarezserrato/Turing-recursive
+└── S4TuringPoisson/    # builds on ../Turing-recursive via lakefile.toml
+```
 
 ```bash
 git clone https://github.com/psuarezserrato/Turing-recursive.git
