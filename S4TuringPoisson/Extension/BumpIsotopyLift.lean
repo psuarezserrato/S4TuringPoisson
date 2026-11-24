@@ -1749,15 +1749,25 @@ theorem leafwiseBumpDiffeomorph_ne_id :
 
 /-- Algorithmic undecidability of forward-orbit reachability for `leafwiseBumpDiffeomorph M` on
 `M`. -/
+-- tier: T2
 theorem undecidable_orbit_reachability_leafwiseBumpDiffeomorph :
-    ∃ (U : Opens M) (chart : UnitDisk2 → M) (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+    ∃ (U : Opens M) (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → M) (chart : UnitDisk2 → M)
+      (coord : Nat.Partrec.Code → UnitDisk2)
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦
         ∃ n : ℕ, (⇑(leafwiseBumpDiffeomorph M))^[n] (chart (coord c)) ∈ U) ∧

@@ -1403,8 +1403,8 @@ theorem unconditional_corollary2_closedFourManifold_on_S4_check :
         Sphere4 S4PositiveVolumeForm
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
     exact ⟨V, π_f, f, d_bar, hpos, hlt, hposΩ, hunimV, hf_comp, hmp, htc, hne⟩
-  · obtain ⟨V, _, d_bar, U, chart, coord, _, _, _, _, _, hmp, hU, _, _, _, _, _, hre,
-        hnotcomp, _⟩ :=
+  · obtain ⟨V, _, d_bar, U, _, _, _, _, chart, coord, _, _, _, _, _, _, hmp, hU, _, _, _, _, _, _,
+        _, _, _, _, hre, hnotcomp, _⟩ :=
       Main.undecidable_orbit_reachability_closedFourManifold Sphere4 S4PositiveVolumeForm
     exact ⟨V, d_bar, U, chart, coord, hmp, hU, hre, hnotcomp⟩
   · obtain ⟨V', π_f', f', Hs, d_bar', _, hunimV', hcomp, hf_comp, _, _, _, htc, _⟩ :=

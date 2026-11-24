@@ -1596,6 +1596,21 @@ structure UniversalReversibleSimulator : Type 1 where
             (encShift (negHalf (R.encodeCfg (initRevCfg M (Turing.Tape.mk₂ L R_tape))) j)).1 ∧
           posDig (L.map encΓ, R_tape.map encΓ, j) =
             (encShift (nonnegHalf (R.encodeCfg (initRevCfg M (Turing.Tape.mk₂ L R_tape))) j)).1
+  /-- Computably enumerable rational-box presentation of the accepting cylinder union inside
+  `UnitDisk2`. -/
+  computable_targetBoxes :
+    ∀ M : FinTM0,
+      ∃ (encΓ : M.Γ ≃ Fin (Fintype.card M.Γ))
+        (enumBoxes : ℕ × List (Fin (Fintype.card M.Γ)) × ℕ → RatBox2),
+        Computable enumBoxes ∧
+        ∀ (k : ℕ) (w : Window M k),
+          (∀ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1.Nonempty) ∧
+          (⋃ b ∈ acceptBlocks M k w, (cantorCylinderRect encShift b.1 b.2).1) =
+            ⋃ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1
+  /-- Every initial reversible configuration generates an infinite non-repeating forward orbit. -/
+  orbit_initRevCfg_injective :
+    ∀ (M : FinTM0) (t : FinSupportedTape M),
+      Function.Injective (fun n : ℕ ↦ R.step^[n] (initRevCfg M t))
 
 /-- Nonempty open union of Cantor cylinder rectangles in `UnitDisk2` corresponding to
 `S.acceptBlocks M k w`. -/
@@ -1646,7 +1661,13 @@ noncomputable def UniversalReversibleSimulator.turingCompleteWitness
     obtain ⟨b, hb, hrect⟩ := hmem
     have hcyl := (cantorDiskEmbed_mem_cantorCylinderRect_iff S.encShift _ b.1 b.2).mp hrect
     exact S.encodeCfg_init_notMem_of_step_ne_none M t k w hstep b hb hcyl
+  Param := PUnit
+  instTopologicalSpaceParam := inferInstance
+  param₀ := PUnit.unit
+  openChart := Prod.snd
+  openChart_isOpenEmbedding := (Homeomorph.punitProd UnitDisk2).isOpenEmbedding
   chart := id
+  chart_eq_openChart _ := rfl
   chart_continuous := continuous_id
   chart_injective := Function.injective_id
   coordPoint M t := cantorDiskEmbed S.encShift (S.R.encodeCfg (S.initRevCfg M t))
@@ -1689,6 +1710,28 @@ noncomputable def UniversalReversibleSimulator.turingCompleteWitness
       dsimp only [approx]
       rw [hneg_eq, hpos_eq]
       exact norm_approxCantorList_pair_sub_cantorDiskEmbed_le S.encShift s m
+  computable_encodeOpen M := by
+    obtain ⟨encΓ, enumBoxes, hcomp, hboxes⟩ := S.computable_targetBoxes M
+    refine ⟨encΓ, enumBoxes, hcomp, fun k w ↦ ⟨(hboxes k w).1, ?_⟩⟩
+    change (⋃ b ∈ S.acceptBlocks M k w, (cantorCylinderRect S.encShift b.1 b.2).1) =
+      Prod.snd '' (Set.univ ×ˢ
+        ⋃ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1)
+    rw [(hboxes k w).2]
+    ext y
+    simp
+  orbit_encodePoint_injective M t := by
+    have hiter : ∀ (n : ℕ) (s : ℤ → S.R.ShiftAlphabet),
+        φ^[n] (cantorDiskEmbed S.encShift s) =
+          cantorDiskEmbed S.encShift (S.R.toGeneralizedShift.eval^[n] s) := by
+      intro n s
+      induction n generalizing s with
+      | zero => rfl
+      | succ n ih => rw [Function.iterate_succ_apply, hconj, ih, Function.iterate_succ_apply]
+    intro n₁ n₂ h
+    dsimp only at h
+    rw [hiter n₁, hiter n₂, S.R.iterate_eval_encodeCfg, S.R.iterate_eval_encodeCfg] at h
+    exact S.orbit_initRevCfg_injective M t
+      (S.R.encodeCfg_injective (cantorDiskEmbed_injective S.encShift h))
 
 /-- **`CMPP21` Smooth Cantor-Circulation Hypothesis (`CMPP21` Section 5, Theorem 5.2)**:
 Packages a universal unidirectional reversible simulator `sim : UniversalReversibleSimulator`

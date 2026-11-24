@@ -314,9 +314,12 @@ private theorem undecidable_orbit_reachability_S4_of_isotopy :
       (π_f : PoissonStructure (𝓡 4) Sphere4)
       (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
       (U : Opens Sphere4)
+      (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → Sphere4)
       (chart : UnitDisk2 → Sphere4)
       (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       s4Fibration ∘ ⇑d_bar = s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
@@ -324,11 +327,17 @@ private theorem undecidable_orbit_reachability_S4_of_isotopy :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
@@ -337,16 +346,19 @@ private theorem undecidable_orbit_reachability_S4_of_isotopy :
           Computable dec ∧
           ∀ c : Nat.Partrec.Code,
             dec c = true ↔ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U := by
-  obtain ⟨U, chart, coord, approx, hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩ :=
+  obtain ⟨U, Param, instTopParam, param₀, openChart, chart, coord, approx, targetBoxes, hU,
+      hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+      hnotcomp, hnodec⟩ :=
     undecidable_orbit_reachability_leafwiseBumpDiffeomorph Sphere4
-  exact ⟨s4AlignedPositiveVolume, s4AdaptedPoisson, leafwiseBumpDiffeomorph Sphere4, U, chart,
-    coord, approx,
+  exact ⟨s4AlignedPositiveVolume, s4AdaptedPoisson, leafwiseBumpDiffeomorph Sphere4, U, Param,
+    instTopParam, param₀, openChart, chart, coord, approx, targetBoxes,
     fibration_comp_leafwiseBumpDiffeomorph Sphere4,
     isUnimodularWithVolume_adaptedJacobianPoisson Sphere4,
     isPoissonMap_leafwiseBumpDiffeomorph Sphere4,
     mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm Sphere4,
     measurePreserving_leafwiseBumpDiffeomorph Sphere4,
-    hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩
+    hU, hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+    hnotcomp, hnodec⟩
 
 end ParametricHeadlineTheorems
 
@@ -454,10 +466,12 @@ theorem exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
 
 /-- **Algorithmic Undecidability of Forward-Orbit Reachability on $S^4$**:
 There exist a smooth leaf-preserving, volume-preserving, measure-preserving Poisson diffeomorphism
-`d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4`, a nonempty open target `U : Opens Sphere4`, a continuous
-injective disk chart `chart : UnitDisk2 → Sphere4`, initial coordinates
-`coord : Nat.Partrec.Code → UnitDisk2`, and a `Computable` dyadic rational approximation procedure
-`approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac` (`≤ 2⁻ᵐ`) such that forward-orbit reachability
+`d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4`, a nonempty open target `U : Opens Sphere4`, an open-tube
+embedding `openChart : Param × UnitDisk2 → Sphere4`, a continuous injective disk slice
+`chart y = openChart (param₀, y)`, initial coordinates `coord : Nat.Partrec.Code → UnitDisk2`, a
+`Computable` dyadic rational approximation procedure `approx : Nat.Partrec.Code × ℕ → RatFrac ×
+RatFrac` (`≤ 2⁻ᵐ`), and a `Computable` rational-box enumerator `targetBoxes : ℕ → RatBox2`
+generating `U` inside `openChart` such that forward-orbit reachability
 `∃ n, d_bar^[n] (chart (coord c)) ∈ U` is recursively enumerable (`REPred`) yet algorithmically
 undecidable (`¬ ComputablePred`), with no total computable `Bool` decision procedure. -/
 -- tier: T2
@@ -466,9 +480,12 @@ theorem undecidable_orbit_reachability_S4 :
       (π_f : PoissonStructure (𝓡 4) Sphere4)
       (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
       (U : Opens Sphere4)
+      (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → Sphere4)
       (chart : UnitDisk2 → Sphere4)
       (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       s4Fibration ∘ ⇑d_bar = s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
@@ -476,11 +493,17 @@ theorem undecidable_orbit_reachability_S4 :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
@@ -598,9 +621,12 @@ theorem undecidable_orbit_reachability_closedFourManifold
       (π_f : PoissonStructure (𝓡 4) M)
       (d_bar : M ≃ₘ⟮𝓡 4, 𝓡 4⟯ M)
       (U : Opens M)
+      (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → M)
       (chart : UnitDisk2 → M)
       (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       (∀ x : M, ∃ a : ℝ, 0 < a ∧ V.Ω.1 x = a • V_M.Ω.1 x) ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
@@ -608,11 +634,17 @@ theorem undecidable_orbit_reachability_closedFourManifold
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦
@@ -632,16 +664,19 @@ theorem undecidable_orbit_reachability_closedFourManifold
   let _ := A.instNonemptyFiber
   let _ := A.instMeasurableSpaceFiber
   let _ := A.instBorelSpaceFiber
-  obtain ⟨U, chart, coord, approx, hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩ :=
+  obtain ⟨U, Param, instTopParam, param₀, openChart, chart, coord, approx, targetBoxes, hU,
+      hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+      hnotcomp, hnodec⟩ :=
     undecidable_orbit_reachability_leafwiseBumpDiffeomorph M
-  exact ⟨alignedPositiveVolume M, adaptedJacobianPoisson M, leafwiseBumpDiffeomorph M, U, chart,
-    coord, approx,
+  exact ⟨alignedPositiveVolume M, adaptedJacobianPoisson M, leafwiseBumpDiffeomorph M, U, Param,
+    instTopParam, param₀, openChart, chart, coord, approx, targetBoxes,
     fun x ↦ alignedVolumeForm_pos_cooriented M x,
     isUnimodularWithVolume_adaptedJacobianPoisson M,
     isPoissonMap_leafwiseBumpDiffeomorph M,
     mpullback_leafwiseBumpDiffeomorph_alignedVolumeForm M,
     measurePreserving_leafwiseBumpDiffeomorph M,
-    hU, hcont, hinj, hcomp, hbound, hnot0, hre, hnotcomp, hnodec⟩
+    hU, hopen, hchart_eq, hcont, hinj, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre,
+    hnotcomp, hnodec⟩
 
 end UnconditionalClosedFourManifold
 
@@ -746,9 +781,12 @@ theorem undecidable_orbit_reachability_S4_of_cmpp :
       (π_f : PoissonStructure (𝓡 4) Sphere4)
       (d_bar : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4)
       (U : Opens Sphere4)
+      (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → Sphere4)
       (chart : UnitDisk2 → Sphere4)
       (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       s4Fibration ∘ ⇑d_bar = s4Fibration ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
       SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
@@ -756,11 +794,17 @@ theorem undecidable_orbit_reachability_S4_of_cmpp :
       TauCeti.SmoothForm.mpullback d_bar d_bar.contMDiff V.Ω = V.Ω ∧
       MeasurePreserving ⇑d_bar V.μ V.μ ∧
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, (⇑d_bar)^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦

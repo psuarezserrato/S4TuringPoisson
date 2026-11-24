@@ -49,9 +49,12 @@ Gates 1–6 of the `S4TuringPoisson` formalization of Pablo Suárez-Serrato,
    - `FinTM0`, `FinSupportedTape`, `Window`, and `HaltsWithWindow` specify finite-step halting with
      prescribed output window on `[-k, k]`.
    - `TuringCompleteWitness` and `IsTuringComplete` enforce strict decoupling between
-     `encodePoint M t` (equipped with computable rational chart approximations in `UnitDisk2`) and
-     `encodeOpen M k w` (nonempty, independent of `t`, and disjoint from non-terminal initial
-     configurations), ruling out `Classical.by_cases` vacuity and implying `φ ≠ id`.
+     `encodePoint M t` (equipped with computable rational chart approximations in `UnitDisk2` and
+     infinite non-repeating forward orbits `orbit_encodePoint_injective`) and `encodeOpen M k w`
+     (nonempty, independent of `t`, disjoint from non-terminal initial configurations, and
+     presented via a `Computable` `RatBox2` enumerator `computable_encodeOpen` inside an ambient
+     open-tube chart `openChart`), ruling out `Classical.by_cases` vacuity and every periodic map
+     (`IsTuringComplete.iterate_ne_id`, `φ ≠ id`).
 
 4. **Area-Preserving Disk Isotopy Interface (`HasTuringCompleteAreaPreservingDiskIsotopy`, M0.3)**:
    - Packages a jointly $C^\infty$ compactly supported area-preserving disk isotopy
@@ -369,14 +372,58 @@ noncomputable def RatFrac.toReal (r : RatFrac) : ℝ :=
 noncomputable def ratFracPairToEuclidean2 (p : RatFrac × RatFrac) : EuclideanSpace ℝ (Fin 2) :=
   WithLp.toLp 2 ![p.1.toReal, p.2.toReal]
 
-/-- Witness structure for anti-vacuous Turing completeness of a discrete dynamical system
-`φ : X → X` (Moore 1990, CMPP21 Definition 2.1 / Theorem 5.2).
+/-- Unreduced rational 2-box `((xMin, xMax), (yMin, yMax))` specifying an open rectangle inside
+`UnitDisk2`. Automatically inherits `Primcodable` from `RatFrac = Bool × ℕ × ℕ`. -/
+abbrev RatBox2 : Type := (RatFrac × RatFrac) × (RatFrac × RatFrac)
 
-* `encodePoint M t` depends **only** on the machine `M` and input tape `t` (never on `(k, w)`), and
-  is represented in a continuous injective disk chart `chart : UnitDisk2 → X` with computable
-  dyadic-rate rational approximations `approx`.
-* `encodeOpen M k w` depends **only** on `(M, k, w)` (never on `t`), is nonempty, and excludes
-  non-terminal initial configurations (`step ≠ none`).
+/-- Open axis-aligned rational rectangle `(xMin, xMax) × (yMin, yMax) ∩ UnitDisk2` inside
+`UnitDisk2`. -/
+noncomputable def evalRatBox2 (b : RatBox2) : Opens UnitDisk2 :=
+  ⟨{ y : UnitDisk2 |
+      b.1.1.toReal < y.1 0 ∧ y.1 0 < b.1.2.toReal ∧
+      b.2.1.toReal < y.1 1 ∧ y.1 1 < b.2.2.toReal }, by
+    have c0 : Continuous fun y : UnitDisk2 ↦ y.1 0 :=
+      (PiLp.continuous_apply 2 (fun _ : Fin 2 ↦ ℝ) 0).comp continuous_subtype_val
+    have c1 : Continuous fun y : UnitDisk2 ↦ y.1 1 :=
+      (PiLp.continuous_apply 2 (fun _ : Fin 2 ↦ ℝ) 1).comp continuous_subtype_val
+    exact (isOpen_lt continuous_const c0).inter
+      ((isOpen_lt c0 continuous_const).inter
+        ((isOpen_lt continuous_const c1).inter (isOpen_lt c1 continuous_const)))⟩
+
+/-- Pointwise membership characterization for `evalRatBox2`. -/
+@[simp]
+theorem mem_evalRatBox2_iff (b : RatBox2) (y : UnitDisk2) :
+    y ∈ evalRatBox2 b ↔
+      b.1.1.toReal < y.1 0 ∧ y.1 0 < b.1.2.toReal ∧
+      b.2.1.toReal < y.1 1 ∧ y.1 1 < b.2.2.toReal :=
+  Iff.rfl
+
+/-- Canonical finite-list encoding `[encΓ (w (-k)), …, encΓ (w 0), …, encΓ (w k)]` of a target
+output window `w : Window M k` under `encΓ : M.Γ ≃ Fin (Fintype.card M.Γ)`. -/
+def encodeWindow {M : FinTM0} (encΓ : M.Γ ≃ Fin (Fintype.card M.Γ)) (k : ℕ)
+    (w : Window M k) : List (Fin (Fintype.card M.Γ)) :=
+  List.ofFn fun j : Fin (2 * k + 1) ↦
+    encΓ (w ⟨(j.1 : ℤ) - (k : ℤ), ⟨by omega, by omega⟩⟩)
+
+/-- `encodeWindow encΓ k w` has exact length `2 * k + 1`. -/
+@[simp]
+theorem length_encodeWindow {M : FinTM0} (encΓ : M.Γ ≃ Fin (Fintype.card M.Γ)) (k : ℕ)
+    (w : Window M k) :
+    (encodeWindow encΓ k w).length = 2 * k + 1 := by
+  simp [encodeWindow]
+
+/-- Witness structure for anti-vacuous, effective Turing completeness of a discrete dynamical
+system `φ : X → X` (Moore 1990, CMPP21 Definition 2.1 / Theorem 5.2, `S4TCdiffeo-Aug-2026.tex`
+p. 13).
+
+* `encodePoint M t` depends **only** on the machine `M` and input tape `t` (never on `(k, w)`), is
+  represented in a continuous injective disk slice `chart : UnitDisk2 → X` (`chart y = openChart
+  (param₀, y)`) with computable dyadic-rate rational approximations `approx`, and generates an
+  infinite non-repeating forward orbit (`orbit_encodePoint_injective`).
+* `encodeOpen M k w` depends **only** on `(M, k, w)` (never on `t`), is nonempty, excludes
+  non-terminal initial configurations (`step ≠ none`), and is generated inside the ambient open
+  tube `openChart : Param × UnitDisk2 → X` (`IsOpenEmbedding`) by a `Computable` rational-box
+  enumerator `enumBoxes` (`computable_encodeOpen`).
 * Forward-orbit reachability into `encodeOpen M k w` from `encodePoint M t` is equivalent to
   `HaltsWithWindow M t k w`. -/
 structure TuringCompleteWitness {X : Type*} [TopologicalSpace X] (φ : X → X) where
@@ -395,8 +442,24 @@ structure TuringCompleteWitness {X : Type*} [TopologicalSpace X] (φ : X → X) 
     ∀ (M : FinTM0) (t : FinSupportedTape M) (k : ℕ) (w : Window M k),
       Turing.TM0.step M.machine (M.initCfg t) ≠ none →
         encodePoint M t ∉ encodeOpen M k w
+  /-- Transverse parameter space for the ambient open-tube chart `openChart` (`B₀ × D²` in
+  `S4TCdiffeo-Aug-2026.tex`). -/
+  Param : Type
+  /-- Topological space structure on `Param`. -/
+  instTopologicalSpaceParam : TopologicalSpace Param
+  /-- Distinguished base parameter selecting the slice `chart : UnitDisk2 → X`. -/
+  param₀ : Param
+  /-- Ambient open-tube chart `Param × UnitDisk2 → X` carrying the open target sets. -/
+  openChart : Param × UnitDisk2 → X
+  /-- `openChart` is a topological open embedding for the product topology on
+  `Param × UnitDisk2`. -/
+  openChart_isOpenEmbedding :
+    @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopologicalSpaceParam _) _
+      openChart
   /-- Constructible coordinate chart `UnitDisk2 → X` carrying the encoded points. -/
   chart : UnitDisk2 → X
+  /-- Compatibility `chart y = openChart (param₀, y)` between `chart` and `openChart`. -/
+  chart_eq_openChart : ∀ y : UnitDisk2, chart y = openChart (param₀, y)
   /-- Continuity of `chart`. -/
   chart_continuous : Continuous chart
   /-- Injectivity of `chart`. -/
@@ -417,41 +480,43 @@ structure TuringCompleteWitness {X : Type*} [TopologicalSpace X] (φ : X → X) 
         ∀ (L R : List M.Γ) (m : ℕ),
           ‖ratFracPairToEuclidean2 (approx (L.map encΓ, R.map encΓ, m)) -
               (coordPoint M (Turing.Tape.mk₂ L R)).1‖ ≤ (1 / 2 : ℝ) ^ m
+  /-- Computably enumerable rational-box presentation of every target open set `encodeOpen M k w`
+  inside the ambient open tube `openChart`. -/
+  computable_encodeOpen :
+    ∀ M : FinTM0,
+      ∃ (encΓ : M.Γ ≃ Fin (Fintype.card M.Γ))
+        (enumBoxes : ℕ × List (Fin (Fintype.card M.Γ)) × ℕ → RatBox2),
+        Computable enumBoxes ∧
+        ∀ (k : ℕ) (w : Window M k),
+          (∀ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1.Nonempty) ∧
+          (encodeOpen M k w).1 =
+            openChart '' (Set.univ ×ˢ
+              ⋃ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1)
+  /-- Every encoded initial point generates an infinite non-repeating forward orbit. -/
+  orbit_encodePoint_injective :
+    ∀ (M : FinTM0) (t : FinSupportedTape M),
+      Function.Injective (fun n : ℕ ↦ φ^[n] (encodePoint M t))
 
 /-- A self-map `φ : X → X` on a topological space `X` is **Turing complete** if it admits a
 `TuringCompleteWitness`. -/
 def IsTuringComplete {X : Type*} [TopologicalSpace X] (φ : X → X) : Prop :=
   Nonempty (TuringCompleteWitness φ)
 
+/-- No positive iterate `φ^[p]` (`0 < p`) of a Turing complete self-map can equal `id` (refuting
+every periodic map, including period-`2` rotation by `π`). -/
+theorem IsTuringComplete.iterate_ne_id {X : Type*} [TopologicalSpace X] {φ : X → X}
+    {p : ℕ} (hp : 0 < p) (hφ : IsTuringComplete φ) : φ^[p] ≠ id := by
+  intro hid
+  obtain ⟨W⟩ := hφ
+  let M₀ : FinTM0 := { Γ := PUnit, Λ := PUnit, machine := fun _ _ ↦ none }
+  have heq : φ^[p] (W.encodePoint M₀ default) = φ^[0] (W.encodePoint M₀ default) := by
+    simpa only [Function.iterate_zero, id_eq] using congrFun hid (W.encodePoint M₀ default)
+  exact hp.ne' (W.orbit_encodePoint_injective M₀ default heq)
+
 /-- No Turing complete self-map can equal `id` (anti-vacuity sanity theorem used in Gate 6). -/
 theorem IsTuringComplete.ne_id {X : Type*} [TopologicalSpace X] {φ : X → X}
     (hφ : IsTuringComplete φ) : φ ≠ id := by
-  intro hid
-  subst hid
-  obtain ⟨W⟩ := hφ
-  let M₁ : FinTM0 :=
-    { Γ := Bool
-      Λ := Bool
-      machine := fun q _ ↦
-        match q with
-        | false => some (true, Turing.TM0.Stmt.write true)
-        | true => none }
-  let t₀ : FinSupportedTape M₁ := default
-  let w₀ : Window M₁ 0 := fun _ ↦ true
-  have hstep : Turing.TM0.step M₁.machine (M₁.initCfg t₀) ≠ none := by
-    simp [M₁, FinTM0.initCfg, Turing.TM0.step]
-  have hnot0 : W.encodePoint M₁ t₀ ∉ W.encodeOpen M₁ 0 w₀ :=
-    W.notMem_encodeOpen_of_step_ne_none M₁ t₀ 0 w₀ hstep
-  have hhalt : HaltsWithWindow M₁ t₀ 0 w₀ := by
-    rw [haltsWithWindow_iff_exists_steps]
-    refine ⟨1, { q := true, Tape := t₀.write true }, rfl, rfl, ?_⟩
-    rintro ⟨i, hi⟩
-    have hi0 : i = 0 := le_antisymm hi.2 (by simpa using hi.1)
-    subst hi0
-    rfl
-  obtain ⟨n, hn⟩ := (W.orbit_mem_encodeOpen_iff M₁ t₀ 0 w₀).mpr hhalt
-  simp only [Function.iterate_id, id_eq] at hn
-  exact hnot0 hn
+  simpa only [Function.iterate_one] using hφ.iterate_ne_id Nat.one_pos
 
 /-! ## 4. Area-Preserving Disk Isotopy Interface (M0.3) -/
 

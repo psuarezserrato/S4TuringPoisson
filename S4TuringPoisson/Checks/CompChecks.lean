@@ -441,15 +441,23 @@ open HasTuringCompleteAreaPreservingDiskIsotopy
 `[HasTuringCompleteAreaPreservingDiskIsotopy]`. -/
 theorem diskTimeOneMap_undecidable_orbit_reachability
     [HasTuringCompleteAreaPreservingDiskIsotopy] :
-    ∃ (U : Opens UnitDisk2) (chart : UnitDisk2 → UnitDisk2)
+    ∃ (U : Opens UnitDisk2) (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → UnitDisk2) (chart : UnitDisk2 → UnitDisk2)
       (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, diskTimeOneMap^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred
@@ -495,7 +503,8 @@ theorem dBarModel4D_gate6_and_undecidability [HasTuringCompleteAreaPreservingDis
         (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, dBarModel4D^[n] (chart (coord c)) ∈ U)) := by
   refine ⟨gate6_foliation_and_halting_separation Prod.fst dBarModel4D rfl
     isTuringComplete_dBarModel4D, ?_⟩
-  obtain ⟨U, chart, coord, approx, hU, _, _, hcomp, _, _, _, hnotcomp, _⟩ :=
+  obtain ⟨U, _, _, _, _, chart, coord, approx, _, hU, _, _, _, _, hcomp, _, _, _, _, _, _,
+      hnotcomp, _⟩ :=
     isTuringComplete_dBarModel4D.undecidable_orbit_reachability
   exact ⟨U, chart, coord, approx, hU, hcomp, hnotcomp⟩
 
@@ -863,5 +872,83 @@ theorem universalReversibleSimulator_sanity :
     exact not_haltsWithWindow_M_loop_default
       ((universalReversibleSimulator.orbit_mem_acceptBlocks_iff M_loop default 1
         w_loop).mp ⟨n, b, hb, hcyl⟩)
+
+/-! ## 10. Gate G5-Comp Periodic Refutation & Constructible `RatBox2` Witness (`SC-R4`) -/
+
+section GateG5CompSCR4
+
+/-- Period-`2` rotation by `π` (`(x, y) ↦ (-x, -y)`) on `UnitDisk2`. -/
+def diskHalfTurn (y : UnitDisk2) : UnitDisk2 :=
+  ⟨-y.1, by
+    have hy := y.2
+    simpa only [UnitDisk2, Metric.mem_ball, dist_zero_right, norm_neg] using hy⟩
+
+/-- `diskHalfTurn` is nontrivial (`diskHalfTurn ≠ id`) yet has period `2`
+(`diskHalfTurn^[2] = id`). -/
+-- tier: T1
+theorem diskHalfTurn_ne_id_and_sq_eq_id :
+    diskHalfTurn ≠ id ∧ diskHalfTurn^[2] = id := by
+  refine ⟨?_, ?_⟩
+  · intro hid
+    let p : UnitDisk2 :=
+      ⟨WithLp.toLp 2 ![1 / 4, 0], toLp_mem_unitDisk2_of_mem_Ioo ⟨by norm_num, by norm_num⟩
+        ⟨by norm_num, by norm_num⟩⟩
+    have heq := congrArg (fun u : UnitDisk2 ↦ u.1 0) (congrFun hid p)
+    change -(1 / 4 : ℝ) = 1 / 4 at heq
+    linarith
+  · funext y
+    apply Subtype.ext
+    change -(-y.1) = y.1
+    exact neg_neg y.1
+
+/-- **Gate G5-Comp Adversarial Witness (`SC-R4`, Period-`2` Rotation Refutation)**:
+Rotation by `π` (`(x, y) ↦ (-x, -y)`) on `UnitDisk2` is non-identity (`≠ id`) yet satisfies
+`¬ IsTuringComplete diskHalfTurn` via `IsTuringComplete.iterate_ne_id`. -/
+-- tier: T1
+theorem periodic_rotation_not_isTuringComplete :
+    ¬ IsTuringComplete diskHalfTurn := fun htc ↦
+  htc.iterate_ne_id (by decide : 0 < 2) diskHalfTurn_ne_id_and_sq_eq_id.2
+
+/-- **Gate G5-Comp Constructible `RatBox2` & Non-Periodicity Witness on `Sphere4` (`SC-R4`)**:
+Verifies directly from `Main.undecidable_orbit_reachability_S4` and
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4` that:
+1. the exported rational-box enumerator `targetBoxes : ℕ → RatBox2` is `Computable`,
+2. `(evalRatBox2 (targetBoxes 0)).1` is nonempty inside `UnitDisk2`,
+3. its lifted open tube `openChart '' (Set.univ ×ˢ (evalRatBox2 (targetBoxes 0)).1)` is nonempty,
+   contained in `U.1`, and has strictly positive volume `0 < V.μ (...)` on `Sphere4`, and
+4. the headline diffeomorphism `Main.s4TuringDiffeomorph` is non-periodic at **every** positive
+   period `p > 0` (`(⇑Main.s4TuringDiffeomorph)^[p] ≠ id`). -/
+-- tier: T2
+theorem sphere4_undecidable_targetBoxes_witness :
+    (∀ p : ℕ, 0 < p → (⇑Main.s4TuringDiffeomorph : Sphere4 → Sphere4)^[p] ≠ id) ∧
+    ∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
+      (U : Opens Sphere4)
+      (Param : Type) (_ : TopologicalSpace Param)
+      (openChart : Param × UnitDisk2 → Sphere4)
+      (targetBoxes : ℕ → RatBox2),
+      Computable targetBoxes ∧
+      (evalRatBox2 (targetBoxes 0)).1.Nonempty ∧
+      openChart '' (Set.univ ×ˢ (evalRatBox2 (targetBoxes 0)).1) ⊆ U.1 ∧
+      0 < V.μ (openChart '' (Set.univ ×ˢ (evalRatBox2 (targetBoxes 0)).1)) := by
+  have htc : IsTuringComplete (⇑Main.s4TuringDiffeomorph : Sphere4 → Sphere4) :=
+    isTuringComplete_leafwiseBumpDiffeomorph Sphere4
+  refine ⟨fun p hp ↦ htc.iterate_ne_id hp, ?_⟩
+  obtain ⟨V, _, _, U, Param, instTopParam, param₀, openChart, _, _, _, targetBoxes,
+      _, _, _, _, _, _, hopen, _, _, _, _, _, hcomp_boxes, hbox_ne, hU_eq, _, _, _, _⟩ :=
+    Main.undecidable_orbit_reachability_S4
+  let _ : TopologicalSpace Param := instTopParam
+  let W₀ : Opens Sphere4 :=
+    ⟨openChart '' (Set.univ ×ˢ (evalRatBox2 (targetBoxes 0)).1),
+      hopen.isOpenMap _ (isOpen_univ.prod (evalRatBox2 (targetBoxes 0)).2)⟩
+  obtain ⟨y₀, hy₀⟩ := hbox_ne 0
+  have hW₀_ne : W₀.1.Nonempty := ⟨openChart (param₀, y₀), (param₀, y₀), ⟨trivial, hy₀⟩, rfl⟩
+  have hsub : W₀.1 ⊆ U.1 := by
+    rw [hU_eq]
+    refine Set.image_mono (Set.prod_mono Subset.rfl ?_)
+    exact Set.subset_iUnion (fun j : ℕ ↦ (evalRatBox2 (targetBoxes j)).1) 0
+  exact ⟨V, U, Param, instTopParam, openChart, targetBoxes, hcomp_boxes, hbox_ne 0, hsub,
+    V.measure_pos_of_nonempty W₀ hW₀_ne⟩
+
+end GateG5CompSCR4
 
 end S4TuringPoisson.Checks
