@@ -25,14 +25,15 @@ public import Mathlib.LinearAlgebra.Matrix.ToLin
 public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Basic
 public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Constructions
 public import TauCeti.Geometry.Manifold.Orientation.Pullback
+public import TauCeti.Geometry.Manifold.RegularValue.Open
 public import TauCeti.Geometry.Sphere.Connected
 
 /-!
-# Local Singular Fibration Models & Global Wrinkled / Broken Lefschetz Structures (M2.1)
+# Local Singular Fibration Models & Global Regular-Disk / Broken Lefschetz Structures (M2.1)
 
 This file formalizes Milestone M2.1 of `S4TuringPoisson` (`S4TCdiffeo-Aug-2026.tex`,
 Auroux–Donaldson–Katzarkov 2005, Lekili 2009, García-Naranjo–Suárez-Serrato–Vera 2015, and
-Suárez-Serrato–Torres 2016):
+Suárez-Serrato–Torres Orozco 2016, *Bol. Soc. Mat. Mex.* 22(1) (2016), 263–280):
 
 1. **Critical Point Sets & Regularity (`criticalPoints`, `euclideanCriticalPoints`)**:
    - Manifold-level `criticalPoints I J f = {p | ¬ Function.Surjective (mfderiv I J f p)}` and
@@ -56,16 +57,18 @@ Suárez-Serrato–Torres 2016):
    - Local chart singularity predicates `IsLocallyModeledOn`, `IsIndefiniteFoldAt`,
      `IsRealLefschetzAt`, `IsChiralRealLefschetzAt` (orientation-preserving charts via
      `TauCeti.Manifold.Orientation.IsOrientationPreservingAt`), and `IsWrinkledCuspAt`.
-4. **`WrinkledFibration` & `BrokenLefschetzFibration`**:
-   - Global smooth singular fibration structures packaging a nonempty regular open disk
+4. **`RegularDiskFibration` & `BrokenLefschetzFibration`**:
+   - Global smooth fibration structures packaging a nonempty regular open disk
      `baseRegion ⊆ Base` disjoint from `f '' Crit(f)`, a compact nonempty smooth 2-manifold fiber
      `Fiber`, a Euclidean disk parametrization `baseDisk`, and an explicit smooth trivialization
-     `f ⁻¹' baseRegion ≃ₘ baseRegion × Fiber` directly usable by Milestones M2.2, M2.3, and M4.
+     `f ⁻¹' baseRegion ≃ₘ baseRegion × Fiber` (`RegularDiskFibration`, imposing zero critical-locus
+     restrictions), extended by `BrokenLefschetzFibration` (`IsRealLefschetzAt ∨ IsIndefiniteFoldAt`
+     at every critical point) and `PurelyWrinkledFibration` (in `PurelyWrinkled.lean`).
 -/
 
 @[expose] public section
 
-open Function Metric Module Set TopologicalSpace
+open Filter Function Metric Module Set TopologicalSpace
 open scoped ContDiff Manifold Topology
 
 namespace S4TuringPoisson
@@ -1729,20 +1732,278 @@ theorem not_isChiralRealLefschetzAt_achiralRealLefschetzMap_zero :
 
 end ChiralLefschetz
 
-/-! ## 5. Global `WrinkledFibration` and `BrokenLefschetzFibration` Structures -/
+/-! ## 5. Regular-Locus Density & Global `RegularDiskFibration` / `BrokenLefschetzFibration` -/
+
+section RegularDensity
+
+private theorem surjective_mfderiv_congr_of_eventuallyEq_local
+    {E H E' H' M N : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [TopologicalSpace H]
+    {I : ModelWithCorners ℝ E H}
+    [NormedAddCommGroup E'] [NormedSpace ℝ E'] [TopologicalSpace H']
+    {J : ModelWithCorners ℝ E' H'}
+    [TopologicalSpace M] [ChartedSpace H M]
+    [TopologicalSpace N] [ChartedSpace H' N]
+    {f g : M → N} {x : M} (h : f =ᶠ[𝓝 x] g) :
+    Function.Surjective (mfderiv I J f x) ↔ Function.Surjective (mfderiv I J g x) := by
+  have heq : mfderiv I J f x =
+      (tangentSpaceCast J (g x) (f x) :
+        TangentSpace J (g x) →L[ℝ] TangentSpace J (f x)).comp (mfderiv I J g x) :=
+    h.mfderiv_eq
+  have hcoe : ⇑(mfderiv I J f x) =
+      ⇑(tangentSpaceCast J (g x) (f x)) ∘ ⇑(mfderiv I J g x) := by
+    rw [heq]; rfl
+  rw [hcoe]
+  exact ⟨fun hs y ↦ by
+      obtain ⟨v, hv⟩ := hs (tangentSpaceCast J (g x) (f x) y)
+      exact ⟨v, (tangentSpaceCast J (g x) (f x)).injective hv⟩,
+    fun hs ↦ (tangentSpaceCast J (g x) (f x)).surjective.comp hs⟩
+
+private theorem partialDiffeomorph_mfderiv_bijective_local
+    {E H E' H' M N : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [TopologicalSpace H]
+    {I : ModelWithCorners ℝ E H}
+    [NormedAddCommGroup E'] [NormedSpace ℝ E'] [TopologicalSpace H']
+    {J : ModelWithCorners ℝ E' H'}
+    [TopologicalSpace M] [ChartedSpace H M]
+    [TopologicalSpace N] [ChartedSpace H' N]
+    (Φ : PartialDiffeomorph I J M N ∞) {x : M} (hx : x ∈ Φ.source) :
+    Function.Bijective (mfderiv I J Φ x) := by
+  have hx_t : Φ x ∈ Φ.symm.source := Φ.symm_source ▸ Φ.map_source hx
+  have hleft : Φ.symm (Φ x) = x := Φ.left_inv hx
+  have hΦ_md : MDifferentiableAt I J (⇑Φ) x :=
+    (Φ.contMDiffOn.contMDiffAt (Φ.open_source.mem_nhds hx)).mdifferentiableAt (by simp)
+  have hsymm_md : MDifferentiableAt J I (⇑Φ.symm) (Φ x) :=
+    (Φ.symm.contMDiffOn.contMDiffAt (Φ.symm.open_source.mem_nhds hx_t)).mdifferentiableAt
+      (by simp)
+  have hev_left : (⇑Φ.symm ∘ ⇑Φ) =ᶠ[𝓝 x] id :=
+    _root_.eventually_nhds_iff.mpr ⟨Φ.source, fun q hq ↦ Φ.left_inv hq, Φ.open_source, hx⟩
+  have hev_right : (⇑Φ ∘ ⇑Φ.symm) =ᶠ[𝓝 (Φ x)] id :=
+    _root_.eventually_nhds_iff.mpr
+      ⟨Φ.symm.source, fun y hy ↦ Φ.right_inv (Φ.symm_source ▸ hy), Φ.symm.open_source, hx_t⟩
+  have hinj : Function.Injective (mfderiv I J Φ x) := by
+    have hcm := mfderiv_comp (x := x) hsymm_md hΦ_md
+    have heq : (mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x) =
+        (tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x) :
+          TangentSpace I (id x) →L[ℝ] TangentSpace I ((⇑Φ.symm ∘ ⇑Φ) x)).comp
+          (ContinuousLinearMap.id ℝ (TangentSpace I x)) := by
+      rw [← hcm, hev_left.mfderiv_eq, mfderiv_id]
+    have hinj_comp : Function.Injective (⇑(mfderiv J I Φ.symm (Φ x)) ∘ ⇑(mfderiv I J Φ x)) := by
+      have hcoe : ⇑((mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x)) =
+          ⇑(tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x)) := by
+        rw [heq]; rfl
+      change Function.Injective ⇑((mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x))
+      rw [hcoe]
+      exact (tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x)).injective
+    exact hinj_comp.of_comp
+  have hsurj : Function.Surjective (mfderiv I J Φ x) := by
+    have hΦ_at : MDifferentiableAt I J (⇑Φ) (Φ.symm (Φ x)) := hleft.symm ▸ hΦ_md
+    have hcm := mfderiv_comp (x := Φ x) hΦ_at hsymm_md
+    have heq : (mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x)) =
+        (tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x)) :
+          TangentSpace J (id (Φ x)) →L[ℝ] TangentSpace J ((⇑Φ ∘ ⇑Φ.symm) (Φ x))).comp
+          (ContinuousLinearMap.id ℝ (TangentSpace J (Φ x))) := by
+      rw [← hcm, hev_right.mfderiv_eq, mfderiv_id]
+    have hsurj_comp : Function.Surjective
+        (⇑(mfderiv I J Φ (Φ.symm (Φ x))) ∘ ⇑(mfderiv J I Φ.symm (Φ x))) := by
+      have hcoe : ⇑((mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x))) =
+          ⇑(tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x))) := by
+        rw [heq]; rfl
+      change Function.Surjective
+        ⇑((mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x)))
+      rw [hcoe]
+      exact (tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x))).surjective
+    have hs := hsurj_comp.of_comp
+    rwa [hleft] at hs
+  exact ⟨hinj, hsurj⟩
+
+/-- Local chart conjugacy by `C^∞` partial diffeomorphisms `(φ, ψ)` transports critical points
+of `f : M → Base` onto critical points of `g : ℝ⁴ → ℝ²`. -/
+-- tier: T2
+theorem mem_criticalPoints_iff_of_partialDiffeomorph_conj
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base]
+    {f : M → Base} {g : EuclideanSpace ℝ (Fin 4) → EuclideanPlane}
+    (φ : PartialDiffeomorph I_M (𝓡 4) M (EuclideanSpace ℝ (Fin 4)) ∞)
+    (ψ : PartialDiffeomorph I_B (𝓡 2) Base EuclideanPlane ∞)
+    (hf : ContMDiffOn I_M I_B ∞ f φ.source) (hg : ContDiff ℝ ∞ g)
+    (hconj : ∀ q ∈ φ.source, f q ∈ ψ.source ∧ ψ (f q) = g (φ q))
+    {q : M} (hq : q ∈ φ.source) :
+    q ∈ criticalPoints I_M I_B f ↔ φ q ∈ criticalPoints (𝓡 4) (𝓡 2) g := by
+  have hev : (⇑ψ ∘ f) =ᶠ[𝓝 q] (g ∘ ⇑φ) :=
+    _root_.eventually_nhds_iff.mpr
+      ⟨φ.source, fun z hz ↦ (hconj z hz).2, φ.open_source, hq⟩
+  have hφ_bij := partialDiffeomorph_mfderiv_bijective_local φ hq
+  have hψ_bij := partialDiffeomorph_mfderiv_bijective_local ψ (hconj q hq).1
+  have hψ_md : MDifferentiableAt I_B (𝓡 2) (⇑ψ) (f q) :=
+    (ψ.contMDiffOn.contMDiffAt (ψ.open_source.mem_nhds (hconj q hq).1)).mdifferentiableAt
+      (by simp)
+  have hf_md : MDifferentiableAt I_M I_B f q :=
+    (hf.contMDiffAt (φ.open_source.mem_nhds hq)).mdifferentiableAt (by simp)
+  have hg_md : MDifferentiableAt (𝓡 4) (𝓡 2) g (φ q) :=
+    hg.contMDiff.contMDiffAt.mdifferentiableAt (by simp)
+  have hφ_md : MDifferentiableAt I_M (𝓡 4) (⇑φ) q :=
+    (φ.contMDiffOn.contMDiffAt (φ.open_source.mem_nhds hq)).mdifferentiableAt (by simp)
+  have h1 : Function.Surjective (mfderiv I_M I_B f q) ↔
+      Function.Surjective (mfderiv I_M (𝓡 2) (⇑ψ ∘ f) q) := by
+    rw [mfderiv_comp (x := q) hψ_md hf_md, ContinuousLinearMap.coe_comp]
+    exact ⟨fun hs ↦ hψ_bij.2.comp hs, fun hs w ↦ by
+      obtain ⟨x, hx⟩ := hs (mfderiv I_B (𝓡 2) ψ (f q) w)
+      exact ⟨x, hψ_bij.1 hx⟩⟩
+  have h2 : Function.Surjective (mfderiv I_M (𝓡 2) (g ∘ ⇑φ) q) ↔
+      Function.Surjective (mfderiv (𝓡 4) (𝓡 2) g (φ q)) := by
+    rw [mfderiv_comp (x := q) hg_md hφ_md, ContinuousLinearMap.coe_comp]
+    exact ⟨fun hs y ↦ by obtain ⟨x, hx⟩ := hs y; exact ⟨mfderiv I_M (𝓡 4) φ q x, hx⟩,
+      fun hs ↦ hs.comp hφ_bij.2⟩
+  rw [mem_criticalPoints_iff, mem_criticalPoints_iff]
+  exact not_congr (h1.trans ((surjective_mfderiv_congr_of_eventuallyEq_local hev).trans h2))
+
+private theorem regular_witness_of_isLocallyModeledOn_ray
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base]
+    {f : M → Base} (hf : ContMDiff I_M I_B ∞ f)
+    {model : EuclideanSpace ℝ (Fin 4) → EuclideanPlane} (hmodel : ContDiff ℝ ∞ model)
+    (hray : ∀ t : ℝ, t ≠ 0 → vec4 0 0 t 0 ∉ criticalPoints (𝓡 4) (𝓡 2) model)
+    {p : M} (hloc : IsLocallyModeledOn I_M I_B f p model 0)
+    {U : Set M} (hU : IsOpen U) (hpU : p ∈ U) :
+    (U ∩ {x : M | x ∉ criticalPoints I_M I_B f}).Nonempty := by
+  obtain ⟨φ, ψ, hp_src, -, hφp, -, hmod⟩ := hloc
+  have h0_tgt : (0 : EuclideanSpace ℝ (Fin 4)) ∈ φ.target := hφp ▸ φ.map_source hp_src
+  have hsymm0 : (φ.symm : EuclideanSpace ℝ (Fin 4) → M) 0 = p := by
+    rw [← hφp]
+    exact φ.left_inv hp_src
+  let γ : ℝ → EuclideanSpace ℝ (Fin 4) := fun t ↦ vec4 0 0 t 0
+  have hγ_cont : Continuous γ :=
+    (contDiff_vec4 (n := ⊤) contDiff_const contDiff_const contDiff_id contDiff_const).continuous
+  have hγ0 : γ 0 = 0 := ext_vec4 rfl rfl rfl rfl
+  have hev_tgt : ∀ᶠ t : ℝ in 𝓝 0, γ t ∈ φ.target :=
+    hγ_cont.continuousAt.eventually (hγ0 ▸ φ.open_target.mem_nhds h0_tgt)
+  have hcomp_cont : ContinuousAt (fun t : ℝ ↦ (φ.symm : EuclideanSpace ℝ (Fin 4) → M) (γ t)) 0 :=
+    (φ.symm.contMDiffOn.continuousOn.continuousAt
+      (hγ0 ▸ φ.symm_source ▸ φ.open_target.mem_nhds h0_tgt)).comp hγ_cont.continuousAt
+  have hev_U : ∀ᶠ t : ℝ in 𝓝 0, (φ.symm : EuclideanSpace ℝ (Fin 4) → M) (γ t) ∈ U ∩ φ.source := by
+    refine hcomp_cont.eventually ((hU.inter φ.open_source).mem_nhds ?_)
+    simp only [hγ0, hsymm0]
+    exact ⟨hpU, hp_src⟩
+  obtain ⟨ε, hε_pos, hε⟩ := Metric.eventually_nhds_iff.mp (hev_tgt.and hev_U)
+  have ht_dist : dist (ε / 2) 0 < ε := by
+    rw [Real.dist_eq, sub_zero, abs_of_pos (half_pos hε_pos)]
+    linarith
+  obtain ⟨hy_tgt, hq_US⟩ := hε ht_dist
+  refine ⟨φ.symm (γ (ε / 2)), hq_US.1, ?_⟩
+  have hright : φ (φ.symm (γ (ε / 2))) = γ (ε / 2) := φ.right_inv hy_tgt
+  rw [Set.mem_ofPred_eq,
+    mem_criticalPoints_iff_of_partialDiffeomorph_conj φ ψ hf.contMDiffOn hmodel hmod hq_US.2,
+    hright]
+  exact hray (ε / 2) (half_pos hε_pos).ne'
+
+/-- Openness of the regular-point locus `{x : M | x ∉ criticalPoints I_M I_B f}` for any `C^∞` map
+into a finite-dimensional smooth manifold. -/
+-- tier: T2
+theorem isOpen_regularPoints
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [FiniteDimensional ℝ E_B]
+    [TopologicalSpace H_B] {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M 1 M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B 1 Base]
+    {f : M → Base} (hf : ContMDiff I_M I_B ∞ f) :
+    IsOpen {x : M | x ∉ criticalPoints I_M I_B f} := by
+  have heq :
+      {x : M | x ∉ criticalPoints I_M I_B f} = {x : M | TauCeti.IsRegularPoint I_M I_B f x} := by
+    ext x
+    simp only [Set.mem_ofPred_eq, notMem_criticalPoints_iff, TauCeti.isRegularPoint_iff]
+  rw [heq]
+  exact TauCeti.isOpen_setOf_isRegularPoint hf (by simp)
+
+/-- **Generic Regularity of Wrinkled and Broken Lefschetz Singularities (`SC-R2`)**:
+whenever every critical point `p ∈ criticalPoints I_M I_B f` is locally modeled on an indefinite
+quadratic fold (`IsIndefiniteFoldAt`), a wrinkled cusp (`IsWrinkledCuspAt`), or an isolated real
+Lefschetz point (`IsRealLefschetzAt`), the regular locus `{x : M | x ∉ criticalPoints I_M I_B f}`
+is dense in `M`. -/
+-- tier: T2
+theorem dense_regularPoints_of_wrinkled_or_lefschetz
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base]
+    {f : M → Base} (hf : ContMDiff I_M I_B ∞ f)
+    (hsing : ∀ p ∈ criticalPoints I_M I_B f,
+      IsIndefiniteFoldAt I_M I_B f p ∨
+        IsWrinkledCuspAt I_M I_B f p ∨
+        IsRealLefschetzAt I_M I_B f p) :
+    Dense {x : M | x ∉ criticalPoints I_M I_B f} := by
+  refine dense_iff_inter_open.mpr fun U hU hne ↦ ?_
+  obtain ⟨p, hpU⟩ := hne
+  by_cases hp : p ∈ criticalPoints I_M I_B f
+  · rcases hsing p hp with hfold | hcusp | hlef
+    · refine regular_witness_of_isLocallyModeledOn_ray hf contDiff_indefiniteFoldMap
+        (fun t ht ↦ ?_) hfold hU hpU
+      rw [criticalPoints_indefiniteFoldMap, Set.mem_ofPred_eq]
+      rintro ⟨-, -, h2⟩
+      exact ht (by simpa using h2)
+    · refine regular_witness_of_isLocallyModeledOn_ray hf contDiff_wrinkledCuspMap
+        (fun t ht ↦ ?_) hcusp hU hpU
+      rw [criticalPoints_wrinkledCuspMap, Set.mem_ofPred_eq]
+      rintro ⟨-, h2, -⟩
+      exact ht (by simpa using h2)
+    · refine regular_witness_of_isLocallyModeledOn_ray hf contDiff_realLefschetzMap
+        (fun t ht ↦ ?_) hlef hU hpU
+      rw [criticalPoints_realLefschetzMap, Set.mem_singleton_iff]
+      intro h0
+      exact ht (by simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 4) ↦ v 2) h0)
+  · exact ⟨p, hpU, hp⟩
+
+/-- If every critical point of `f` satisfies `IsIndefiniteFoldAt ∨ IsWrinkledCuspAt ∨
+IsRealLefschetzAt`, then `criticalPoints I_M I_B f` has empty interior. -/
+-- tier: T2
+theorem interior_criticalPoints_eq_empty_of_wrinkled_or_lefschetz
+    {E_M H_M E_B H_B M Base : Type*}
+    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M}
+    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B}
+    [TopologicalSpace M] [ChartedSpace H_M M]
+    [TopologicalSpace Base] [ChartedSpace H_B Base]
+    {f : M → Base} (hf : ContMDiff I_M I_B ∞ f)
+    (hsing : ∀ p ∈ criticalPoints I_M I_B f,
+      IsIndefiniteFoldAt I_M I_B f p ∨
+        IsWrinkledCuspAt I_M I_B f p ∨
+        IsRealLefschetzAt I_M I_B f p) :
+    interior (criticalPoints I_M I_B f) = ∅ := by
+  have hd := dense_regularPoints_of_wrinkled_or_lefschetz hf hsing
+  refine Set.eq_empty_iff_forall_notMem.mpr fun x hx ↦ ?_
+  obtain ⟨y, hy_int, hy_reg⟩ := hd.inter_open_nonempty _ isOpen_interior ⟨x, hx⟩
+  exact hy_reg (interior_subset hy_int)
+
+end RegularDensity
 
 section GlobalFibrations
 
 universe u v w
 
-/-- A **wrinkled / smooth singular surface fibration** `f : M → Base` from a smooth 4-manifold `M`
-to a smooth 2-manifold `Base` with regular fiber `Fiber` (`Lekili 2009`, `ST16`,
-`S4TCdiffeo-Aug-2026.tex`), packaging:
+/-- A **regular-disk fibration** `f : M → Base` from a smooth 4-manifold `M` to a smooth
+2-manifold `Base` with regular fiber `Fiber` (`SC-R1`), packaging a global `C^∞` map trivialized
+over one nonempty regular open base disk (with zero restrictions on `criticalPoints I_M I_B toFun`):
 - a nonempty compact Hausdorff smooth 2-manifold regular fiber `Fiber`,
 - a nonempty open regular region `baseRegion ⊆ Base` disjoint from `f '' Crit(f)`,
 - an explicit Euclidean disk chart `baseDisk : Metric.ball 0 r_B ≃ₘ baseRegion` (`r_B > 0`), and
 - an explicit smooth trivialization `f ⁻¹' baseRegion ≃ₘ baseRegion × Fiber` compatible with `f`. -/
-structure WrinkledFibration
+structure RegularDiskFibration
     {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     (I_M : ModelWithCorners ℝ E_M H_M) (M : Type u)
     [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
@@ -1780,7 +2041,7 @@ structure WrinkledFibration
     ∀ p : (⟨toFun ⁻¹' baseRegion.1, baseRegion.2.preimage contMDiff_toFun.continuous⟩ : Opens M),
       (trivialization p).1 = ⟨toFun p.1, p.2⟩
 
-instance instCoeFunWrinkledFibration
+instance instCoeFunRegularDiskFibration
     {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     {I_M : ModelWithCorners ℝ E_M H_M} {M : Type u}
     [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
@@ -1789,10 +2050,10 @@ instance instCoeFunWrinkledFibration
     [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
     {Fiber : Type w} [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber] :
-    CoeFun (WrinkledFibration I_M M I_B Base Fiber) (fun _ ↦ M → Base) :=
-  ⟨WrinkledFibration.toFun⟩
+    CoeFun (RegularDiskFibration I_M M I_B Base Fiber) (fun _ ↦ M → Base) :=
+  ⟨RegularDiskFibration.toFun⟩
 
-namespace WrinkledFibration
+namespace RegularDiskFibration
 
 variable {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
   {I_M : ModelWithCorners ℝ E_M H_M} {M : Type u}
@@ -1802,10 +2063,10 @@ variable {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [Topol
   [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
   {F : Type w} [TopologicalSpace F] [ChartedSpace EuclideanPlane F]
   [IsManifold (𝓡 2) ∞ F] [T2Space F] [CompactSpace F] [Nonempty F]
-  (W : WrinkledFibration I_M M I_B Base F)
+  (W : RegularDiskFibration I_M M I_B Base F)
 
 /-- Convenient dot-notation alias for the regular fiber type `F`. -/
-abbrev Fiber (_ : WrinkledFibration I_M M I_B Base F) : Type w := F
+abbrev Fiber (_ : RegularDiskFibration I_M M I_B Base F) : Type w := F
 
 /-- Open preimage `f ⁻¹' B` in `M` as an element of `Opens M`. -/
 abbrev preimageOpen : Opens M :=
@@ -1824,17 +2085,21 @@ theorem disjoint_baseRegion_criticalPoints :
 noncomputable def embed (bz : W.baseRegion × F) : M :=
   (W.trivialization.symm bz).1
 
+/-- Smoothness of `W.embed`. -/
 theorem contMDiff_embed : ContMDiff (I_B.prod (𝓡 2)) I_M ∞ W.embed :=
   contMDiff_subtype_val.comp W.trivialization.symm.contMDiff
 
+/-- Local diffeomorphism property of `W.embed`. -/
 theorem isLocalDiffeomorph_embed : IsLocalDiffeomorph (I_B.prod (𝓡 2)) I_M ∞ W.embed :=
   fun bz ↦ (W.trivialization.symm.isLocalDiffeomorph bz).comp
     (hg := TauCeti.isLocalDiffeomorph_subtype_val (W.trivialization.symm bz))
 
+/-- Open embedding property of `W.embed`. -/
 theorem isOpenEmbedding_embed : Topology.IsOpenEmbedding W.embed :=
   W.preimageOpen.2.isOpenEmbedding_subtypeVal.comp
     W.trivialization.symm.toHomeomorph.isOpenEmbedding
 
+/-- Range of `W.embed` equals `W.toFun ⁻¹' W.baseRegion.1`. -/
 theorem range_embed : Set.range W.embed = W.toFun ⁻¹' W.baseRegion.1 := by
   ext x
   simp only [embed, Set.mem_range, Set.mem_preimage]
@@ -1844,6 +2109,7 @@ theorem range_embed : Set.range W.embed = W.toFun ⁻¹' W.baseRegion.1 := by
   · intro hx
     exact ⟨W.trivialization ⟨x, hx⟩, congrArg Subtype.val (W.trivialization.symm_apply_apply _)⟩
 
+/-- Evaluating `W` on `W.embed (b, z)` recovers `b.1`. -/
 @[simp]
 theorem apply_embed (b : W.baseRegion) (z : F) : W (W.embed (b, z)) = b.1 := by
   have h := W.trivialization_fst (W.trivialization.symm (b, z))
@@ -1861,13 +2127,16 @@ coordinates `Metric.ball 0 r_B`. -/
 noncomputable def embedDisk (wz : W.baseDiskOpen × F) : M :=
   W.embed (W.baseDisk wz.1, wz.2)
 
+/-- Smoothness of `W.embedDisk`. -/
 theorem contMDiff_embedDisk : ContMDiff ((𝓡 2).prod (𝓡 2)) I_M ∞ W.embedDisk :=
   W.contMDiff_embed.comp ((W.baseDisk.contMDiff.comp contMDiff_fst).prodMk contMDiff_snd)
 
+/-- Open embedding property of `W.embedDisk`. -/
 theorem isOpenEmbedding_embedDisk : Topology.IsOpenEmbedding W.embedDisk :=
   W.isOpenEmbedding_embed.comp
     (W.baseDisk.toHomeomorph.isOpenEmbedding.prodMap (Homeomorph.refl F).isOpenEmbedding)
 
+/-- Local diffeomorphism property of `W.embedDisk`. -/
 theorem isLocalDiffeomorph_embedDisk : IsLocalDiffeomorph ((𝓡 2).prod (𝓡 2)) I_M ∞ W.embedDisk := by
   have hprod :
       IsLocalDiffeomorph ((𝓡 2).prod (𝓡 2)) (I_B.prod (𝓡 2)) ∞
@@ -1875,6 +2144,7 @@ theorem isLocalDiffeomorph_embedDisk : IsLocalDiffeomorph ((𝓡 2).prod (𝓡 2
     (W.baseDisk.prodCongr (Diffeomorph.refl (𝓡 2) F ∞)).isLocalDiffeomorph
   exact fun wz ↦ (hprod wz).comp (hg := W.isLocalDiffeomorph_embed (W.baseDisk wz.1, wz.2))
 
+/-- Evaluating `W` on `W.embedDisk (w, z)` recovers `(W.baseDisk w).1`. -/
 @[simp]
 theorem apply_embedDisk (w : W.baseDiskOpen) (z : F) :
     W (W.embedDisk (w, z)) = (W.baseDisk w).1 :=
@@ -1884,11 +2154,12 @@ theorem apply_embedDisk (w : W.baseDiskOpen) (z : F) :
 noncomputable def baseCenter : W.baseRegion :=
   W.baseDisk ⟨0, Metric.mem_ball_self W.baseDiskRadius_pos⟩
 
-end WrinkledFibration
+end RegularDiskFibration
 
 /-- A **broken Lefschetz fibration** (`ADK05`, `GK07`, `Lekili 2009`, `GSV15`, `BV21`) is a
-`WrinkledFibration` whose critical points are all locally modeled on isolated real Lefschetz points
-(`IsRealLefschetzAt`) or 1-dimensional circles of indefinite quadratic folds (`IsIndefiniteFoldAt`).
+`RegularDiskFibration` whose critical points are all locally modeled on isolated real Lefschetz
+points (`IsRealLefschetzAt`) or 1-dimensional circles of indefinite quadratic folds
+(`IsIndefiniteFoldAt`).
 
 Because `IsRealLefschetzAt` does not restrict coordinate-chart orientations (compare
 `IsChiralRealLefschetzAt` and `isRealLefschetzAt_achiralRealLefschetzMap_zero`), this structure
@@ -1905,11 +2176,27 @@ structure BrokenLefschetzFibration
     (Fiber : Type w) [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber] :
     Type (max u v w)
-    extends WrinkledFibration I_M M I_B Base Fiber where
+    extends RegularDiskFibration I_M M I_B Base Fiber where
   /-- Every critical point is either a real Lefschetz point or an indefinite quadratic fold. -/
   singularities_broken_lefschetz :
     ∀ p ∈ criticalPoints I_M I_B toFun,
       IsRealLefschetzAt I_M I_B toFun p ∨ IsIndefiniteFoldAt I_M I_B toFun p
+
+/-- The regular locus of every `BrokenLefschetzFibration` is dense in `M`. -/
+-- tier: T1
+theorem BrokenLefschetzFibration.dense_regularPoints
+    {E_M H_M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
+    {I_M : ModelWithCorners ℝ E_M H_M} {M : Type u}
+    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
+    {E_B H_B : Type*} [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
+    {I_B : ModelWithCorners ℝ E_B H_B} {Base : Type v}
+    [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
+    {Fiber : Type w} [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
+    [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber]
+    (B : BrokenLefschetzFibration I_M M I_B Base Fiber) :
+    Dense {x : M | x ∉ criticalPoints I_M I_B B.toFun} :=
+  dense_regularPoints_of_wrinkled_or_lefschetz B.contMDiff_toFun fun p hp ↦
+    (B.singularities_broken_lefschetz p hp).elim (fun h ↦ Or.inr (Or.inr h)) Or.inl
 
 end GlobalFibrations
 

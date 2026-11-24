@@ -13,6 +13,7 @@ public import Mathlib.Analysis.Calculus.BumpFunction.Basic
 public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 public import S4TuringPoisson.Fibration.S4Fibration
 public import S4TuringPoisson.Fibration.WrinkledGeneral4Manifold
+public import S4TuringPoisson.Poisson.JacobianPoisson
 public import TauCeti.Geometry.Manifold.DifferentialForm.Pullback.LocalDiffeomorph
 public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Composition
 public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Injective
@@ -20,12 +21,14 @@ public import TauCeti.Geometry.Manifold.Orientation.CoordinateBall
 public import TauCeti.Geometry.Manifold.Orientation.TopForm
 
 /-!
-# Unconditional Local Wrinkled Fibration on Closed Oriented 4-Manifolds (`L-R3`, Track B)
+# Unconditional Local Regular-Disk Fibration on Closed Oriented 4-Manifolds (`L-R3`, Track B)
 
-This file implements Deliverable `L-R3` (Track B) of `MISSION_DIRECTIVE_LEKILI.md`, proving that
-every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a positive volume 4-form
-`V_M : PositiveVolumeForm (𝓡 4) M` admits an inhabitant of
-`AdmitsWrinkledOrBrokenLefschetzFibration M` with zero additional geometric typeclasses:
+This file implements Deliverable `L-R3` (Track B) together with the `SC-R1` / `SC-R2` separation
+theorems, proving that every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a
+positive volume 4-form `V_M : PositiveVolumeForm (𝓡 4) M` admits an inhabitant of
+`AdmitsRegularDiskFibration M` with zero additional geometric typeclasses, while separating this
+local coordinate-ball construction sharply from genuine wrinkled / broken Lefschetz fibrations
+(`AdmitsWrinkledOrBrokenLefschetzFibration M`):
 
 1. **West-Pole 4D Inverse Stereographic Chart (`stereo4Inv`, `stereo4Diffeomorph`)**:
    - Identifies `EuclideanSpace ℝ (Fin 4)` diffeomorphically with `Sphere4 \ {s4WestPole}` where
@@ -35,7 +38,8 @@ every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a positive 
 2. **Orientation-Preserving Top-Form Pullback & Coordinate Ball (`exists_pos_smul_mpullback_...`)**:
    - Converts `TauCeti.Manifold.Orientation.IsOrientationPreservingAt` between top-form
      orientations into pointwise positive scalar proportionality `f^* φ' = c • φ` (`c > 0`).
-3. **Bumped Stereographic Local Fibration (`closedManifoldLocalMap`)**:
+3. **Bumped Stereographic Local Fibration (`closedManifoldLocalMap`,
+   `closedManifoldRegularDiskFibration`)**:
    - Obtains an orientation-preserving smooth open embedding `e : ℝ⁴ → M` via
      `exists_isOpenEmbedding_isLocalDiffeomorph_isOrientationPreservingAt`.
    - Blends `P(u) = s4ProjPlane (stereo4Inv u)` via a smooth radial `ContDiffBump` (`rIn = 4`,
@@ -43,17 +47,18 @@ every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a positive 
      smoothly outside `e (closedBall 0 (9 / 2))` by the constant `southPoleStereoInv (vec2 (-1) 0)`
      (disjoint from `s4BaseRegion`).
    - Proves `closedManifoldLocalMap ⁻¹' s4BaseRegion = (e ∘ stereo4Chart) '' s4PreimageOpen` and
-     deduces `AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm`.
-
-*Honesty Note (Gate G7)*: This closes `AdmitsWrinkledOrBrokenLefschetzFibration` (and Corollary 2
-for the unconstrained `WrinkledFibration` interface) via a local coordinate-ball definite-fold map;
-global indefinite-fold / cusp theory is formalized separately in `PurelyWrinkled.lean`,
-`ADKS4Fibration.lean`, and `LekiliMoves.lean`.
+     deduces `AdmitsRegularDiskFibration.ofPositiveVolumeForm`.
+4. **Track B Separation (`SC-R2`)**:
+   - Proves `criticalPoints` of `closedManifoldRegularDiskFibration ch` has nonempty interior (since
+     `closedManifoldLocalMap ch` is constant on the nonempty open exterior
+     `ch.emb '' {u | 5 < ‖u‖}`), so its Jacobian–Poisson structure satisfies
+     `¬ π_f.IsGenericallyRankTwo` and cannot underlie any
+     `AdmitsWrinkledOrBrokenLefschetzFibration M`.
 -/
 
 @[expose] public section
 
-open Function Metric Module Set TopologicalSpace
+open Filter Function Metric Module Set TopologicalSpace
 open scoped ContDiff Manifold Topology
 
 namespace S4TuringPoisson
@@ -792,13 +797,13 @@ theorem regular_on_closedManifoldLocalMap {M : Type*} [TopologicalSpace M]
   rw [← hcomp_eq, hlhs_comp] at hsurj_rhs
   exact Function.Surjective.of_comp hsurj_rhs
 
-/-- Explicit global `WrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 Sphere2` over `s4BaseRegion` on any
+/-- Explicit global `RegularDiskFibration (𝓡 4) M (𝓡 2) Sphere2 Sphere2` over `s4BaseRegion` on any
 nonempty Hausdorff smooth 4-manifold `(M, V_M)`. -/
-noncomputable def closedManifoldWrinkledFibration {M : Type*} [TopologicalSpace M]
+noncomputable def closedManifoldRegularDiskFibration {M : Type*} [TopologicalSpace M]
     [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M] [IsManifold (𝓡 4) ∞ M]
     [MeasurableSpace M] [BorelSpace M] [T2Space M] {V_M : PositiveVolumeForm (𝓡 4) M}
     (ch : ClosedManifoldChart M V_M) :
-    WrinkledFibration (𝓡 4) M (𝓡 2) Sphere2 Sphere2 where
+    RegularDiskFibration (𝓡 4) M (𝓡 2) Sphere2 Sphere2 where
   toFun := closedManifoldLocalMap ch
   contMDiff_toFun := contMDiff_closedManifoldLocalMap ch
   baseRegion := s4BaseRegion
@@ -953,16 +958,16 @@ theorem closedManifoldTrivialization_pos_cooriented {M : Type*} [TopologicalSpac
     (s4Trivialization_pos_cooriented (localToS4PreimageDiffeomorph ch p))
     (localToS4PreimageDiffeomorph_mpullback_s4VolumeForm ch p)
 
-/-- **Track B Unconditional Fibration Constructor (`L-R3`)**:
-Every nonempty compact Hausdorff smooth 4-manifold `M` equipped with a `PositiveVolumeForm` `V_M`
-admits a positively co-oriented `WrinkledFibration M → Sphere2` with regular fiber `Sphere2`.
+/-- **Track B Unconditional Regular-Disk Fibration Constructor (`L-R3`, `SC-R1`)**:
+Every nonempty Hausdorff smooth 4-manifold `M` equipped with a `PositiveVolumeForm` `V_M`
+admits a positively co-oriented `RegularDiskFibration M → Sphere2` with regular fiber `Sphere2`.
 (Marked `@[instance_reducible]`, not global `instance`, to avoid collision with `Sphere4`.) -/
 @[instance_reducible]
-noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm
+noncomputable def AdmitsRegularDiskFibration.ofPositiveVolumeForm
     {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
     [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [Nonempty M] [T2Space M]
     (V_M : PositiveVolumeForm (𝓡 4) M) :
-    AdmitsWrinkledOrBrokenLefschetzFibration M :=
+    AdmitsRegularDiskFibration M :=
   let ch := closedManifoldChart M V_M
   { ambientVolume := V_M
     Fiber := Sphere2
@@ -974,9 +979,115 @@ noncomputable def AdmitsWrinkledOrBrokenLefschetzFibration.ofPositiveVolumeForm
     instNonemptyFiber := ⟨s2NorthPole⟩
     instMeasurableSpaceFiber := inferInstance
     instBorelSpaceFiber := inferInstance
-    fibration := closedManifoldWrinkledFibration ch
+    fibration := closedManifoldRegularDiskFibration ch
     fiberVolume := S2PositiveVolumeForm
     trivialization_pos_cooriented := closedManifoldTrivialization_pos_cooriented ch }
+
+/-! ## 4. Track B Separation: Nonempty Critical Interior & `¬ IsGenericallyRankTwo` (`SC-R2`) -/
+
+/-- On any Hausdorff smooth 4-manifold `(M, V_M)` (in particular any compact nonempty Hausdorff
+smooth 4-manifold), `criticalPoints` of `(closedManifoldRegularDiskFibration ch).toFun` has
+**nonempty interior** in `M` (`closedManifoldLocalMap ch` is constant on the nonempty open set
+`ch.emb '' {u : ℝ⁴ | 5 < ‖u‖}`). -/
+-- tier: T2
+theorem nonempty_interior_criticalPoints_closedManifoldRegularDiskFibration
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [T2Space M]
+    {V_M : PositiveVolumeForm (𝓡 4) M} (ch : ClosedManifoldChart M V_M) :
+    (interior
+      (criticalPoints (𝓡 4) (𝓡 2) (closedManifoldRegularDiskFibration ch).toFun)).Nonempty := by
+  let W_ext : Set (EuclideanSpace ℝ (Fin 4)) := {u | 5 < ‖u‖}
+  have hW_open : IsOpen W_ext := isOpen_lt continuous_const continuous_norm
+  let u₀ : EuclideanSpace ℝ (Fin 4) := vec4 6 0 0 0
+  have hu₀_mem : u₀ ∈ W_ext := by
+    change 5 < ‖u₀‖
+    have hsq : ‖u₀‖ ^ 2 = 36 := by
+      rw [norm_sq_r4]
+      simp [u₀]
+      norm_num
+    nlinarith [norm_nonneg u₀]
+  let U_ext : Set M := ch.emb '' W_ext
+  have hU_open : IsOpen U_ext := ch.isOpenEmbedding.isOpenMap W_ext hW_open
+  let c₀ : Sphere2 := southPoleStereoInv (vec2 (-1) 0)
+  have hconst : ∀ y ∈ U_ext, closedManifoldLocalMap ch y = c₀ := by
+    rintro _ ⟨u, hu, rfl⟩
+    rw [closedManifoldLocalMap_emb]
+    refine localBallMap_eq_const_of_notMem_closedBall fun hcb ↦ ?_
+    have hle : ‖u‖ ≤ 9 / 2 := by simpa [Metric.mem_closedBall, dist_zero_right] using hcb
+    have hgt : 5 < ‖u‖ := hu
+    linarith
+  have hU_sub :
+      U_ext ⊆ criticalPoints (𝓡 4) (𝓡 2) (closedManifoldRegularDiskFibration ch).toFun := by
+    intro x hx
+    rw [mem_criticalPoints_iff]
+    intro hsurj
+    have hev : (closedManifoldRegularDiskFibration ch).toFun =ᶠ[𝓝 x] fun _ : M ↦ c₀ :=
+      Filter.eventuallyEq_of_mem (hU_open.mem_nhds hx) hconst
+    have hzero : mfderiv (𝓡 4) (𝓡 2) (closedManifoldRegularDiskFibration ch).toFun x = 0 := by
+      rw [hev.mfderiv_eq, mfderiv_const, ContinuousLinearMap.comp_zero]
+    rw [hzero] at hsurj
+    obtain ⟨v, hv⟩ :=
+      hsurj (vec2 1 0 : TangentSpace (𝓡 2) ((closedManifoldRegularDiskFibration ch).toFun x))
+    have h1 : (0 : EuclideanPlane) 0 = (vec2 1 0 : EuclideanPlane) 0 :=
+      congrArg (fun u : EuclideanPlane ↦ u 0) hv
+    norm_num at h1
+  exact ⟨ch.emb u₀, interior_maximal hU_sub hU_open ⟨u₀, hu₀_mem, rfl⟩⟩
+
+/-- The regular locus of `closedManifoldRegularDiskFibration ch` is **not** dense in `M`. -/
+-- tier: T1
+theorem not_dense_regularPoints_closedManifoldRegularDiskFibration
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [T2Space M]
+    {V_M : PositiveVolumeForm (𝓡 4) M} (ch : ClosedManifoldChart M V_M) :
+    ¬ Dense {x : M | x ∉ criticalPoints (𝓡 4) (𝓡 2)
+        (closedManifoldRegularDiskFibration ch).toFun} := by
+  intro hd
+  obtain ⟨x, hx⟩ := nonempty_interior_criticalPoints_closedManifoldRegularDiskFibration ch
+  obtain ⟨y, hy_int, hy_reg⟩ := hd.inter_open_nonempty _ isOpen_interior ⟨x, hx⟩
+  exact hy_reg (interior_subset hy_int)
+
+/-- **Track B Anti-Vacuity Separation Theorem (`SC-R2`, `¬ IsGenericallyRankTwo`)**:
+For any positive volume 4-form `V` on `M` (including the aligned volume form on compact `M`), the
+Jacobian–Poisson structure `π_f` induced by `(closedManifoldRegularDiskFibration ch).toFun`
+satisfies `¬ π_f.IsGenericallyRankTwo`. -/
+-- tier: T1
+theorem not_isGenericallyRankTwo_closedManifoldLocal
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [T2Space M]
+    {V_M : PositiveVolumeForm (𝓡 4) M} (ch : ClosedManifoldChart M V_M)
+    (V : PositiveVolumeForm (𝓡 4) M) :
+    ¬ (jacobianPoissonOfPositiveVolume V S2VolumeForm
+        (closedManifoldRegularDiskFibration ch).toFun
+        (closedManifoldRegularDiskFibration ch).contMDiff_toFun).IsGenericallyRankTwo := by
+  rw [isGenericallyRankTwo_jacobianPoissonOfPositiveVolume_iff V S2VolumeForm S2VolumeForm_ne_zero]
+  exact not_dense_regularPoints_closedManifoldRegularDiskFibration ch
+
+/-- **Track B Singularity Exclusion (`SC-R1` / `SC-R2`)**:
+`(closedManifoldRegularDiskFibration ch).toFun` cannot underlie **any**
+`AdmitsWrinkledOrBrokenLefschetzFibration M` instance on `M`. -/
+-- tier: T1
+theorem not_admitsWrinkledOrBrokenLefschetzFibration_closedManifoldLocal
+    {M : Type*} [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [T2Space M]
+    {V_M : PositiveVolumeForm (𝓡 4) M} (ch : ClosedManifoldChart M V_M)
+    (A : AdmitsWrinkledOrBrokenLefschetzFibration M) :
+    letI := A.instTopologicalSpaceFiber
+    letI := A.instChartedSpaceFiber
+    letI := A.instIsManifoldFiber
+    letI := A.instT2SpaceFiber
+    letI := A.instCompactSpaceFiber
+    letI := A.instNonemptyFiber
+    A.fibration.toFun ≠ (closedManifoldRegularDiskFibration ch).toFun := by
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  intro hEq
+  have hd := @AdmitsWrinkledOrBrokenLefschetzFibration.dense_regularPoints M _ _ _ _ _ A
+  rw [hEq] at hd
+  exact not_dense_regularPoints_closedManifoldRegularDiskFibration ch hd
 
 end LocalBumpedFibration
 

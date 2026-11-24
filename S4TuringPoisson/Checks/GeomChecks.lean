@@ -93,9 +93,14 @@ This file implements the Milestone M0–M5 geometric verification gates from Sec
     `PurelyWrinkledFibration`.
   - `gate52_lekili_astroid_and_surgery_witness`: verifies Lekili Move 1's 3-cusp deltoid and
     indefinite fold together with `s4BrokenLefschetzFibration.exists_purelyWrinkledFibration`.
-  - `gate53_adk_s4_topology_and_turing_witness`: verifies `S²` and `T²` regular fibers,
+  - `gate53_adk_s4_topology_and_turing_witness`: verifies smooth ($C^\infty$) `S²` and `T²`
+    regular-fiber diffeomorphisms (`s4ADKNorthFiberDiffeomorph`, `s4ADKTorusFiberDiffeomorph`),
+    south-hemisphere $T^2$ broken Lefschetz trivialization (`s4ADKTorusBrokenLefschetzFibration`),
     indefinite-fold critical circle, and Turing completeness / Hamiltonian flow realization for
     the global ADK fibration on `Sphere4`.
+  - `closedManifoldLocal_not_genericallyRankTwo`: verifies Gate `G5-Geom-1` separation on `Sphere4`
+    (Track B's coordinate-ball map has nonempty critical interior, satisfies
+    `¬ IsGenericallyRankTwo`, and cannot underlie `AdmitsWrinkledOrBrokenLefschetzFibration`).
   - `unconditional_corollary2_closedFourManifold_on_S4_check`: instantiates unconditional
     Corollary 2 (`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_closedFourManifold`
     and `undecidable_orbit_reachability_closedFourManifold`) on `Sphere4`.
@@ -1087,13 +1092,14 @@ theorem gate5_s4_aligned_volume_witness :
 /-- Non-emptiness of the open 4-manifold domain `innerPreimageOpen Sphere4` on which Equation (1)
 holds, ruling out vacuous pullback identities. -/
 theorem innerPreimageOpen_s4_nonempty : (innerPreimageOpen Sphere4).1.Nonempty := by
-  let x₀ : Sphere4 := s4WrinkledFibration.embed (s4WrinkledFibration.baseCenter, s2NorthPole)
+  let x₀ : Sphere4 :=
+    s4RegularDiskFibration.embed (s4RegularDiskFibration.baseCenter, s2NorthPole)
   refine ⟨x₀, ?_⟩
   change s4Fibration x₀ ∈ (baseInnerOpen Sphere4).1
-  have hf : s4Fibration x₀ = s4WrinkledFibration.baseCenter.1 :=
-    s4WrinkledFibration.apply_embed s4WrinkledFibration.baseCenter s2NorthPole
+  have hf : s4Fibration x₀ = s4RegularDiskFibration.baseCenter.1 :=
+    s4RegularDiskFibration.apply_embed s4RegularDiskFibration.baseCenter s2NorthPole
   rw [hf]
-  have hcore : s4WrinkledFibration.baseCenter.1 ∈ (baseCoreOpen Sphere4).1 :=
+  have hcore : s4RegularDiskFibration.baseCenter.1 ∈ (baseCoreOpen Sphere4).1 :=
     baseCenter_mem_baseCoreOpen Sphere4
   have hclosed := baseOpenSubdisk_subset_baseClosedSubdisk Sphere4 (rCore Sphere4)
     (rCore_lt_baseRadius Sphere4) hcore
@@ -1180,9 +1186,9 @@ set_option linter.concreteInstances false
 /-- **M5 Headline Theorem 1 & Corollary 2 Synthesis Check on `Sphere4`**:
 Under `[HasTuringCompleteAreaPreservingDiskIsotopy]`, verifies that both
 `Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4` (Theorem 1) and
-`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4` (Corollary 2
-instantiated on `Sphere4`) produce genuine Gate 5 non-degenerate volumes `V`, unimodular
-generically rank-2 Jacobian–Poisson structures with nonempty rank-0 singular locus, and
+`Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold` (Corollary 2
+instantiated on `Sphere4` via `s4ADKAdmits`) produce genuine Gate 5 non-degenerate volumes `V`,
+unimodular generically rank-2 Jacobian–Poisson structures with nonempty rank-0 singular locus, and
 leaf-preserving, volume-preserving, measure-preserving, Turing complete Poisson diffeomorphisms. -/
 theorem m5_headline_theorems_S4_and_fourManifold_check
     [HasTuringCompleteAreaPreservingDiskIsotopy] :
@@ -1193,6 +1199,7 @@ theorem m5_headline_theorems_S4_and_fourManifold_check
       V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
       V.μ Set.univ < ⊤ ∧
       π_f.IsUnimodularWithVolume V.Ω ∧
+      π_f.IsGenericallyRankTwo ∧
       (∀ x ∉ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 2) ∧
       (criticalPoints (𝓡 4) (𝓡 2) s4Fibration).Nonempty ∧
       (∀ x ∈ criticalPoints (𝓡 4) (𝓡 2) s4Fibration, π_f.rankAt x = 0) ∧
@@ -1209,26 +1216,29 @@ theorem m5_headline_theorems_S4_and_fourManifold_check
       0 < V'.μ (Metric.ball s4BasePoint (1 / 2)) ∧
       V'.μ (Metric.ball s4BasePoint (1 / 2)) < V'.μ Set.univ ∧
       π_f'.IsUnimodularWithVolume V'.Ω ∧
-      s4Fibration ∘ ⇑d_bar' = s4Fibration ∧
+      π_f'.IsGenericallyRankTwo ∧
+      s4ADKFibration ∘ ⇑d_bar' = s4ADKFibration ∧
       SmoothBivector.IsPoissonMap π_f'.toSmoothBivector π_f'.toSmoothBivector
         d_bar' d_bar'.contMDiff ∧
       MeasurePreserving ⇑d_bar' V'.μ V'.μ ∧
       IsTuringComplete ⇑d_bar' ∧
       (⇑d_bar' : Sphere4 → Sphere4) ≠ id) := by
   constructor
-  · obtain ⟨V, π_f, d_bar, -, hunim, -, hreg, hne, hcrit, hfib, hpoiss, -, hpull, hmp, htc,
+  · obtain ⟨V, π_f, d_bar, -, hunim, -, hgen, hreg, hne, hcrit, hfib, hpoiss, -, hpull, hmp, htc,
       hne_id⟩ := Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_S4
     obtain ⟨hpos, hlt, hfin⟩ := positiveVolumeForm_s4_gate5 V
-    exact ⟨V, π_f, d_bar, hpos, hlt, hfin, hunim, hreg, hne, hcrit, hfib, hpoiss, hpull, hmp, htc,
-      hne_id⟩
-  · obtain ⟨V', π_f', d_bar', -, hunim', -, -, -, hfib', hpoiss', -, -, hmp', htc', hne_id'⟩ :=
-      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold Sphere4
+    exact ⟨V, π_f, d_bar, hpos, hlt, hfin, hunim, hgen, hreg, hne, hcrit, hfib, hpoiss, hpull,
+      hmp, htc, hne_id⟩
+  · obtain ⟨V', π_f', d_bar', -, hunim', -, hgen', -, -, hfib', hpoiss', -, -, hmp', htc',
+        hne_id'⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold
+        (A := s4ADKAdmits) Sphere4
     obtain ⟨hpos', hlt', -⟩ := positiveVolumeForm_s4_gate5 V'
-    exact ⟨V', π_f', d_bar', hpos', hlt', hunim', hfib', hpoiss', hmp', htc', hne_id'⟩
+    exact ⟨V', π_f', d_bar', hpos', hlt', hunim', hgen', hfib', hpoiss', hmp', htc', hne_id'⟩
 
 /-- **M3.3 + M5 CMPP Hamiltonian Synthesis Check on `Sphere4`**:
-Verifies automatic synthesis of Theorem 1 and Corollary 2 (instantiated on `Sphere4`) from
-`[HasCMPPCantorCirculationHamiltonians]`. -/
+Verifies automatic synthesis of Theorem 1 and Corollary 2 (instantiated on `Sphere4` via
+`s4ADKAdmits`) from `[HasCMPPCantorCirculationHamiltonians]`. -/
 theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
     [HasCMPPCantorCirculationHamiltonians] :
     (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
@@ -1243,7 +1253,8 @@ theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
       (π_f' : PoissonStructure (𝓡 4) Sphere4)
       (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
       π_f'.IsUnimodularWithVolume V'.Ω ∧
-      s4Fibration ∘ ⇑d_bar' = s4Fibration ∧
+      π_f'.IsGenericallyRankTwo ∧
+      s4ADKFibration ∘ ⇑d_bar' = s4ADKFibration ∧
       SmoothBivector.IsPoissonMap π_f'.toSmoothBivector π_f'.toSmoothBivector
         d_bar' d_bar'.contMDiff ∧
       MeasurePreserving ⇑d_bar' V'.μ V'.μ ∧
@@ -1253,9 +1264,10 @@ theorem m5_cmpp_headline_theorems_S4_and_fourManifold_check
       Main.exists_turingComplete_volumePreserving_diffeomorph_S4_of_cmpp
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
     exact ⟨V, d_bar, hpos, hlt, hfib, hpull, hmp, htc⟩
-  · obtain ⟨V', π_f', d_bar', -, hunim', -, -, -, hfib', hpoiss', -, -, hmp', htc', -⟩ :=
-      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_of_cmpp Sphere4
-    exact ⟨V', π_f', d_bar', hunim', hfib', hpoiss', hmp', htc'⟩
+  · obtain ⟨V', π_f', d_bar', -, hunim', -, hgen', -, -, hfib', hpoiss', -, -, hmp', htc', -⟩ :=
+      Main.exists_turingComplete_volumePreserving_poissonDiffeomorph_fourManifold_of_cmpp
+        (A := s4ADKAdmits) Sphere4
+    exact ⟨V', π_f', d_bar', hunim', hgen', hfib', hpoiss', hmp', htc'⟩
 
 end M5HeadlineChecks
 
@@ -1314,15 +1326,20 @@ theorem gate52_lekili_astroid_and_surgery_witness :
     singularities_lekiliMove1 one_ne_zero,
     ⟨P, P.baseDiskRadius_pos, P.baseRegion_nonempty, hsub, hval⟩⟩
 
-/-- **Gate G5.3 Global ADK Broken Lefschetz Fibration Topology & Turing Completeness on $S^4$**:
-Verifies that `s4ADKFibration` has both `S²` (`s2NorthPole`) and `T²` (`s2SouthPole`) regular
-fibers, an indefinite-fold critical point at `s4ADKCritBase`, an unconditional Turing complete
-volume-preserving Poisson diffeomorphism (with Gate 5 bounds on `V`), and a finite
-Poisson–Hamiltonian flow realization. -/
+/-- **Gate G5.3 / G5-Geom-3 Global ADK Broken Lefschetz Smooth Fibers & Turing Completeness on
+$S^4$ (`SC-R6b`)**:
+Verifies that `s4ADKFibration` has smooth ($C^\infty$) `S²` (`s2NorthPole`) and `T²`
+(`s2SouthPole`) regular-fiber diffeomorphisms (`s4ADKNorthFiberDiffeomorph`,
+`s4ADKTorusFiberDiffeomorph`), south-hemisphere $T^2$ broken Lefschetz trivialization around
+`s2SouthPole` (`s4ADKTorusBrokenLefschetzFibration`), an indefinite-fold critical point at
+`s4ADKCritBase`, an unconditional Turing complete volume-preserving generically rank-`2` Poisson
+diffeomorphism (with Gate 5 bounds on `V`), and a finite Poisson–Hamiltonian flow realization. -/
 theorem gate53_adk_s4_topology_and_turing_witness :
-    Nonempty (Sphere2 ≃ₜ {x : Sphere4 // s4ADKFibration x = s2NorthPole}) ∧
-      Nonempty ((Metric.sphere (0 : EuclideanPlane) 1 × Metric.sphere (0 : EuclideanPlane) 1) ≃ₜ
+    Nonempty (Sphere2 ≃ₘ⟮𝓡 2, ADKRegularFiberModel⟯
+        {x : Sphere4 // s4ADKFibration x = s2NorthPole}) ∧
+      Nonempty (Torus2 ≃ₘ⟮𝓡 2, ADKRegularFiberModel⟯
         {x : Sphere4 // s4ADKFibration x = s2SouthPole}) ∧
+      s2SouthPole ∈ s4ADKTorusBrokenLefschetzFibration.baseRegion.1 ∧
       s4ADKCritBase ∈ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration ∧
       IsIndefiniteFoldAt (𝓡 4) (𝓡 2) s4ADKFibration s4ADKCritBase ∧
       (∃ (V : PositiveVolumeForm (𝓡 4) Sphere4)
@@ -1331,6 +1348,7 @@ theorem gate53_adk_s4_topology_and_turing_witness :
         0 < V.μ (Metric.ball s4BasePoint (1 / 2)) ∧
         V.μ (Metric.ball s4BasePoint (1 / 2)) < V.μ Set.univ ∧
         π_f.IsUnimodularWithVolume V.Ω ∧
+        π_f.IsGenericallyRankTwo ∧
         s4ADKFibration ∘ ⇑d_bar = s4ADKFibration ∧
         SmoothBivector.IsPoissonMap π_f.toSmoothBivector π_f.toSmoothBivector
           d_bar d_bar.contMDiff ∧
@@ -1342,22 +1360,58 @@ theorem gate53_adk_s4_topology_and_turing_witness :
         (π_f' : PoissonStructure (𝓡 4) Sphere4)
         (Hs : List C^∞⟮𝓡 4, Sphere4; ℝ⟯)
         (d_bar' : Sphere4 ≃ₘ⟮𝓡 4, 𝓡 4⟯ Sphere4),
-        d_bar' = composePoissonHamiltonianTimeOneFlows (A := s4ADKAdmits) Sphere4 Hs ∧
+        d_bar' = composePoissonHamiltonianTimeOneFlows
+          (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4 Hs ∧
         s4ADKFibration ∘ ⇑d_bar' = s4ADKFibration ∧
         π_f'.IsUnimodularWithVolume V'.Ω ∧
+        π_f'.IsGenericallyRankTwo ∧
         IsTuringComplete ⇑d_bar' := by
   have hcrit : s4ADKCritBase ∈ criticalPoints (𝓡 4) (𝓡 2) s4ADKFibration := by
     rw [criticalPoints_s4ADKFibration]
     exact ⟨rfl, rfl, rfl⟩
-  refine ⟨⟨s4ADKNorthFiberHomeomorph⟩, ⟨s4ADKTorusFiberHomeomorph⟩, hcrit,
+  refine ⟨⟨s4ADKNorthFiberDiffeomorph⟩, ⟨s4ADKTorusFiberDiffeomorph⟩,
+    s2SouthPole_mem_s4ADKTorusBaseRegion, hcrit,
     isIndefiniteFoldAt_s4ADKFibration hcrit, ?_, ?_⟩
-  · obtain ⟨V, π_f, d_bar, _, hunimV, _, _, _, _, hfib, hpoiss, _, hpull, hmp, htc, hne⟩ :=
+  · obtain ⟨V, π_f, d_bar, _, hunimV, _, hgen, _, _, _, hfib, hpoiss, _, hpull, hmp, htc, hne⟩ :=
       exists_turingComplete_volumePreserving_poissonDiffeomorph_S4_ADK
     obtain ⟨hpos, hlt, -⟩ := positiveVolumeForm_s4_gate5 V
-    exact ⟨V, π_f, d_bar, hpos, hlt, hunimV, hfib, hpoiss, hpull, hmp, htc, hne⟩
-  · obtain ⟨V', π_f', Hs, d_bar', hunimV', hcomp, hfib, _, _, _, htc, _⟩ :=
+    exact ⟨V, π_f, d_bar, hpos, hlt, hunimV, hgen, hfib, hpoiss, hpull, hmp, htc, hne⟩
+  · obtain ⟨V', π_f', Hs, d_bar', hunimV', hgen', hcomp, hfib, _, _, _, htc, _⟩ :=
       exists_poisson_hamiltonian_realization_S4_ADK
-    exact ⟨V', π_f', Hs, d_bar', hcomp, hfib, hunimV', htc⟩
+    exact ⟨V', π_f', Hs, d_bar', hcomp, hfib, hunimV', hgen', htc⟩
+
+/-- **Gate G5-Geom-1 Local vs. Global Fibration Separation Witness on `Sphere4` (`SC-R1`/`SC-R2`)**:
+Verifies directly on `(Sphere4, S4PositiveVolumeForm)` that Track B's coordinate-ball map
+`(closedManifoldRegularDiskFibration ch).toFun` (`ch := closedManifoldChart Sphere4
+S4PositiveVolumeForm`) has nonempty critical interior, induces a Jacobian–Poisson structure
+satisfying `¬ IsGenericallyRankTwo` for every positive volume 4-form `V`, and cannot underlie any
+`AdmitsWrinkledOrBrokenLefschetzFibration Sphere4` instance — whereas `s4ADKAdmits`'s adapted
+Poisson structure **is** `IsGenericallyRankTwo`. -/
+theorem closedManifoldLocal_not_genericallyRankTwo :
+    have : Nonempty Sphere4 := ⟨s4BasePoint⟩
+    let ch := closedManifoldChart Sphere4 S4PositiveVolumeForm
+    (interior
+        (criticalPoints (𝓡 4) (𝓡 2) (closedManifoldRegularDiskFibration ch).toFun)).Nonempty ∧
+      (∀ V : PositiveVolumeForm (𝓡 4) Sphere4,
+        ¬ (jacobianPoissonOfPositiveVolume V S2VolumeForm
+            (closedManifoldRegularDiskFibration ch).toFun
+            (closedManifoldRegularDiskFibration ch).contMDiff_toFun).IsGenericallyRankTwo) ∧
+      (∀ A : AdmitsWrinkledOrBrokenLefschetzFibration Sphere4,
+        letI := A.instTopologicalSpaceFiber
+        letI := A.instChartedSpaceFiber
+        letI := A.instIsManifoldFiber
+        letI := A.instT2SpaceFiber
+        letI := A.instCompactSpaceFiber
+        letI := A.instNonemptyFiber
+        A.fibration.toFun ≠ (closedManifoldRegularDiskFibration ch).toFun) ∧
+      (adaptedJacobianPoisson
+        (A := s4ADKAdmits.toAdmitsRegularDiskFibration) Sphere4).IsGenericallyRankTwo := by
+  have : Nonempty Sphere4 := ⟨s4BasePoint⟩
+  let ch := closedManifoldChart Sphere4 S4PositiveVolumeForm
+  exact ⟨nonempty_interior_criticalPoints_closedManifoldRegularDiskFibration ch,
+    fun V ↦ not_isGenericallyRankTwo_closedManifoldLocal ch V,
+    fun A ↦ not_admitsWrinkledOrBrokenLefschetzFibration_closedManifoldLocal ch A,
+    isGenericallyRankTwo_adaptedJacobianPoisson (A := s4ADKAdmits) Sphere4⟩
 
 /-- **Unconditional Closed 4-Manifold Corollary 2 Check (`L-R3`, Track B) on `Sphere4`**:
 Instantiates the zero-fibration-hypothesis closed-manifold theorems

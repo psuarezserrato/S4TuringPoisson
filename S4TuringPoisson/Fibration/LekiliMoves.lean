@@ -45,8 +45,8 @@ Theorem 4):
    §4 / Theorem 4)**: Globalizes Move 1 onto manifolds via a radial bump modification
    (`rIn = 1, rOut = 2`) with an explicit quantitative collar right-inverse bound, replacing
    isolated `IsRealLefschetzAt` points outside `closure P.baseRegion` while preserving
-   `WrinkledFibration` and exporting compact surgery support `K` and smooth global homotopy `H` in
-   `BrokenLefschetzFibration.exists_purelyWrinkledFibration`.
+   `RegularDiskFibration` and exporting compact surgery support `K` and smooth global homotopy `H`
+   in `BrokenLefschetzFibration.exists_purelyWrinkledFibration`.
 -/
 
 @[expose] public section
@@ -5376,110 +5376,6 @@ private theorem surjective_mfderiv_congr_of_eventuallyEq
       exact ⟨v, (tangentSpaceCast J (g x) (f x)).injective hv⟩,
     fun hs ↦ (tangentSpaceCast J (g x) (f x)).surjective.comp hs⟩
 
-private theorem partialDiffeomorph_mfderiv_bijective
-    {E H E' H' M N : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [TopologicalSpace H]
-    {I : ModelWithCorners ℝ E H}
-    [NormedAddCommGroup E'] [NormedSpace ℝ E'] [TopologicalSpace H']
-    {J : ModelWithCorners ℝ E' H'}
-    [TopologicalSpace M] [ChartedSpace H M]
-    [TopologicalSpace N] [ChartedSpace H' N]
-    (Φ : PartialDiffeomorph I J M N ∞) {x : M} (hx : x ∈ Φ.source) :
-    Function.Bijective (mfderiv I J Φ x) := by
-  have hx_t : Φ x ∈ Φ.symm.source := Φ.symm_source ▸ Φ.map_source hx
-  have hleft : Φ.symm (Φ x) = x := Φ.left_inv hx
-  have hΦ_md : MDifferentiableAt I J (⇑Φ) x :=
-    (Φ.contMDiffOn.contMDiffAt (Φ.open_source.mem_nhds hx)).mdifferentiableAt (by simp)
-  have hsymm_md : MDifferentiableAt J I (⇑Φ.symm) (Φ x) :=
-    (Φ.symm.contMDiffOn.contMDiffAt (Φ.symm.open_source.mem_nhds hx_t)).mdifferentiableAt
-      (by simp)
-  have hev_left : (⇑Φ.symm ∘ ⇑Φ) =ᶠ[𝓝 x] id :=
-    _root_.eventually_nhds_iff.mpr ⟨Φ.source, fun q hq ↦ Φ.left_inv hq, Φ.open_source, hx⟩
-  have hev_right : (⇑Φ ∘ ⇑Φ.symm) =ᶠ[𝓝 (Φ x)] id :=
-    _root_.eventually_nhds_iff.mpr
-      ⟨Φ.symm.source, fun y hy ↦ Φ.right_inv (Φ.symm_source ▸ hy), Φ.symm.open_source, hx_t⟩
-  have hinj : Function.Injective (mfderiv I J Φ x) := by
-    have hcm := mfderiv_comp (x := x) hsymm_md hΦ_md
-    have heq : (mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x) =
-        (tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x) :
-          TangentSpace I (id x) →L[ℝ] TangentSpace I ((⇑Φ.symm ∘ ⇑Φ) x)).comp
-          (ContinuousLinearMap.id ℝ (TangentSpace I x)) := by
-      rw [← hcm, hev_left.mfderiv_eq, mfderiv_id]
-    have hinj_comp : Function.Injective (⇑(mfderiv J I Φ.symm (Φ x)) ∘ ⇑(mfderiv I J Φ x)) := by
-      have hcoe : ⇑((mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x)) =
-          ⇑(tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x)) := by
-        rw [heq]; rfl
-      change Function.Injective ⇑((mfderiv J I Φ.symm (Φ x)).comp (mfderiv I J Φ x))
-      rw [hcoe]
-      exact (tangentSpaceCast I (id x) ((⇑Φ.symm ∘ ⇑Φ) x)).injective
-    exact hinj_comp.of_comp
-  have hsurj : Function.Surjective (mfderiv I J Φ x) := by
-    have hΦ_at : MDifferentiableAt I J (⇑Φ) (Φ.symm (Φ x)) := hleft.symm ▸ hΦ_md
-    have hcm := mfderiv_comp (x := Φ x) hΦ_at hsymm_md
-    have heq : (mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x)) =
-        (tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x)) :
-          TangentSpace J (id (Φ x)) →L[ℝ] TangentSpace J ((⇑Φ ∘ ⇑Φ.symm) (Φ x))).comp
-          (ContinuousLinearMap.id ℝ (TangentSpace J (Φ x))) := by
-      rw [← hcm, hev_right.mfderiv_eq, mfderiv_id]
-    have hsurj_comp : Function.Surjective
-        (⇑(mfderiv I J Φ (Φ.symm (Φ x))) ∘ ⇑(mfderiv J I Φ.symm (Φ x))) := by
-      have hcoe : ⇑((mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x))) =
-          ⇑(tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x))) := by
-        rw [heq]; rfl
-      change Function.Surjective
-        ⇑((mfderiv I J Φ (Φ.symm (Φ x))).comp (mfderiv J I Φ.symm (Φ x)))
-      rw [hcoe]
-      exact (tangentSpaceCast J (id (Φ x)) ((⇑Φ ∘ ⇑Φ.symm) (Φ x))).surjective
-    have hs := hsurj_comp.of_comp
-    rwa [hleft] at hs
-  exact ⟨hinj, hsurj⟩
-
-/-- Local chart conjugacy by `C^∞` partial diffeomorphisms `(φ, ψ)` transports critical points
-of `f : M → Base` onto critical points of `g : ℝ⁴ → ℝ²`. -/
--- tier: T2
-theorem mem_criticalPoints_iff_of_partialDiffeomorph_conj
-    {E_M H_M E_B H_B M Base : Type*}
-    [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
-    {I_M : ModelWithCorners ℝ E_M H_M}
-    [NormedAddCommGroup E_B] [NormedSpace ℝ E_B] [TopologicalSpace H_B]
-    {I_B : ModelWithCorners ℝ E_B H_B}
-    [TopologicalSpace M] [ChartedSpace H_M M]
-    [TopologicalSpace Base] [ChartedSpace H_B Base]
-    {f : M → Base} {g : EuclideanSpace ℝ (Fin 4) → EuclideanPlane}
-    (φ : PartialDiffeomorph I_M (𝓡 4) M (EuclideanSpace ℝ (Fin 4)) ∞)
-    (ψ : PartialDiffeomorph I_B (𝓡 2) Base EuclideanPlane ∞)
-    (hf : ContMDiffOn I_M I_B ∞ f φ.source) (hg : ContDiff ℝ ∞ g)
-    (hconj : ∀ q ∈ φ.source, f q ∈ ψ.source ∧ ψ (f q) = g (φ q))
-    {q : M} (hq : q ∈ φ.source) :
-    q ∈ criticalPoints I_M I_B f ↔ φ q ∈ criticalPoints (𝓡 4) (𝓡 2) g := by
-  have hev : (⇑ψ ∘ f) =ᶠ[𝓝 q] (g ∘ ⇑φ) :=
-    _root_.eventually_nhds_iff.mpr
-      ⟨φ.source, fun z hz ↦ (hconj z hz).2, φ.open_source, hq⟩
-  have hφ_bij := partialDiffeomorph_mfderiv_bijective φ hq
-  have hψ_bij := partialDiffeomorph_mfderiv_bijective ψ (hconj q hq).1
-  have hψ_md : MDifferentiableAt I_B (𝓡 2) (⇑ψ) (f q) :=
-    (ψ.contMDiffOn.contMDiffAt (ψ.open_source.mem_nhds (hconj q hq).1)).mdifferentiableAt
-      (by simp)
-  have hf_md : MDifferentiableAt I_M I_B f q :=
-    (hf.contMDiffAt (φ.open_source.mem_nhds hq)).mdifferentiableAt (by simp)
-  have hg_md : MDifferentiableAt (𝓡 4) (𝓡 2) g (φ q) :=
-    hg.contMDiff.contMDiffAt.mdifferentiableAt (by simp)
-  have hφ_md : MDifferentiableAt I_M (𝓡 4) (⇑φ) q :=
-    (φ.contMDiffOn.contMDiffAt (φ.open_source.mem_nhds hq)).mdifferentiableAt (by simp)
-  have h1 : Function.Surjective (mfderiv I_M I_B f q) ↔
-      Function.Surjective (mfderiv I_M (𝓡 2) (⇑ψ ∘ f) q) := by
-    rw [mfderiv_comp (x := q) hψ_md hf_md, ContinuousLinearMap.coe_comp]
-    exact ⟨fun hs ↦ hψ_bij.2.comp hs, fun hs w ↦ by
-      obtain ⟨x, hx⟩ := hs (mfderiv I_B (𝓡 2) ψ (f q) w)
-      exact ⟨x, hψ_bij.1 hx⟩⟩
-  have h2 : Function.Surjective (mfderiv I_M (𝓡 2) (g ∘ ⇑φ) q) ↔
-      Function.Surjective (mfderiv (𝓡 4) (𝓡 2) g (φ q)) := by
-    rw [mfderiv_comp (x := q) hg_md hφ_md, ContinuousLinearMap.coe_comp]
-    exact ⟨fun hs y ↦ by obtain ⟨x, hx⟩ := hs y; exact ⟨mfderiv I_M (𝓡 4) φ q x, hx⟩,
-      fun hs ↦ hs.comp hφ_bij.2⟩
-  rw [mem_criticalPoints_iff, mem_criticalPoints_iff]
-  exact not_congr (h1.trans ((surjective_mfderiv_congr_of_eventuallyEq hev).trans h2))
-
 /-- Pulls back a local normal form `IsLocallyModeledOn` for `g` at `φ q` along a `C^∞` partial
 diffeomorphism conjugacy `ψ (f z) = g (φ z)`. -/
 -- tier: T2
@@ -5687,7 +5583,7 @@ private theorem contMDiff_uncurry_concatSmoothHomotopy
       _root_.eventually_nhds_iff.mpr ⟨U₂, heq₂, hU₂_open, hp_gt⟩
     exact (hg₂_md.contMDiffAt.congr_of_eventuallyEq hev).contMDiffWithinAt
 
-private theorem wrinkledFibration_mem_closure_baseRegion
+private theorem regularDiskFibration_mem_closure_baseRegion
     {E_M H_M E_B H_B M Base Fiber : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     {I_M : ModelWithCorners ℝ E_M H_M}
@@ -5697,7 +5593,7 @@ private theorem wrinkledFibration_mem_closure_baseRegion
     [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base]
     [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber]
-    {W : WrinkledFibration I_M M I_B Base Fiber}
+    {W : RegularDiskFibration I_M M I_B Base Fiber}
     [T2Space M] [DecidableEq M] {S : Finset M} {p₀ : M} (_hp₀_not : p₀ ∉ S)
     (hp₀_lef : IsRealLefschetzAt I_M I_B W.toFun p₀)
     (hp₀_out : W.toFun p₀ ∉ closure (W.baseRegion : Set Base))
@@ -5705,7 +5601,7 @@ private theorem wrinkledFibration_mem_closure_baseRegion
       IsIndefiniteFoldAt I_M I_B W.toFun p ∨ IsWrinkledCuspAt I_M I_B W.toFun p ∨
         (p ∈ insert p₀ S ∧ IsRealLefschetzAt I_M I_B W.toFun p ∧
           W.toFun p ∉ closure (W.baseRegion : Set Base))) :
-    ∃ (W' : WrinkledFibration I_M M I_B Base Fiber)
+    ∃ (W' : RegularDiskFibration I_M M I_B Base Fiber)
       (K₂ : Set M) (H₀ : ℝ → M → Base),
       W'.baseRegion = W.baseRegion ∧
       W'.baseDiskRadius = W.baseDiskRadius ∧
@@ -6078,7 +5974,7 @@ private theorem wrinkledFibration_mem_closure_baseRegion
     have hev : f' =ᶠ[𝓝 q] W.toFun :=
       _root_.eventually_nhds_iff.mpr ⟨K₂ᶜ, hf'_eq_out, hK2_closed.isOpen_compl, hq_notK2⟩
     exact (surjective_mfderiv_congr_of_eventuallyEq hev).mpr (W.regular_on_preimage q hq_old)
-  let W' : WrinkledFibration I_M M I_B Base Fiber :=
+  let W' : RegularDiskFibration I_M M I_B Base Fiber :=
     { toFun := f'
       contMDiff_toFun := hf'_md
       baseRegion := W.baseRegion
@@ -6292,7 +6188,7 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
   have hfin := finite_realLefschetzPoints_of_brokenLefschetz B
   have hstep :
       ∀ S : Finset M,
-        ∀ W : WrinkledFibration I_M M I_B Base Fiber,
+        ∀ W : RegularDiskFibration I_M M I_B Base Fiber,
           (∀ p ∈ criticalPoints I_M I_B W.toFun,
             IsIndefiniteFoldAt I_M I_B W.toFun p ∨ IsWrinkledCuspAt I_M I_B W.toFun p ∨
               (p ∈ S ∧ IsRealLefschetzAt I_M I_B W.toFun p ∧
@@ -6330,7 +6226,7 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
           W.toFun a ∉ closure (W.baseRegion : Set Base)
       · obtain ⟨W', K₁, H₁, hreg', hrad', hpre_clos', hK₁_comp, hK₁_disj, hK₁_crit, hW'_out,
             hH₁_md, hH₁_0, hH₁_1, hH₁_stat, hcrit'⟩ :=
-          wrinkledFibration_mem_closure_baseRegion ha ha_cond.2.1 ha_cond.2.2 hcrit
+          regularDiskFibration_mem_closure_baseRegion ha ha_cond.2.1 ha_cond.2.2 hcrit
         obtain ⟨P, K₂, H₂, hP_reg, hP_rad, hP_pre_clos, hK₂_comp, hK₂_disj, hK₂_crit, hP_out,
             hH₂_md, hH₂_0, hH₂_1, hH₂_stat⟩ :=
           ih W' (fun p hp ↦ by simpa only [hreg'] using hcrit' p hp)
@@ -6377,7 +6273,7 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
           exact Or.inr (Or.inr ⟨(Finset.mem_insert.mp hp_mem).resolve_left hp_ne, hp_lef, hp_out⟩)
   obtain ⟨P, K, H, hP_reg, hP_rad, hP_pre_clos, hK_comp, hK_disj, hK_crit, hP_out,
       hH_md, hH_0, hH_1, hH_stat⟩ :=
-    hstep hfin.toFinset B.toWrinkledFibration fun p hp ↦ by
+    hstep hfin.toFinset B.toRegularDiskFibration fun p hp ↦ by
       rcases B.singularities_broken_lefschetz p hp with hp_lef | hp_fold
       · exact Or.inr (Or.inr ⟨hfin.mem_toFinset.mpr ⟨hp, hp_lef⟩, hp_lef, hdisj p hp hp_lef⟩)
       · exact Or.inl hp_fold
@@ -6391,10 +6287,11 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration_of_disjoint_clos
   have hx_not_K : x ∉ K := Set.disjoint_right.mp hK_disj hx_B_cl
   exact hP_out x hx_not_K
 
-/-- Shrinks the regular base disk of a `WrinkledFibration` to half radius `W.baseDiskRadius / 2`,
-ensuring `closure W'.baseRegion.1 ⊆ W.baseRegion.1` (disjoint from `W.toFun '' Crit(W)`). -/
+/-- Shrinks the regular base disk of a `RegularDiskFibration` to half radius
+`W.baseDiskRadius / 2`, ensuring `closure W'.baseRegion.1 ⊆ W.baseRegion.1` (disjoint from
+`W.toFun '' Crit(W)`). -/
 -- tier: T2
-noncomputable def WrinkledFibration.shrinkBaseHalf
+noncomputable def RegularDiskFibration.shrinkBaseHalf
     {E_M H_M E_B H_B M Base Fiber : Type*}
     [NormedAddCommGroup E_M] [NormedSpace ℝ E_M] [TopologicalSpace H_M]
     {I_M : ModelWithCorners ℝ E_M H_M}
@@ -6404,8 +6301,8 @@ noncomputable def WrinkledFibration.shrinkBaseHalf
     [TopologicalSpace Base] [ChartedSpace H_B Base] [IsManifold I_B ∞ Base] [T2Space Base]
     [TopologicalSpace Fiber] [ChartedSpace EuclideanPlane Fiber]
     [IsManifold (𝓡 2) ∞ Fiber] [T2Space Fiber] [CompactSpace Fiber] [Nonempty Fiber]
-    (W : WrinkledFibration I_M M I_B Base Fiber) :
-    {W' : WrinkledFibration I_M M I_B Base Fiber //
+    (W : RegularDiskFibration I_M M I_B Base Fiber) :
+    {W' : RegularDiskFibration I_M M I_B Base Fiber //
       W'.toFun = W.toFun ∧
       W'.baseDiskRadius = W.baseDiskRadius / 2 ∧
       W'.baseRegion.1 ⊆ W.baseRegion.1 ∧
@@ -6639,9 +6536,9 @@ theorem BrokenLefschetzFibration.exists_purelyWrinkledFibration
       (∀ x, H 0 x = B.toFun x) ∧
       (∀ x, H 1 x = P.toFun x) ∧
       ∀ (t : ℝ), ∀ x ∉ K, H t x = B.toFun x := by
-  obtain ⟨W_half, hto, hrad, hsub, hclos⟩ := B.toWrinkledFibration.shrinkBaseHalf
+  obtain ⟨W_half, hto, hrad, hsub, hclos⟩ := B.toRegularDiskFibration.shrinkBaseHalf
   let B_half : BrokenLefschetzFibration I_M M I_B Base Fiber :=
-    { toWrinkledFibration := W_half
+    { toRegularDiskFibration := W_half
       singularities_broken_lefschetz := fun p hp ↦ by
         rw [hto] at hp ⊢
         exact B.singularities_broken_lefschetz p hp }

@@ -23,10 +23,9 @@ public import TauCeti.Geometry.Manifold.LocalDiffeomorph.Composition
 This module implements Milestone M4.1 of `S4TuringPoisson` (`S4TCdiffeo-Aug-2026.tex`, §3–4 &
 Equation (1)):
 
-Given any smooth `4`-manifold `M` admitting a positively co-oriented wrinkled (or broken Lefschetz)
-fibration `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]` `f : M → Sphere2` (with an
-**unconditional instance** for `Sphere4` supplied by `S4Fibration.lean` /
-`WrinkledGeneral4Manifold.lean`):
+Given any smooth `4`-manifold `M` admitting a positively co-oriented regular-disk fibration
+`[A : AdmitsRegularDiskFibration M]` `f : M → Sphere2` (with an **unconditional instance** for
+`Sphere4` supplied by `S4Fibration.lean` / `WrinkledGeneral4Manifold.lean`):
 
 1. **Concentric Base Radii & Smooth Pushed Cutoffs (`rCore`, `rMid`, `rInner`, `rOuter`,
    `baseDiskBump`, `alignedCutoff`)**:
@@ -48,10 +47,12 @@ fibration `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]` `f : M → Sphere2`
 3. **Adapted Unimodular Jacobian–Poisson Structure & Equation (1) (`adaptedJacobianPoisson`)**:
    - Constructs `adaptedJacobianPoisson M : PoissonStructure (𝓡 4) M` from `alignedPositiveVolume`
      and `S2VolumeForm` along `A.fibration`.
-   - Proves global unimodularity (`IsUnimodularWithVolume` and `IsUnimodularPoisson`), generic
-     rank `2` outside `criticalPoints`, rank `0` at every critical point of `f`, Casimir invariance
-     of `u ∘ f`, and **Equation (1)**: on `f ⁻¹' (baseDisk '' ball 0 rInner)` (and on the closed
-     inner preimage), `alignedVolumeForm` equals `Φ^* (p_F^* ω_F ∧ p_B^* μ_B)`.
+   - Proves global unimodularity (`IsUnimodularWithVolume` and `IsUnimodularPoisson`), rank `2`
+     outside `criticalPoints`, rank `0` at every critical point of `f`, generic rank-`2` openness
+     and density (`isGenericallyRankTwo_adaptedJacobianPoisson`) whenever
+     `[AdmitsWrinkledOrBrokenLefschetzFibration M]` holds, Casimir invariance of `u ∘ f`, and
+     **Equation (1)**: on `f ⁻¹' (baseDisk '' ball 0 rInner)` (and on the closed inner preimage),
+     `alignedVolumeForm` equals `Φ^* (p_F^* ω_F ∧ p_B^* μ_B)`.
 -/
 
 @[expose] public section
@@ -61,97 +62,13 @@ open scoped ContDiff Manifold Topology
 
 namespace S4TuringPoisson
 
-/-! ## 1. Rank Zero of Jacobian–Poisson Structures at Surface Critical Points -/
-
-section CriticalRankZero
-
-/-- At every critical point `x ∈ criticalSet I_M I_N f` of a smooth map `f : M → N` from a
-`4`-manifold `M` to a `2`-manifold `N`, the pullback `f^* μ_N` vanishes at `x`, so
-`jacobianAnchor` vanishes and `jacobianPoisson` has rank `0`. -/
-theorem rankAt_jacobianPoisson_of_mem_criticalSet
-    {E_M H_M M : Type*} [NormedAddCommGroup E_M] [NormedSpace ℝ E_M]
-    [TopologicalSpace H_M] {I_M : ModelWithCorners ℝ E_M H_M}
-    [TopologicalSpace M] [ChartedSpace H_M M] [IsManifold I_M ∞ M]
-    [hdim_M : HasFinrank E_M 4] [FiniteDimensional ℝ E_M]
-    {E_N H_N N : Type*} [NormedAddCommGroup E_N] [NormedSpace ℝ E_N]
-    [TopologicalSpace H_N] {I_N : ModelWithCorners ℝ E_N H_N}
-    [TopologicalSpace N] [ChartedSpace H_N N] [IsManifold I_N ∞ N]
-    [hdim_N : HasFinrank E_N 2] [FiniteDimensional ℝ E_N]
-    (Ω : TauCeti.SmoothForm I_M M ℝ 4) (hΩ : ∀ z : M, Ω.1 z ≠ 0)
-    (μ_N : TauCeti.SmoothForm I_N N ℝ 2) (f : M → N) (hf : ContMDiff I_M I_N ∞ f)
-    {x : M} (hcrit : x ∈ criticalSet I_M I_N f) :
-    (jacobianPoisson Ω hΩ μ_N f hf).rankAt x = 0 := by
-  let bN : Module.Basis (Fin 2) ℝ (TangentSpace I_N (f x)) :=
-    (trivializationAt E_N (TangentSpace I_N) (f x)).basisAt
-      (Module.finBasisOfFinrankEq ℝ E_N hdim_N.finrank_eq)
-      (FiberBundle.mem_baseSet_trivializationAt' (f x))
-  let L := mfderiv I_M I_N f x
-  have hdet_zero (w₀ w₁ : TangentSpace I_M x) :
-      bN.repr (L w₀) 0 * bN.repr (L w₁) 1 - bN.repr (L w₀) 1 * bN.repr (L w₁) 0 = 0 := by
-    by_contra hdet
-    apply hcrit
-    intro u
-    let a₀ := bN.repr (L w₀) 0
-    let a₁ := bN.repr (L w₀) 1
-    let c₀ := bN.repr (L w₁) 0
-    let c₁ := bN.repr (L w₁) 1
-    let p₀ := bN.repr u 0
-    let p₁ := bN.repr u 1
-    let d := a₀ * c₁ - a₁ * c₀
-    have hd : d ≠ 0 := hdet
-    let t₀ := (c₁ * p₀ - c₀ * p₁) / d
-    let t₁ := (-a₁ * p₀ + a₀ * p₁) / d
-    refine ⟨t₀ • w₀ + t₁ • w₁, ?_⟩
-    have hw₀ : L w₀ = a₀ • bN 0 + a₁ • bN 1 := by
-      conv_lhs => rw [← bN.sum_repr (L w₀), Fin.sum_univ_two]
-    have hw₁ : L w₁ = c₀ • bN 0 + c₁ • bN 1 := by
-      conv_lhs => rw [← bN.sum_repr (L w₁), Fin.sum_univ_two]
-    have hu : u = p₀ • bN 0 + p₁ • bN 1 := by
-      conv_lhs => rw [← bN.sum_repr u, Fin.sum_univ_two]
-    rw [map_add, map_smul, map_smul, hw₀, hw₁, hu, smul_add, smul_add, smul_smul, smul_smul,
-      smul_smul, smul_smul]
-    have hcoeff0 : t₀ * a₀ + t₁ * c₀ = p₀ := by
-      dsimp only [t₀, t₁]
-      rw [div_mul_eq_mul_div, div_mul_eq_mul_div, ← add_div, div_eq_iff hd]
-      dsimp only [d]
-      ring
-    have hcoeff1 : t₀ * a₁ + t₁ * c₁ = p₁ := by
-      dsimp only [t₀, t₁]
-      rw [div_mul_eq_mul_div, div_mul_eq_mul_div, ← add_div, div_eq_iff hd]
-      dsimp only [d]
-      ring
-    rw [← hcoeff0, ← hcoeff1, add_smul, add_smul]
-    abel
-  have hpul0 : (TauCeti.SmoothForm.mpullback f hf μ_N).1 x = 0 := by
-    ext w
-    rw [TauCeti.SmoothForm.mpullback_apply,
-      ContinuousAlternatingMap.apply_eq_det_mul (μ_N.1 (f x)) bN (fun i ↦ L (w i))]
-    have hdet_eq :
-        bN.det (fun i ↦ L (w i)) =
-          bN.repr (L (w 0)) 0 * bN.repr (L (w 1)) 1 -
-            bN.repr (L (w 0)) 1 * bN.repr (L (w 1)) 0 := by
-      rw [Module.Basis.det_apply, Matrix.det_fin_two]
-      simp only [Module.Basis.toMatrix_apply]
-      ring
-    rw [hdet_eq, hdet_zero (w 0) (w 1), zero_mul]
-    rfl
-  have hanch0 : (jacobianPoisson Ω hΩ μ_N f hf).anchor x = 0 := by
-    ext α : 1
-    change jacobianAnchor Ω μ_N f hf x α = 0
-    rw [jacobianAnchor_eq_subTopDualVector, hpul0,
-      ContinuousAlternatingMap.pairedWedge_zero_right, neg_zero]
-    simp [subTopDualVector]
-  simp [SmoothBivector.rankAt, hanch0]
-
-end CriticalRankZero
-
-/-! ## 2. Concentric Base Radii, Subdisks & Pushed `ContDiffBump` Cutoffs -/
+/-! ## 1. Concentric Base Radii, Subdisks & Pushed `ContDiffBump` Cutoffs -/
 
 section ConcentricBaseCutoffs
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
 
 /-- Base Euclidean disk radius `r_B > 0` of `A.fibration`. -/
 noncomputable def baseRadius : ℝ :=
@@ -457,7 +374,7 @@ theorem baseCenter_mem_baseCoreOpen :
   have heq : (⟨(A.fibration.baseCenter : Sphere2), A.fibration.baseCenter.2⟩ :
       A.fibration.baseRegion) = A.fibration.baseCenter := rfl
   rw [heq]
-  unfold WrinkledFibration.baseCenter
+  unfold RegularDiskFibration.baseCenter
   rw [A.fibration.baseDisk.symm_apply_apply]
   exact Metric.mem_ball_self (rCore_pos M)
 
@@ -685,7 +602,7 @@ section AlignedVolume
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
 
 /-- Lift a rough 4-form on an open subset `U : Opens M` to a rough 4-form on `M` by `0` outside
 `U`, aligning the fiber codomain `Bundle.Trivial M ℝ x`. -/
@@ -1109,7 +1026,7 @@ section AdaptedPoisson
 
 variable (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
   [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
-  [A : AdmitsWrinkledOrBrokenLefschetzFibration M]
+  [A : AdmitsRegularDiskFibration M]
 
 /-- Positive volume form package `(Ω, μ_Ω)` on compact `M` induced by `alignedVolumeForm M`. -/
 noncomputable def alignedPositiveVolume : PositiveVolumeForm (𝓡 4) M :=
@@ -1119,7 +1036,7 @@ noncomputable def alignedPositiveVolume : PositiveVolumeForm (𝓡 4) M :=
 theorem alignedPositiveVolume_Ω : (alignedPositiveVolume M).Ω = alignedVolumeForm M :=
   rfl
 
-/-- **Adapted Generically Rank-2 Unimodular Jacobian–Poisson Structure `π_f`** on `M`
+/-- **Adapted Unimodular Jacobian–Poisson Structure `π_f`** on `M`
 (`GSV15` Theorem 2.6, `BV21`, `S4TCdiffeo-Aug-2026.tex`, Proposition 1). -/
 noncomputable def adaptedJacobianPoisson : PoissonStructure (𝓡 4) M := by
   letI := A.instTopologicalSpaceFiber
@@ -1218,6 +1135,50 @@ theorem isCasimir_comp_adaptedJacobianPoisson (u : C^∞⟮𝓡 2, Sphere2; ℝ�
   exact isCasimir_comp_jacobianPoisson (alignedPositiveVolume M).Ω
     (alignedPositiveVolume M).Ω_ne_zero S2VolumeForm A.fibration A.fibration.contMDiff_toFun u
 
+/-- `adaptedJacobianPoisson M` is generically rank `2` if and only if the regular locus
+`{x : M | x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration}` is dense in `M`. -/
+-- tier: T2
+theorem isGenericallyRankTwo_adaptedJacobianPoisson_iff :
+    letI := A.instTopologicalSpaceFiber
+    letI := A.instChartedSpaceFiber
+    letI := A.instIsManifoldFiber
+    letI := A.instT2SpaceFiber
+    letI := A.instCompactSpaceFiber
+    letI := A.instNonemptyFiber
+    (adaptedJacobianPoisson M).IsGenericallyRankTwo ↔
+      Dense {x : M | x ∉ criticalPoints (𝓡 4) (𝓡 2) A.fibration} := by
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  exact isGenericallyRankTwo_jacobianPoissonOfPositiveVolume_iff (alignedPositiveVolume M)
+    S2VolumeForm S2VolumeForm_ne_zero A.fibration A.fibration.contMDiff_toFun
+
 end AdaptedPoisson
+
+section WrinkledGenericRankTwo
+
+/-- **Generic Rank-`2` Density Theorem (`SC-R2`)**: on every compact smooth 4-manifold `M`
+admitting `[A : AdmitsWrinkledOrBrokenLefschetzFibration M]`, the adapted unimodular
+Jacobian–Poisson structure `adaptedJacobianPoisson M` satisfies `IsGenericallyRankTwo` (its rank-`2`
+symplectic locus is both open and dense in `M`). -/
+-- tier: T1
+theorem isGenericallyRankTwo_adaptedJacobianPoisson
+    (M : Type*) [TopologicalSpace M] [ChartedSpace (EuclideanSpace ℝ (Fin 4)) M]
+    [IsManifold (𝓡 4) ∞ M] [MeasurableSpace M] [BorelSpace M] [CompactSpace M]
+    [A : AdmitsWrinkledOrBrokenLefschetzFibration M] :
+    (adaptedJacobianPoisson M).IsGenericallyRankTwo := by
+  let _ := A.instTopologicalSpaceFiber
+  let _ := A.instChartedSpaceFiber
+  let _ := A.instIsManifoldFiber
+  let _ := A.instT2SpaceFiber
+  let _ := A.instCompactSpaceFiber
+  let _ := A.instNonemptyFiber
+  exact (isGenericallyRankTwo_adaptedJacobianPoisson_iff M).mpr
+    (AdmitsWrinkledOrBrokenLefschetzFibration.dense_regularPoints M)
+
+end WrinkledGenericRankTwo
 
 end S4TuringPoisson
