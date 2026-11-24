@@ -45,8 +45,9 @@ This module formalizes Milestone B1 (`S4TuringPoisson/Dynamics/Reversible/Bennet
      Milestone B3 (`UniversalReversibleSimulator`).
    - Walking lemmas (`seekHistLeft`, `seekHistRight`, `seekWorkLeft`, `seekWorkRight`), active
      macro-step `bennett_macroStep`, terminal step `bennett_haltStep`, full-tape halting equivalence
-     `bennett_orbit_halted_full`, and windowed halting equivalence `bennett_orbit_halted_iff`
-     (all **UNCONDITIONAL**).
+     `bennett_orbit_halted_full`, windowed halting equivalence `bennett_orbit_halted_iff`, and
+     infinite non-repeating forward orbits `bennettReversibleTM_iterate_step_initCfg_ne` /
+     `bennettReversibleTM_orbit_initCfg_injective` (all **UNCONDITIONAL**).
 
 4. **Gate G5 Concrete Anti-Vacuity Witnesses**:
    - `bennettReversibleTM_eval_bijective`, concrete 4-branch halting witness `bennettToyHalt`, and
@@ -2308,6 +2309,688 @@ theorem bennett_orbit_halted_iff (M : FinTM0) (t : FinSupportedTape M)
   · rintro ⟨c, hreach, hterm, hwin⟩
     obtain ⟨n, _, rel, hq, hsym⟩ := hfwd hreach hterm
     exact ⟨n, c.q, rel, hq, fun i ↦ (hsym i.1).trans (hwin i)⟩
+
+/-! ### Infinite Non-Repeating Forward Orbits from `bennettInitCfg` -/
+
+/-- Local boolean tape invariant shared by all stationary/walking active phases of
+`bennettReversibleTM M` when the physical head sits at `pos`, work head at `posW`, and history
+cursor at `posH`. -/
+private structure ActiveTapeInv (M : FinTM0) (pos posW posH : ℤ)
+    (T : Tape (BennettCell M)) : Prop where
+  workHead_eq : ∀ i : ℤ, (T.nth i).workHead = decide (pos + i = posW)
+  histHead_eq : ∀ i : ℤ, (T.nth i).histHead = decide (pos + i = posH)
+  hist_none_lt : ∀ i : ℤ, pos + i < posH → (T.nth i).hist = none
+  haltMark_false : ∀ i : ℤ, (T.nth i).haltMark = false
+
+private theorem activeTapeInv_initTape (M : FinTM0) (t : FinSupportedTape M) :
+    ActiveTapeInv M 0 0 0 (bennettInitTape M t) where
+  workHead_eq i := by simpa using (bennettInv_initCfg M t).workHead_eq i
+  histHead_eq i := (bennettInv_initCfg M t).histHead_eq i
+  hist_none_lt := (bennettInv_initCfg M t).hist_none_lt
+  haltMark_false := (bennettInv_initCfg M t).haltMark_false
+
+private theorem ActiveTapeInv.write_sym {M : FinTM0} {pos posW posH : ℤ}
+    {T : Tape (BennettCell M)} (h : ActiveTapeInv M pos posW posH T) (b : M.Γ) :
+    ActiveTapeInv M pos posW posH (T.write { T.head with sym := b }) where
+  workHead_eq i := by
+    by_cases hi : i = 0
+    · subst hi; simpa using h.workHead_eq 0
+    · simp [Tape.write_nth, hi, h.workHead_eq i]
+  histHead_eq i := by
+    by_cases hi : i = 0
+    · subst hi; simpa using h.histHead_eq 0
+    · simp [Tape.write_nth, hi, h.histHead_eq i]
+  hist_none_lt i hlt := by
+    by_cases hi : i = 0
+    · subst hi; simpa using h.hist_none_lt 0 hlt
+    · simp [Tape.write_nth, hi, h.hist_none_lt i hlt]
+  haltMark_false i := by
+    by_cases hi : i = 0
+    · subst hi; simpa using h.haltMark_false 0
+    · simp [Tape.write_nth, hi, h.haltMark_false i]
+
+private theorem ActiveTapeInv.move_left {M : FinTM0} {pos posW posH : ℤ}
+    {T : Tape (BennettCell M)} (h : ActiveTapeInv M pos posW posH T) :
+    ActiveTapeInv M (pos - 1) posW posH (T.move Dir.left) where
+  workHead_eq i := by
+    rw [Tape.move_left_nth, h.workHead_eq (i - 1)]
+    exact decide_eq_decide.mpr (by omega)
+  histHead_eq i := by
+    rw [Tape.move_left_nth, h.histHead_eq (i - 1)]
+    exact decide_eq_decide.mpr (by omega)
+  hist_none_lt i hlt := by
+    rw [Tape.move_left_nth]
+    exact h.hist_none_lt (i - 1) (by omega)
+  haltMark_false i := by
+    rw [Tape.move_left_nth]
+    exact h.haltMark_false (i - 1)
+
+private theorem ActiveTapeInv.move_right {M : FinTM0} {pos posW posH : ℤ}
+    {T : Tape (BennettCell M)} (h : ActiveTapeInv M pos posW posH T) :
+    ActiveTapeInv M (pos + 1) posW posH (T.move Dir.right) where
+  workHead_eq i := by
+    rw [Tape.move_right_nth, h.workHead_eq (i + 1)]
+    exact decide_eq_decide.mpr (by omega)
+  histHead_eq i := by
+    rw [Tape.move_right_nth, h.histHead_eq (i + 1)]
+    exact decide_eq_decide.mpr (by omega)
+  hist_none_lt i hlt := by
+    rw [Tape.move_right_nth]
+    exact h.hist_none_lt (i + 1) (by omega)
+  haltMark_false i := by
+    rw [Tape.move_right_nth]
+    exact h.haltMark_false (i + 1)
+
+/-- Single-step forward invariant certifying that every state along the forward trajectory of
+`bennettInitCfg M t` takes a defined `bennettRule M` transition (`isSome = true`). -/
+private def ValidTrajectoryCfg (M : FinTM0) (c : (bennettReversibleTM M).Cfg) : Prop :=
+  match c.q with
+  | .exec _ rel =>
+    ∃ posW posH, ActiveTapeInv M posW posW posH c.Tape ∧ rel = compare posW posH
+  | .halted _ _ =>
+    c.Tape.head.workHead = true ∧ c.Tape.head.haltMark = false ∧
+      ∀ j : ℕ, (c.Tape.nth ((j : ℤ) + 1)).workHead = false ∧
+        (c.Tape.nth ((j : ℤ) + 1)).haltMark = false
+  | .haltRun _ _ =>
+    ∀ j : ℕ, (c.Tape.nth (j : ℤ)).workHead = false ∧ (c.Tape.nth (j : ℤ)).haltMark = false
+  | .moveWorkLeft e rMid =>
+    ∃ pos posH q', M.machine e.1 e.2 = some (q', .move .left) ∧
+      (∀ i : ℤ, (c.Tape.nth i).workHead = false) ∧
+      (∀ i : ℤ, (c.Tape.nth i).histHead = decide (pos + i = posH)) ∧
+      (∀ i : ℤ, pos + i < posH → (c.Tape.nth i).hist = none) ∧
+      (∀ i : ℤ, (c.Tape.nth i).haltMark = false) ∧
+      ((rMid = .gt ∧ posH ≤ pos) ∨ (rMid = .lt ∧ pos < posH))
+  | .moveWorkRight e rMid =>
+    ∃ pos posH q', M.machine e.1 e.2 = some (q', .move .right) ∧
+      (∀ i : ℤ, (c.Tape.nth i).workHead = false) ∧
+      (∀ i : ℤ, (c.Tape.nth i).histHead = decide (pos + i = posH)) ∧
+      (∀ i : ℤ, pos + i < posH → (c.Tape.nth i).hist = none) ∧
+      (∀ i : ℤ, (c.Tape.nth i).haltMark = false) ∧
+      ((rMid = .lt ∧ pos ≤ posH) ∨ (rMid = .gt ∧ posH < pos))
+  | .afterExec e rel =>
+    ∃ posW posH, ActiveTapeInv M posW posW posH c.Tape ∧ rel = compare posW posH ∧
+      (M.machine e.1 e.2).isSome = true
+  | .seekHistLeft e =>
+    ∃ pos posW posH, ActiveTapeInv M pos posW posH c.Tape ∧ posH ≤ pos ∧ pos < posW ∧
+      (M.machine e.1 e.2).isSome = true
+  | .seekHistRight e =>
+    ∃ pos posW posH, ActiveTapeInv M pos posW posH c.Tape ∧ posW < pos ∧ pos ≤ posH ∧
+      (M.machine e.1 e.2).isSome = true
+  | .atHist e r =>
+    ∃ posW posH, ActiveTapeInv M posH posW posH c.Tape ∧ r = compare posW posH ∧
+      (M.machine e.1 e.2).isSome = true
+  | .stepHistLeft e rMid =>
+    ∃ pos posW, (M.machine e.1 e.2).isSome = true ∧
+      (∀ i : ℤ, (c.Tape.nth i).histHead = false) ∧
+      (∀ i : ℤ, (c.Tape.nth i).workHead = decide (pos + i = posW)) ∧
+      (∀ i : ℤ, i ≤ 0 → (c.Tape.nth i).hist = none) ∧
+      (∀ i : ℤ, (c.Tape.nth i).haltMark = false) ∧
+      ((rMid = .lt ∧ posW ≤ pos) ∨ (rMid = .gt ∧ pos < posW))
+  | .startReturn _ rRet =>
+    ∃ posW posH, ActiveTapeInv M posH posW posH c.Tape ∧ rRet = compare posW posH
+  | .seekWorkLeft _ =>
+    ∃ pos posW posH, ActiveTapeInv M pos posW posH c.Tape ∧ posW ≤ pos ∧ pos < posH
+  | .seekWorkRight _ =>
+    ∃ pos posW posH, ActiveTapeInv M pos posW posH c.Tape ∧ posH < pos ∧ pos ≤ posW
+
+private theorem validTrajectoryCfg_step (M : FinTM0) {c : (bennettReversibleTM M).Cfg}
+    (hv : ValidTrajectoryCfg M c) :
+    (bennettRule M (c.q, c.Tape.head)).isSome = true ∧
+    ValidTrajectoryCfg M ((bennettReversibleTM M).step c) := by
+  rcases c with ⟨q, T⟩
+  cases q with
+  | exec q₀ rel =>
+    obtain ⟨posW, posH, hT, rfl⟩ := hv
+    have hwh0 : T.head.workHead = true := by simpa using hT.workHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    have hhh0 : T.head.histHead = decide (posW = posH) := by simpa using hT.histHead_eq 0
+    have hguard : (T.head.workHead && !T.head.haltMark &&
+        (T.head.histHead == (compare posW posH == .eq))) = true := by
+      rw [hwh0, hhm0, hhh0]
+      simpa using decide_eq_beq_compare_eq posW posH
+    rcases hm : M.machine q₀ T.head.sym with _ | ⟨q', (_ | _) | b⟩
+    · have hr : bennettRule M (.exec q₀ (compare posW posH), T.head) =
+          some (.halted q₀ (compare posW posH), T.head) := by
+        dsimp only [bennettRule]; rw [hguard]; simp [hm]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_halted, bennettTape_write_head]
+      refine ⟨hwh0, hhm0, fun j ↦ ?_⟩
+      have hne : posW + ((j : ℤ) + 1) ≠ posW := by omega
+      exact ⟨by simpa [hne] using hT.workHead_eq ((j : ℤ) + 1), hT.haltMark_false ((j : ℤ) + 1)⟩
+    · let rMid : Ordering := match compare posW posH with | .gt => .gt | _ => .lt
+      have hr : bennettRule M (.exec q₀ (compare posW posH), T.head) =
+          some (.moveWorkLeft (q₀, T.head.sym) rMid, { T.head with workHead := false }) := by
+        dsimp only [bennettRule]; rw [hguard]; simp only [↓reduceIte, hm]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_moveWorkLeft]
+      refine ⟨posW - 1, posH, q', hm, fun i ↦ ?_, fun i ↦ ?_, fun i hlt ↦ ?_, fun i ↦ ?_, ?_⟩
+      · rw [Tape.move_left_nth, Tape.write_nth]
+        split_ifs with h0
+        · rfl
+        · have hne : posW + (i - 1) ≠ posW := by omega
+          simpa [hne] using hT.workHead_eq (i - 1)
+      · rw [Tape.move_left_nth, Tape.write_nth]
+        have heq_p : (posW - 1 + i = posH) ↔ (posW + (i - 1) = posH) := by omega
+        rw [decide_eq_decide.mpr heq_p]
+        split_ifs with h0
+        · have hi : i = 1 := by omega
+          subst hi; simpa using hT.histHead_eq 0
+        · exact hT.histHead_eq (i - 1)
+      · rw [Tape.move_left_nth, Tape.write_nth]
+        split_ifs with h0
+        · have hi : i = 1 := by omega
+          subst hi; simpa using hT.hist_none_lt 0 (by omega)
+        · exact hT.hist_none_lt (i - 1) (by omega)
+      · rw [Tape.move_left_nth, Tape.write_nth]
+        split_ifs with h0
+        · exact hT.haltMark_false 0
+        · exact hT.haltMark_false (i - 1)
+      · dsimp only [rMid]
+        rcases lt_trichotomy posW posH with hlt | rfl | hgt
+        · rw [compare_lt_iff_lt.mpr hlt]; exact Or.inr ⟨rfl, by omega⟩
+        · rw [compare_eq_iff_eq.mpr rfl]; exact Or.inr ⟨rfl, by omega⟩
+        · rw [compare_gt_iff_gt.mpr hgt]; exact Or.inl ⟨rfl, by omega⟩
+    · let rMid : Ordering := match compare posW posH with | .lt => .lt | _ => .gt
+      have hr : bennettRule M (.exec q₀ (compare posW posH), T.head) =
+          some (.moveWorkRight (q₀, T.head.sym) rMid, { T.head with workHead := false }) := by
+        dsimp only [bennettRule]; rw [hguard]; simp only [↓reduceIte, hm]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_moveWorkRight]
+      refine ⟨posW + 1, posH, q', hm, fun i ↦ ?_, fun i ↦ ?_, fun i hlt ↦ ?_, fun i ↦ ?_, ?_⟩
+      · rw [Tape.move_right_nth, Tape.write_nth]
+        split_ifs with h0
+        · rfl
+        · have hne : posW + (i + 1) ≠ posW := by omega
+          simpa [hne] using hT.workHead_eq (i + 1)
+      · rw [Tape.move_right_nth, Tape.write_nth]
+        have heq_p : (posW + 1 + i = posH) ↔ (posW + (i + 1) = posH) := by omega
+        rw [decide_eq_decide.mpr heq_p]
+        split_ifs with h0
+        · have hi : i = -1 := by omega
+          subst hi; simpa using hT.histHead_eq 0
+        · exact hT.histHead_eq (i + 1)
+      · rw [Tape.move_right_nth, Tape.write_nth]
+        split_ifs with h0
+        · have hi : i = -1 := by omega
+          subst hi; simpa using hT.hist_none_lt 0 (by omega)
+        · exact hT.hist_none_lt (i + 1) (by omega)
+      · rw [Tape.move_right_nth, Tape.write_nth]
+        split_ifs with h0
+        · exact hT.haltMark_false 0
+        · exact hT.haltMark_false (i + 1)
+      · dsimp only [rMid]
+        rcases lt_trichotomy posW posH with hlt | rfl | hgt
+        · rw [compare_lt_iff_lt.mpr hlt]; exact Or.inl ⟨rfl, by omega⟩
+        · rw [compare_eq_iff_eq.mpr rfl]; exact Or.inr ⟨rfl, by omega⟩
+        · rw [compare_gt_iff_gt.mpr hgt]; exact Or.inr ⟨rfl, by omega⟩
+    · have hr : bennettRule M (.exec q₀ (compare posW posH), T.head) =
+          some (.afterExec (q₀, T.head.sym) (compare posW posH), { T.head with sym := b }) := by
+        dsimp only [bennettRule]; rw [hguard]; simp [hm]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_afterExec]
+      exact ⟨posW, posH, hT.write_sym b, rfl, by simp [hm]⟩
+  | halted q₀ rel =>
+    dsimp only [ValidTrajectoryCfg] at hv
+    obtain ⟨hwh0, hhm0, hrest⟩ := hv
+    have hr : bennettRule M (.halted q₀ rel, T.head) =
+        some (.haltRun q₀ rel, { T.head with haltMark := true }) := by
+      simp [bennettRule, hwh0, hhm0]
+    refine ⟨by simp [hr], ?_⟩
+    rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_haltRun]
+    intro j
+    have hne : (j : ℤ) + 1 ≠ 0 := by omega
+    have hnth : (((T.write { T.head with haltMark := true }).move Dir.right).nth (j : ℤ)) =
+        T.nth ((j : ℤ) + 1) := by
+      simp [Tape.move_right_nth, Tape.write_nth, hne]
+    dsimp only [ValidTrajectoryCfg]
+    rw [hnth]
+    exact hrest j
+  | haltRun q₀ rel =>
+    dsimp only [ValidTrajectoryCfg] at hv
+    obtain ⟨hwh0, hhm0⟩ := hv 0
+    have hwh0' : T.head.workHead = false := by simpa using hwh0
+    have hhm0' : T.head.haltMark = false := by simpa using hhm0
+    have hr : bennettRule M (.haltRun q₀ rel, T.head) =
+        some (.haltRun q₀ rel, { T.head with haltMark := true }) := by
+      simp [bennettRule, hwh0', hhm0']
+    refine ⟨by simp [hr], ?_⟩
+    rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_haltRun]
+    intro j
+    have hne : (j : ℤ) + 1 ≠ 0 := by omega
+    have hcast : ((j + 1 : ℕ) : ℤ) = (j : ℤ) + 1 := by push_cast; ring
+    have hnth : (((T.write { T.head with haltMark := true }).move Dir.right).nth (j : ℤ)) =
+        T.nth ((j + 1 : ℕ) : ℤ) := by
+      rw [hcast]
+      simp [Tape.move_right_nth, Tape.write_nth, hne]
+    dsimp only [ValidTrajectoryCfg]
+    rw [hnth]
+    exact hv (j + 1)
+  | moveWorkLeft e rMid =>
+    obtain ⟨pos, posH, q', hm, hwh, hhh, hhist, hhm, hcases⟩ := hv
+    have hwh0 : T.head.workHead = false := hwh 0
+    have hhm0 : T.head.haltMark = false := hhm 0
+    have hT_next : ActiveTapeInv M pos pos posH (T.write { T.head with workHead := true }) :=
+      { workHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simp
+          · have hne : pos + i ≠ pos := by omega
+            simp [Tape.write_nth, hi, hne, hwh i]
+        histHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simpa using hhh 0
+          · simp [Tape.write_nth, hi, hhh i]
+        hist_none_lt := fun i hlt ↦ by
+          by_cases hi : i = 0
+          · subst hi; simpa using hhist 0 hlt
+          · simp [Tape.write_nth, hi, hhist i hlt]
+        haltMark_false := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; exact hhm 0
+          · simp [Tape.write_nth, hi, hhm i] }
+    rcases hcases with ⟨rfl, hle⟩ | ⟨rfl, hlt⟩
+    · let rel' : Ordering := if T.head.histHead then .eq else .gt
+      have hr : bennettRule M (.moveWorkLeft e .gt, T.head) =
+          some (.afterExec e rel', { T.head with workHead := true }) := by
+        simp [bennettRule, hwh0, hhm0, hm, rel']
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_afterExec]
+      have hrel' : rel' = compare pos posH := by
+        have hhh0 : T.head.histHead = decide (pos = posH) := by simpa using hhh 0
+        dsimp [rel']; rw [hhh0]
+        by_cases heq : pos = posH
+        · simp [heq]
+        · have hgt : posH < pos := by omega
+          simp [heq, compare_gt_iff_gt.mpr hgt]
+      exact ⟨pos, posH, hT_next, hrel', by simp [hm]⟩
+    · have hhh0 : T.head.histHead = false := by
+        have hne : pos ≠ posH := by omega
+        simpa [hne] using hhh 0
+      have hr : bennettRule M (.moveWorkLeft e .lt, T.head) =
+          some (.afterExec e .lt, { T.head with workHead := true }) := by
+        simp [bennettRule, hwh0, hhm0, hm, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_afterExec]
+      exact ⟨pos, posH, hT_next, (compare_lt_iff_lt.mpr hlt).symm, by simp [hm]⟩
+  | moveWorkRight e rMid =>
+    obtain ⟨pos, posH, q', hm, hwh, hhh, hhist, hhm, hcases⟩ := hv
+    have hwh0 : T.head.workHead = false := hwh 0
+    have hhm0 : T.head.haltMark = false := hhm 0
+    have hT_next : ActiveTapeInv M pos pos posH (T.write { T.head with workHead := true }) :=
+      { workHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simp
+          · have hne : pos + i ≠ pos := by omega
+            simp [Tape.write_nth, hi, hne, hwh i]
+        histHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simpa using hhh 0
+          · simp [Tape.write_nth, hi, hhh i]
+        hist_none_lt := fun i hlt ↦ by
+          by_cases hi : i = 0
+          · subst hi; simpa using hhist 0 hlt
+          · simp [Tape.write_nth, hi, hhist i hlt]
+        haltMark_false := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; exact hhm 0
+          · simp [Tape.write_nth, hi, hhm i] }
+    rcases hcases with ⟨rfl, hle⟩ | ⟨rfl, hgt⟩
+    · let rel' : Ordering := if T.head.histHead then .eq else .lt
+      have hr : bennettRule M (.moveWorkRight e .lt, T.head) =
+          some (.afterExec e rel', { T.head with workHead := true }) := by
+        simp [bennettRule, hwh0, hhm0, hm, rel']
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_afterExec]
+      have hrel' : rel' = compare pos posH := by
+        have hhh0 : T.head.histHead = decide (pos = posH) := by simpa using hhh 0
+        dsimp [rel']; rw [hhh0]
+        by_cases heq : pos = posH
+        · simp [heq]
+        · have hlt : pos < posH := by omega
+          simp [heq, compare_lt_iff_lt.mpr hlt]
+      exact ⟨pos, posH, hT_next, hrel', by simp [hm]⟩
+    · have hhh0 : T.head.histHead = false := by
+        have hne : pos ≠ posH := by omega
+        simpa [hne] using hhh 0
+      have hr : bennettRule M (.moveWorkRight e .gt, T.head) =
+          some (.afterExec e .gt, { T.head with workHead := true }) := by
+        simp [bennettRule, hwh0, hhm0, hm, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_afterExec]
+      exact ⟨pos, posH, hT_next, (compare_gt_iff_gt.mpr hgt).symm, by simp [hm]⟩
+  | afterExec e rel =>
+    obtain ⟨posW, posH, hT, rfl, he⟩ := hv
+    have hwh0 : T.head.workHead = true := by simpa using hT.workHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    have hhh0 : T.head.histHead = decide (posW = posH) := by simpa using hT.histHead_eq 0
+    have hguard : (T.head.workHead && !T.head.haltMark &&
+        (T.head.histHead == (compare posW posH == .eq)) && (M.machine e.1 e.2).isSome) = true := by
+      rw [hwh0, hhm0, hhh0, he]
+      simpa using decide_eq_beq_compare_eq posW posH
+    rcases lt_trichotomy posW posH with hlt | rfl | hgt
+    · have hc : compare posW posH = .lt := compare_lt_iff_lt.mpr hlt
+      have hr : bennettRule M (.afterExec e (compare posW posH), T.head) =
+          some (.seekHistRight e, T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekHistRight,
+        bennettTape_write_head]
+      exact ⟨posW + 1, posW, posH, hT.move_right, by omega, by omega, he⟩
+    · have hc : compare posW posW = .eq := compare_eq_iff_eq.mpr rfl
+      have hr : bennettRule M (.afterExec e (compare posW posW), T.head) =
+          some (.atHist e .eq, T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by dsimp only; rw [hr]; rfl, ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_atHist, bennettTape_write_head]
+      exact ⟨posW, posW, hT, hc.symm, he⟩
+    · have hc : compare posW posH = .gt := compare_gt_iff_gt.mpr hgt
+      have hr : bennettRule M (.afterExec e (compare posW posH), T.head) =
+          some (.seekHistLeft e, T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekHistLeft,
+        bennettTape_write_head]
+      exact ⟨posW - 1, posW, posH, hT.move_left, by omega, by omega, he⟩
+  | seekHistLeft e =>
+    obtain ⟨pos, posW, posH, hT, hle, hlt, he⟩ := hv
+    have hwh0 : T.head.workHead = false := by
+      have hne : pos ≠ posW := by omega
+      simpa [hne] using hT.workHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    by_cases hp : pos = posH
+    · subst hp
+      have hhh0 : T.head.histHead = true := by simpa using hT.histHead_eq 0
+      have hr : bennettRule M (.seekHistLeft e, T.head) = some (.atHist e .gt, T.head) := by
+        simp [bennettRule, hwh0, hhm0, he, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_atHist, bennettTape_write_head]
+      exact ⟨posW, pos, hT, (compare_gt_iff_gt.mpr hlt).symm, he⟩
+    · have hhh0 : T.head.histHead = false := by
+        simpa [hp] using hT.histHead_eq 0
+      have hr : bennettRule M (.seekHistLeft e, T.head) = some (.seekHistLeft e, T.head) := by
+        simp [bennettRule, hwh0, hhm0, he, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekHistLeft,
+        bennettTape_write_head]
+      exact ⟨pos - 1, posW, posH, hT.move_left, by omega, by omega, he⟩
+  | seekHistRight e =>
+    obtain ⟨pos, posW, posH, hT, hlt, hle, he⟩ := hv
+    have hwh0 : T.head.workHead = false := by
+      have hne : pos ≠ posW := by omega
+      simpa [hne] using hT.workHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    by_cases hp : pos = posH
+    · subst hp
+      have hhh0 : T.head.histHead = true := by simpa using hT.histHead_eq 0
+      have hr : bennettRule M (.seekHistRight e, T.head) = some (.atHist e .lt, T.head) := by
+        simp [bennettRule, hwh0, hhm0, he, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_atHist, bennettTape_write_head]
+      exact ⟨posW, pos, hT, (compare_lt_iff_lt.mpr hlt).symm, he⟩
+    · have hhh0 : T.head.histHead = false := by
+        simpa [hp] using hT.histHead_eq 0
+      have hr : bennettRule M (.seekHistRight e, T.head) = some (.seekHistRight e, T.head) := by
+        simp [bennettRule, hwh0, hhm0, he, hhh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekHistRight,
+        bennettTape_write_head]
+      exact ⟨pos + 1, posW, posH, hT.move_right, by omega, by omega, he⟩
+  | atHist e r =>
+    obtain ⟨posW, posH, hT, rfl, he⟩ := hv
+    have hhh0 : T.head.histHead = true := by simpa using hT.histHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    have hwh0 : T.head.workHead = decide (posW = posH) := by
+      have h0 := hT.workHead_eq 0
+      simp only [add_zero] at h0
+      exact h0.trans (decide_eq_decide.mpr eq_comm)
+    have hguard : (T.head.histHead && !T.head.haltMark &&
+        (T.head.workHead == (compare posW posH == .eq)) && (M.machine e.1 e.2).isSome) = true := by
+      rw [hhh0, hhm0, hwh0, he]
+      simpa using decide_eq_beq_compare_eq posW posH
+    let rMid : Ordering := match compare posW posH with | .lt => .lt | _ => .gt
+    have hr : bennettRule M (.atHist e (compare posW posH), T.head) =
+        some (.stepHistLeft e rMid, { T.head with histHead := false }) := by
+      dsimp only [bennettRule]; rw [hguard]; rfl
+    refine ⟨by simp [hr], ?_⟩
+    rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_stepHistLeft]
+    refine ⟨posH - 1, posW, he, fun i ↦ ?_, fun i ↦ ?_, fun i hi ↦ ?_, fun i ↦ ?_, ?_⟩
+    · rw [Tape.move_left_nth, Tape.write_nth]
+      split_ifs with h0
+      · rfl
+      · have hne : posH + (i - 1) ≠ posH := by omega
+        simpa [hne] using hT.histHead_eq (i - 1)
+    · rw [Tape.move_left_nth, Tape.write_nth]
+      have heq_p : (posH - 1 + i = posW) ↔ (posH + (i - 1) = posW) := by omega
+      rw [decide_eq_decide.mpr heq_p]
+      split_ifs with h0
+      · have hi1 : i = 1 := by omega
+        subst hi1; simpa using hT.workHead_eq 0
+      · exact hT.workHead_eq (i - 1)
+    · rw [Tape.move_left_nth, Tape.write_nth]
+      have hne : i - 1 ≠ 0 := by omega
+      simp only [hne, ↓reduceIte]
+      exact hT.hist_none_lt (i - 1) (by omega)
+    · rw [Tape.move_left_nth, Tape.write_nth]
+      split_ifs with h0
+      · exact hT.haltMark_false 0
+      · exact hT.haltMark_false (i - 1)
+    · dsimp only [rMid]
+      rcases lt_trichotomy posW posH with hlt | rfl | hgt
+      · rw [compare_lt_iff_lt.mpr hlt]; exact Or.inl ⟨rfl, by omega⟩
+      · rw [compare_eq_iff_eq.mpr rfl]; exact Or.inr ⟨rfl, by omega⟩
+      · rw [compare_gt_iff_gt.mpr hgt]; exact Or.inr ⟨rfl, by omega⟩
+  | stepHistLeft e rMid =>
+    obtain ⟨pos, posW, he, hhh, hwh, hhist, hhm, hcases⟩ := hv
+    obtain ⟨⟨q', stmt⟩, hm⟩ := Option.isSome_iff_exists.mp he
+    have hhist0 : T.head.hist = none := hhist 0 le_rfl
+    have hhh0 : T.head.histHead = false := hhh 0
+    have hhm0 : T.head.haltMark = false := hhm 0
+    have hT_next : ActiveTapeInv M pos posW pos
+        (T.write { T.head with hist := some e, histHead := true }) :=
+      { workHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simpa using hwh 0
+          · simp [Tape.write_nth, hi, hwh i]
+        histHead_eq := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; simp
+          · have hne : pos + i ≠ pos := by omega
+            simp [Tape.write_nth, hi, hne, hhh i]
+        hist_none_lt := fun i hlt ↦ by
+          have hi0 : i ≠ 0 := by omega
+          simp only [Tape.write_nth, hi0, ↓reduceIte]
+          exact hhist i (by omega)
+        haltMark_false := fun i ↦ by
+          by_cases hi : i = 0
+          · subst hi; exact hhm 0
+          · simp [Tape.write_nth, hi, hhm i] }
+    rcases hcases with ⟨rfl, hle⟩ | ⟨rfl, hlt⟩
+    · let rRet : Ordering := if T.head.workHead then .eq else .lt
+      have hr : bennettRule M (.stepHistLeft e .lt, T.head) =
+          some (.startReturn q' rRet, { T.head with hist := some e, histHead := true }) := by
+        simp [bennettRule, hhist0, hhh0, hhm0, hm, rRet]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_startReturn]
+      have hrRet : rRet = compare posW pos := by
+        have hwh0 : T.head.workHead = decide (pos = posW) := by simpa using hwh 0
+        dsimp [rRet]; rw [hwh0]
+        by_cases heq : pos = posW
+        · simp [heq]
+        · have hlt' : posW < pos := by omega
+          simp [heq, compare_lt_iff_lt.mpr hlt']
+      exact ⟨posW, pos, hT_next, hrRet⟩
+    · have hwh0 : T.head.workHead = false := by
+        have hne : pos ≠ posW := by omega
+        simpa [hne] using hwh 0
+      have hr : bennettRule M (.stepHistLeft e .gt, T.head) =
+          some (.startReturn q' .gt, { T.head with hist := some e, histHead := true }) := by
+        simp [bennettRule, hhist0, hhh0, hhm0, hm, hwh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_startReturn]
+      exact ⟨posW, pos, hT_next, (compare_gt_iff_gt.mpr hlt).symm⟩
+  | startReturn q' rRet =>
+    obtain ⟨posW, posH, hT, rfl⟩ := hv
+    have hhh0 : T.head.histHead = true := by simpa using hT.histHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    have hwh0 : T.head.workHead = decide (posW = posH) := by
+      have h0 := hT.workHead_eq 0
+      simp only [add_zero] at h0
+      exact h0.trans (decide_eq_decide.mpr eq_comm)
+    have hguard : (T.head.histHead && !T.head.haltMark &&
+        (T.head.workHead == (compare posW posH == .eq))) = true := by
+      rw [hhh0, hhm0, hwh0]
+      simpa using decide_eq_beq_compare_eq posW posH
+    rcases lt_trichotomy posW posH with hlt | rfl | hgt
+    · have hc : compare posW posH = .lt := compare_lt_iff_lt.mpr hlt
+      have hr : bennettRule M (.startReturn q' (compare posW posH), T.head) =
+          some (.seekWorkLeft q', T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekWorkLeft,
+        bennettTape_write_head]
+      exact ⟨posH - 1, posW, posH, hT.move_left, by omega, by omega⟩
+    · have hc : compare posW posW = .eq := compare_eq_iff_eq.mpr rfl
+      have hr : bennettRule M (.startReturn q' (compare posW posW), T.head) =
+          some (.exec q' .eq, T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by dsimp only; rw [hr]; rfl, ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_exec, bennettTape_write_head]
+      exact ⟨posW, posW, hT, hc.symm⟩
+    · have hc : compare posW posH = .gt := compare_gt_iff_gt.mpr hgt
+      have hr : bennettRule M (.startReturn q' (compare posW posH), T.head) =
+          some (.seekWorkRight q', T.head) := by
+        dsimp only [bennettRule]; rw [hguard, hc]; rfl
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekWorkRight,
+        bennettTape_write_head]
+      exact ⟨posH + 1, posW, posH, hT.move_right, by omega, by omega⟩
+  | seekWorkLeft q' =>
+    obtain ⟨pos, posW, posH, hT, hle, hlt⟩ := hv
+    have hhh0 : T.head.histHead = false := by
+      have hne : pos ≠ posH := by omega
+      simpa [hne] using hT.histHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    by_cases hp : pos = posW
+    · subst hp
+      have hwh0 : T.head.workHead = true := by simpa using hT.workHead_eq 0
+      have hr : bennettRule M (.seekWorkLeft q', T.head) = some (.exec q' .lt, T.head) := by
+        simp [bennettRule, hhh0, hhm0, hwh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_exec, bennettTape_write_head]
+      exact ⟨pos, posH, hT, (compare_lt_iff_lt.mpr hlt).symm⟩
+    · have hwh0 : T.head.workHead = false := by
+        simpa [hp] using hT.workHead_eq 0
+      have hr : bennettRule M (.seekWorkLeft q', T.head) = some (.seekWorkLeft q', T.head) := by
+        simp [bennettRule, hhh0, hhm0, hwh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekWorkLeft,
+        bennettTape_write_head]
+      exact ⟨pos - 1, posW, posH, hT.move_left, by omega, by omega⟩
+  | seekWorkRight q' =>
+    obtain ⟨pos, posW, posH, hT, hlt, hle⟩ := hv
+    have hhh0 : T.head.histHead = false := by
+      have hne : pos ≠ posH := by omega
+      simpa [hne] using hT.histHead_eq 0
+    have hhm0 : T.head.haltMark = false := hT.haltMark_false 0
+    by_cases hp : pos = posW
+    · subst hp
+      have hwh0 : T.head.workHead = true := by simpa using hT.workHead_eq 0
+      have hr : bennettRule M (.seekWorkRight q', T.head) = some (.exec q' .gt, T.head) := by
+        simp [bennettRule, hhh0, hhm0, hwh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_exec, bennettTape_write_head]
+      exact ⟨pos, posH, hT, (compare_gt_iff_gt.mpr hlt).symm⟩
+    · have hwh0 : T.head.workHead = false := by
+        simpa [hp] using hT.workHead_eq 0
+      have hr : bennettRule M (.seekWorkRight q', T.head) = some (.seekWorkRight q', T.head) := by
+        simp [bennettRule, hhh0, hhm0, hwh0]
+      refine ⟨by simp [hr], ?_⟩
+      rw [bennettReversibleTM_step_of_rule M ⟨_, T⟩ hr, bennettDirIn_seekWorkRight,
+        bennettTape_write_head]
+      exact ⟨pos + 1, posW, posH, hT.move_right, by omega, by omega⟩
+
+private theorem validTrajectoryCfg_iterate_initCfg (M : FinTM0) (t : FinSupportedTape M) :
+    ∀ k : ℕ, ValidTrajectoryCfg M ((bennettReversibleTM M).step^[k] (bennettInitCfg M t))
+  | 0 => by
+    dsimp only [Function.iterate_zero, id_eq, ValidTrajectoryCfg, bennettInitCfg]
+    exact ⟨0, 0, activeTapeInv_initTape M t, rfl⟩
+  | k + 1 => by
+    rw [Function.iterate_succ_apply']
+    exact (validTrajectoryCfg_step M (validTrajectoryCfg_iterate_initCfg M t k)).2
+
+private theorem invStep_bennettInitCfg (M : FinTM0) (t : FinSupportedTape M) :
+    (bennettReversibleTM M).invStep (bennettInitCfg M t) =
+      ⟨.startReturn default .eq, bennettInitTape M t⟩ := by
+  let hd : BennettCell M := (bennettInitTape M t).head
+  have hrule : bennettRule M (.startReturn default .eq, hd) = some (.exec default .eq, hd) := rfl
+  have hperm : bennettStepPerm M (.startReturn default .eq, hd) = (.exec default .eq, hd) :=
+    extendPartialInjPerm_eq_of_some (bennettRule M) (bennettRule_partial_injective M) hrule
+  have hsymm : (bennettStepPerm M).symm (.exec default .eq, hd) = (.startReturn default .eq, hd) :=
+    (bennettStepPerm M).symm_apply_eq.mpr hperm.symm
+  unfold ReversibleTM.invStep bennettInitCfg
+  dsimp only [bennettReversibleTM, bennettDirIn]
+  change (⟨((bennettStepPerm M).symm (.exec default .eq, hd)).1,
+    (bennettInitTape M t).write ((bennettStepPerm M).symm (.exec default .eq, hd)).2⟩ :
+      (bennettReversibleTM M).Cfg) = _
+  rw [hsymm, bennettTape_write_head]
+
+/-- No positive iterate `m ≥ 1` of `(bennettReversibleTM M).step` returns `bennettInitCfg M t` to
+itself (since `invStep (bennettInitCfg M t)` sits in `.startReturn default .eq` over `hist = none`,
+which has no `bennettRule` preimage). -/
+-- tier: T2
+theorem bennettReversibleTM_iterate_step_initCfg_ne (M : FinTM0) (t : FinSupportedTape M)
+    {m : ℕ} (hm : 1 ≤ m) :
+    (bennettReversibleTM M).step^[m] (bennettInitCfg M t) ≠ bennettInitCfg M t := by
+  intro heq
+  rcases m with _ | m
+  · omega
+  · rcases m with _ | k
+    · have hinv := congrArg (bennettReversibleTM M).invStep heq
+      rw [Function.iterate_one, (bennettReversibleTM M).invStep_step,
+        invStep_bennettInitCfg] at hinv
+      have hq := congrArg ReversibleTM.Cfg.q hinv
+      cases hq
+    · let c_k := (bennettReversibleTM M).step^[k] (bennettInitCfg M t)
+      have h2 : (bennettReversibleTM M).step ((bennettReversibleTM M).step c_k) =
+          bennettInitCfg M t := by
+        simpa only [Function.iterate_succ_apply', c_k] using heq
+      have h1 : (bennettReversibleTM M).step c_k =
+          ⟨.startReturn default .eq, bennettInitTape M t⟩ := by
+        have hinv := congrArg (bennettReversibleTM M).invStep h2
+        rwa [(bennettReversibleTM M).invStep_step, invStep_bennettInitCfg] at hinv
+      have hisSome := (validTrajectoryCfg_step M (validTrajectoryCfg_iterate_initCfg M t k)).1
+      obtain ⟨⟨q', b⟩, hrule⟩ := Option.isSome_iff_exists.mp hisSome
+      have hstep := bennettReversibleTM_step_of_rule M c_k hrule
+      rw [h1] at hstep
+      have hq' : q' = .startReturn default .eq := by
+        rcases hdir : bennettDirIn q' <;> rw [hdir] at hstep <;>
+          exact (congrArg ReversibleTM.Cfg.q hstep).symm
+      subst hq'
+      rw [bennettDirIn_startReturn] at hstep
+      have htape := congrArg (fun c : (bennettReversibleTM M).Cfg ↦ c.Tape.head) hstep
+      change (bennettInitTape M t).head = (c_k.Tape.write b).head at htape
+      rw [tape_write_head] at htape
+      subst htape
+      have hinv_rule := bennettRuleInv_of_some M hrule
+      cases hinv_rule
+
+/-- The forward reversible orbit `n ↦ (bennettReversibleTM M).step^[n] (bennettInitCfg M t)` is
+injective (`Function.Injective`) for every `M : FinTM0` and `t : FinSupportedTape M`. -/
+-- tier: T1
+theorem bennettReversibleTM_orbit_initCfg_injective (M : FinTM0) (t : FinSupportedTape M) :
+    Function.Injective
+      (fun n : ℕ ↦ (bennettReversibleTM M).step^[n] (bennettInitCfg M t)) := by
+  intro n₁ n₂ h
+  dsimp only at h
+  rcases lt_trichotomy n₁ n₂ with hlt | rfl | hgt
+  · have hdecomp : n₂ = n₁ + (n₂ - n₁) := by omega
+    rw [hdecomp, Function.iterate_add_apply] at h
+    have hper := ((bennettReversibleTM M).stepEquiv.injective.iterate n₁ h).symm
+    exact absurd hper (bennettReversibleTM_iterate_step_initCfg_ne M t (by omega))
+  · rfl
+  · have hdecomp : n₁ = n₂ + (n₁ - n₂) := by omega
+    rw [hdecomp, Function.iterate_add_apply] at h
+    have hper := (bennettReversibleTM M).stepEquiv.injective.iterate n₂ h
+    exact absurd hper (bennettReversibleTM_iterate_step_initCfg_ne M t (by omega))
 
 /-! ## 4. Gate G5 Concrete Anti-Vacuity Witnesses -/
 

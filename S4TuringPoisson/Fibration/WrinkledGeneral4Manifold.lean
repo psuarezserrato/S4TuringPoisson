@@ -935,12 +935,29 @@ theorem isTuringComplete_liftTimeOne (C : SymplecticDiskChart F η) :
       change ι (W.encodePoint M_tm t_in) ∉ ι '' (W.encodeOpen M_tm k w).1
       rw [hι.injective.mem_set_image]
       exact W.notMem_encodeOpen_of_step_ne_none M_tm t_in k w hstep
+    Param := W.Param
+    instTopologicalSpaceParam := W.instTopologicalSpaceParam
+    param₀ := W.param₀
+    openChart := ι ∘ W.openChart
+    openChart_isOpenEmbedding := by
+      let _ := W.instTopologicalSpaceParam
+      exact hι.comp W.openChart_isOpenEmbedding
     chart := fun y ↦ ι (W.chart y)
+    chart_eq_openChart := fun y ↦ congrArg ι (W.chart_eq_openChart y)
     chart_continuous := hι.continuous.comp W.chart_continuous
     chart_injective := hι.injective.comp W.chart_injective
     coordPoint := W.coordPoint
     encodePoint_eq_chart := fun M_tm t_in ↦ congrArg ι (W.encodePoint_eq_chart M_tm t_in)
     computable_approx := W.computable_approx
+    computable_encodeOpen := fun M_tm ↦ by
+      obtain ⟨encΓ, enumBoxes, hcomp, hboxes⟩ := W.computable_encodeOpen M_tm
+      refine ⟨encΓ, enumBoxes, hcomp, fun k w ↦ ⟨(hboxes k w).1, ?_⟩⟩
+      change ι '' (W.encodeOpen M_tm k w).1 = _
+      rw [(hboxes k w).2, ← Set.image_comp]
+    orbit_encodePoint_injective := fun M_tm t_in n₁ n₂ h ↦ by
+      dsimp only at h
+      rw [hiter _ n₁, hiter _ n₂] at h
+      exact W.orbit_encodePoint_injective M_tm t_in (hι.injective h)
   }⟩
 
 end TuringIsotopy

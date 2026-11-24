@@ -1,0 +1,78 @@
+{
+  "declaration": "S4TuringPoisson.cantorIntervalRatPair_snd",
+  "raw_name": "cantorIntervalRatPair_snd",
+  "spec_file": "S4TuringPoisson/Dynamics/GeneralizedShift.lean",
+  "milestone": "SC1",
+  "tier": "T0",
+  "statement": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits",
+  "max_attempts": 5,
+  "escalated_at": "2026-11-24T07:24:17Z",
+  "retrieved_premises": [
+    "S4TuringPoisson.cantorIntervalRatPair",
+    "S4TuringPoisson.cantorIntervalRightRatFrac",
+    "S4TuringPoisson.cantorOpenInterval_eq_Ioo_ratFrac",
+    "S4TuringPoisson.primrec_cantorIntervalRightRatFrac"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits :=\n  by\n  rw [cantorIntervalRatPair]\n  simp",
+      "proof_body": "by\n  rw [cantorIntervalRatPair]\n  simp",
+      "compiler_error": "/Users/pablosuarez/.gemini/antigravity/worktrees/869f035d-39f6-46b9-aae5-94ba049206fb/swarm-worker-comp-b0c18806/.agents/gemma_scratch/S4TuringPoisson.cantorIntervalRatPair_snd_1.lean:1901:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25702.78,
+      "lean_ms": 11509.33,
+      "tokens": 67,
+      "accepted": false
+    },
+    {
+      "attempt": 2,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits :=\n  by\n  rw [cantorIntervalRatPair]\n  simp",
+      "proof_body": "by\n  rw [cantorIntervalRatPair]\n  simp",
+      "compiler_error": "/Users/pablosuarez/.gemini/antigravity/worktrees/869f035d-39f6-46b9-aae5-94ba049206fb/swarm-worker-comp-b0c18806/.agents/gemma_scratch/S4TuringPoisson.cantorIntervalRatPair_snd_2.lean:1901:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25040.55,
+      "lean_ms": 9326.97,
+      "tokens": 67,
+      "accepted": false
+    },
+    {
+      "attempt": 3,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits :=\n  by\n  rw [cantorIntervalRatPair]\n  simp",
+      "proof_body": "by\n  rw [cantorIntervalRatPair]\n  simp",
+      "compiler_error": "/Users/pablosuarez/.gemini/antigravity/worktrees/869f035d-39f6-46b9-aae5-94ba049206fb/swarm-worker-comp-b0c18806/.agents/gemma_scratch/S4TuringPoisson.cantorIntervalRatPair_snd_3.lean:1901:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 25457.56,
+      "lean_ms": 10161.44,
+      "tokens": 67,
+      "accepted": false
+    },
+    {
+      "attempt": 4,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits :=\n  by\n  rw [cantorIntervalRatPair]\n  simp",
+      "proof_body": "by\n  rw [cantorIntervalRatPair]\n  simp",
+      "compiler_error": "/Users/pablosuarez/.gemini/antigravity/worktrees/869f035d-39f6-46b9-aae5-94ba049206fb/swarm-worker-comp-b0c18806/.agents/gemma_scratch/S4TuringPoisson.cantorIntervalRatPair_snd_4.lean:1901:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24814.83,
+      "lean_ms": 9681.92,
+      "tokens": 67,
+      "accepted": false
+    },
+    {
+      "attempt": 5,
+      "think": false,
+      "candidate_code": "@[simp]\ntheorem cantorIntervalRatPair_snd (B : \u2115) (digits : List \u2115) :\n    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits :=\n  by\n  rw [cantorIntervalRatPair]\n  simp",
+      "proof_body": "by\n  rw [cantorIntervalRatPair]\n  simp",
+      "compiler_error": "/Users/pablosuarez/.gemini/antigravity/worktrees/869f035d-39f6-46b9-aae5-94ba049206fb/swarm-worker-comp-b0c18806/.agents/gemma_scratch/S4TuringPoisson.cantorIntervalRatPair_snd_5.lean:1901:2: error: No goals to be solved",
+      "error_class": "other",
+      "latency_ms": 24889.13,
+      "lean_ms": 9788.16,
+      "tokens": 67,
+      "accepted": false
+    }
+  ]
+}

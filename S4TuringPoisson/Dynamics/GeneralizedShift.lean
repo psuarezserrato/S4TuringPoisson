@@ -746,6 +746,22 @@ theorem iterate_eval_encodeCfg (R : ReversibleTM) (c : R.Cfg) (n : ℕ) :
   | zero => rfl
   | succ n ih => rw [Function.iterate_succ_apply, R.eval_encodeCfg, ih, Function.iterate_succ_apply]
 
+/-- `R.encodeCfg` is injective on configurations `R.Cfg`. -/
+-- tier: T1
+theorem encodeCfg_injective (R : ReversibleTM) : Function.Injective R.encodeCfg := by
+  rintro ⟨q₁, T₁⟩ ⟨q₂, T₂⟩ h
+  have h0 := congrArg Prod.snd (congrFun h 0)
+  dsimp only [encodeCfg, ↓reduceIte] at h0
+  have hq : q₁ = q₂ := Option.some.inj h0
+  have hnth : ∀ i : ℤ, T₁.nth i = T₂.nth i := fun i ↦ congrArg Prod.fst (congrFun h i)
+  have hhd : T₁.head = T₂.head := hnth 0
+  have hleft : T₁.left = T₂.left := Turing.ListBlank.ext fun j ↦ hnth (Int.negSucc j)
+  have hright : T₁.right = T₂.right := Turing.ListBlank.ext fun j ↦ hnth (Int.ofNat (j + 1))
+  rcases T₁ with ⟨_, _, _⟩
+  rcases T₂ with ⟨_, _, _⟩
+  dsimp only at hhd hleft hright
+  rw [hq, hhd, hleft, hright]
+
 end ReversibleTM
 
 /-! ## 3. `FinTM0` Conjugacy on `{-1, 0, 1}` & `HaltsWithWindow` Equivalence (`CMPP21` Prop. 4.4) -/
@@ -1839,5 +1855,205 @@ theorem FinTM0.exists_computable_approx_cantorDiskEmbed (M : FinTM0) :
       Real.sqrt (e₀ ^ 2 + e₁ ^ 2) ≤ Real.sqrt (((1 / 2 : ℝ) ^ m) ^ 2) :=
         Real.sqrt_le_sqrt hsum_sq
       _ = (1 / 2 : ℝ) ^ m := Real.sqrt_sq (by positivity)
+
+/-! ### Exact Primitive-Recursive `RatBox2` Endpoints for `cantorCylinderRect` -/
+
+/-- Left rational endpoint `(K - 1/3) / (4 * B^m)` of `cantorOpenInterval` computed from a finite
+digit list in base `B`. -/
+def cantorIntervalLeftRatFrac (B : ℕ) (digits : List ℕ) : RatFrac :=
+  let p := cantorPrefixPairList B digits
+  if p.1 = 0 then
+    (true, 1, 12 * p.2 - 1)
+  else
+    (false, 3 * p.1 - 1, 12 * p.2 - 1)
+
+/-- Right rational endpoint `(K + 4/3) / (4 * B^m)` of `cantorOpenInterval` computed from a finite
+digit list in base `B`. -/
+def cantorIntervalRightRatFrac (B : ℕ) (digits : List ℕ) : RatFrac :=
+  let p := cantorPrefixPairList B digits
+  (false, 3 * p.1 + 4, 12 * p.2 - 1)
+
+/-- Pair of rational endpoints `(left, right)` for a 1D Cantor cylinder interval. -/
+def cantorIntervalRatPair (B : ℕ) (digits : List ℕ) : RatFrac × RatFrac :=
+  (cantorIntervalLeftRatFrac B digits, cantorIntervalRightRatFrac B digits)
+
+/-- Rational 2-box `RatBox2` representing a 2D Cantor cylinder rectangle from its negative and
+non-negative digit lists. -/
+def cantorCylinderRatBox (B : ℕ) (negDigits posDigits : List ℕ) : RatBox2 :=
+  (cantorIntervalRatPair B negDigits, cantorIntervalRatPair B posDigits)
+
+/-- First projection of `cantorIntervalRatPair B digits`. -/
+-- tier: T0
+@[simp]
+theorem cantorIntervalRatPair_fst (B : ℕ) (digits : List ℕ) :
+    (cantorIntervalRatPair B digits).1 = cantorIntervalLeftRatFrac B digits := by
+  rfl
+
+/-- Second projection of `cantorIntervalRatPair B digits`. -/
+-- tier: T0
+@[simp]
+theorem cantorIntervalRatPair_snd (B : ℕ) (digits : List ℕ) :
+    (cantorIntervalRatPair B digits).2 = cantorIntervalRightRatFrac B digits := by
+  rfl
+
+/-- Horizontal interval projection of `cantorCylinderRatBox B negDigits posDigits`. -/
+-- tier: T0
+@[simp]
+theorem cantorCylinderRatBox_fst (B : ℕ) (negDigits posDigits : List ℕ) :
+    (cantorCylinderRatBox B negDigits posDigits).1 = cantorIntervalRatPair B negDigits := by
+  simp [cantorCylinderRatBox]
+
+/-- Vertical interval projection of `cantorCylinderRatBox B negDigits posDigits`. -/
+-- tier: T0
+@[simp]
+theorem cantorCylinderRatBox_snd (B : ℕ) (negDigits posDigits : List ℕ) :
+    (cantorCylinderRatBox B negDigits posDigits).2 = cantorIntervalRatPair B posDigits := by
+  simp [cantorCylinderRatBox]
+
+/-- `cantorIntervalLeftRatFrac B` is primitive recursive. -/
+-- tier: T1
+theorem primrec_cantorIntervalLeftRatFrac (B : ℕ) :
+    Primrec (cantorIntervalLeftRatFrac B) := by
+  unfold cantorIntervalLeftRatFrac
+  have hp := primrec_cantorPrefixPairList B
+  have hp1 := Primrec.fst.comp hp
+  have hp2 := Primrec.snd.comp hp
+  have hden :=
+    Primrec.nat_sub.comp (Primrec.nat_mul.comp (Primrec.const 12) hp2) (Primrec.const 1)
+  have hcond : PrimrecPred (fun digits : List ℕ ↦ (cantorPrefixPairList B digits).1 = 0) :=
+    Primrec.eq.comp hp1 (Primrec.const 0)
+  have hzero : Primrec (fun digits : List ℕ ↦
+      (true, (1 : ℕ), 12 * (cantorPrefixPairList B digits).2 - 1)) :=
+    Primrec.pair (Primrec.const true) (Primrec.pair (Primrec.const 1) hden)
+  have hpos : Primrec (fun digits : List ℕ ↦
+      (false, 3 * (cantorPrefixPairList B digits).1 - 1,
+        12 * (cantorPrefixPairList B digits).2 - 1)) :=
+    Primrec.pair (Primrec.const false)
+      (Primrec.pair
+        (Primrec.nat_sub.comp (Primrec.nat_mul.comp (Primrec.const 3) hp1) (Primrec.const 1))
+        hden)
+  exact Primrec.ite hcond hzero hpos
+
+/-- `cantorIntervalRightRatFrac B` is primitive recursive. -/
+-- tier: T1
+theorem primrec_cantorIntervalRightRatFrac (B : ℕ) :
+    Primrec (cantorIntervalRightRatFrac B) := by
+  unfold cantorIntervalRightRatFrac
+  have hp := primrec_cantorPrefixPairList B
+  have hp1 := Primrec.fst.comp hp
+  have hp2 := Primrec.snd.comp hp
+  have hden :=
+    Primrec.nat_sub.comp (Primrec.nat_mul.comp (Primrec.const 12) hp2) (Primrec.const 1)
+  have hnum :=
+    Primrec.nat_add.comp (Primrec.nat_mul.comp (Primrec.const 3) hp1) (Primrec.const 4)
+  exact Primrec.pair (Primrec.const false) (Primrec.pair hnum hden)
+
+/-- `cantorIntervalRatPair B` is primitive recursive. -/
+-- tier: T1
+theorem primrec_cantorIntervalRatPair (B : ℕ) :
+    Primrec (cantorIntervalRatPair B) :=
+  Primrec.pair (primrec_cantorIntervalLeftRatFrac B) (primrec_cantorIntervalRightRatFrac B)
+
+/-- `cantorCylinderRatBox B` is primitive recursive as a binary function of digit lists. -/
+-- tier: T1
+theorem primrec_cantorCylinderRatBox (B : ℕ) :
+    Primrec₂ (cantorCylinderRatBox B) :=
+  (Primrec.pair
+    ((primrec_cantorIntervalRatPair B).comp Primrec.fst)
+    ((primrec_cantorIntervalRatPair B).comp Primrec.snd)).to₂
+
+/-- Exact evaluation of `cantorPrefixPairList B (List.ofFn g)` matching `cantorPrefixCode` and
+`B ^ m`. -/
+-- tier: T1
+theorem cantorPrefixPairList_ofFn (B : ℕ) {m : ℕ} (g : Fin m → ℕ) :
+    cantorPrefixPairList B (List.ofFn g) = (cantorPrefixCode B g, B ^ m) := by
+  let f : ℕ → ℕ := fun j ↦ if hj : j < m then g ⟨j, hj⟩ else 0
+  have hlist : List.ofFn g = (List.range m).map f := by
+    refine List.ext_getElem (by simp) fun j hj₁ hj₂ ↦ ?_
+    have hjm : j < m := by simpa using hj₁
+    simp [f, hjm]
+  rw [hlist]
+  refine Prod.ext ?_ ?_
+  · rw [cantorPrefixPairList_range_fst B f m]
+    congr 1
+    funext ⟨j, hj⟩
+    simp [f, hj]
+  · rw [cantorPrefixPairList_snd]
+    simp
+
+/-- `cantorOpenInterval w` coincides with the open interval between the real values of
+`cantorIntervalLeftRatFrac` and `cantorIntervalRightRatFrac` on `List.ofFn (fun j ↦ (w j).1)`. -/
+-- tier: T2
+theorem cantorOpenInterval_eq_Ioo_ratFrac {N m : ℕ} (w : Fin m → Fin N)
+    {digits : List ℕ} (hdig : digits = List.ofFn fun j : Fin m ↦ (w j).1) :
+    cantorOpenInterval w =
+      Set.Ioo (cantorIntervalLeftRatFrac (cantorBase N) digits).toReal
+        (cantorIntervalRightRatFrac (cantorBase N) digits).toReal := by
+  subst hdig
+  set B : ℕ := cantorBase N
+  set K : ℕ := cantorPrefixCode B (fun j : Fin m ↦ (w j).1)
+  have hB0 : 0 < B := cantorBase_pos N
+  have hBpos : 1 ≤ B ^ m :=
+    Nat.one_le_pow m B (le_trans (by decide : 1 ≤ 3) (three_le_cantorBase N))
+  have h12 : 1 ≤ 12 * B ^ m := by omega
+  have hden_cast : ((12 * B ^ m - 1 : ℕ) : ℝ) + 1 = 12 * (B : ℝ) ^ m := by
+    have hnat : (12 * B ^ m - 1) + 1 = 12 * B ^ m := Nat.sub_add_cancel h12
+    exact_mod_cast hnat
+  have hp : cantorPrefixPairList B (List.ofFn fun j : Fin m ↦ (w j).1) = (K, B ^ m) :=
+    cantorPrefixPairList_ofFn B (fun j : Fin m ↦ (w j).1)
+  have hB_ne : (B : ℝ) ^ m ≠ 0 := by positivity
+  have hleft :
+      (cantorIntervalLeftRatFrac B (List.ofFn fun j : Fin m ↦ (w j).1)).toReal =
+        ((K : ℝ) - 1 / 3) / (4 * (B : ℝ) ^ m) := by
+    unfold cantorIntervalLeftRatFrac
+    rw [hp]
+    dsimp only
+    by_cases hK : K = 0
+    · simp only [hK, ↓reduceIte, RatFrac.toReal, RatFrac.toRat, Rat.cast_neg, Rat.cast_div,
+        Rat.cast_one, Rat.cast_add, Rat.cast_natCast, Nat.cast_zero]
+      rw [hden_cast]
+      field_simp [hB_ne]
+      ring
+    · have h3K : 1 ≤ 3 * K := by omega
+      have hnum_cast : ((3 * K - 1 : ℕ) : ℝ) = 3 * (K : ℝ) - 1 := by
+        have hnat : (3 * K - 1) + 1 = 3 * K := Nat.sub_add_cancel h3K
+        have hR : ((3 * K - 1 : ℕ) : ℝ) + 1 = 3 * (K : ℝ) := by exact_mod_cast hnat
+        linarith
+      simp only [hK, ↓reduceIte, Bool.false_eq_true, RatFrac.toReal, RatFrac.toRat, Rat.cast_div,
+        Rat.cast_natCast, Rat.cast_add, Rat.cast_one]
+      rw [hden_cast, hnum_cast]
+      field_simp [hB_ne]
+      ring
+  have hright :
+      (cantorIntervalRightRatFrac B (List.ofFn fun j : Fin m ↦ (w j).1)).toReal =
+        ((K : ℝ) + 4 / 3) / (4 * (B : ℝ) ^ m) := by
+    unfold cantorIntervalRightRatFrac
+    rw [hp]
+    simp only [Bool.false_eq_true, ↓reduceIte, RatFrac.toReal, RatFrac.toRat, Rat.cast_div,
+      Rat.cast_natCast, Rat.cast_add, Rat.cast_one]
+    rw [hden_cast]
+    push_cast
+    field_simp [hB_ne]
+    ring
+  unfold cantorOpenInterval
+  rw [hleft, hright]
+
+/-- Every Cantor cylinder rectangle `cantorCylinderRect enc K W` equals `evalRatBox2` of
+`cantorCylinderRatBox (cantorBase N)` applied to its negative and non-negative digit lists. -/
+-- tier: T1
+theorem evalRatBox2_cantorCylinderRatBox_eq {A : Type*} {N : ℕ} (enc : A ≃ Fin N) (K : ℕ)
+    (W : Set.Icc (-(K : ℤ)) (K : ℤ) → A) {negDigits posDigits : List ℕ}
+    (hneg : negDigits = List.ofFn fun j : Fin K ↦ (windowNegPrefix enc K W j).1)
+    (hpos : posDigits = List.ofFn fun j : Fin (K + 1) ↦ (windowNonnegPrefix enc K W j).1) :
+    evalRatBox2 (cantorCylinderRatBox (cantorBase N) negDigits posDigits) =
+      cantorCylinderRect enc K W := by
+  ext y
+  simp only [SetLike.mem_coe]
+  rw [mem_evalRatBox2_iff, mem_cantorCylinderRect_iff,
+    cantorOpenInterval_eq_Ioo_ratFrac (windowNegPrefix enc K W) hneg,
+    cantorOpenInterval_eq_Ioo_ratFrac (windowNonnegPrefix enc K W) hpos]
+  dsimp only [cantorCylinderRatBox, cantorIntervalRatPair]
+  simp only [Set.mem_Ioo]
+  tauto
 
 end S4TuringPoisson

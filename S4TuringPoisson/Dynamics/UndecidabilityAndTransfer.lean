@@ -608,30 +608,38 @@ theorem primrec_map_universalInputList {N : ℕ}
 /-- **Halting Undecidability Transfer (`TuringCompleteWitness` form)**:
 Given any `W : TuringCompleteWitness φ` on a topological space `X`, there exist a **single fixed**
 nonempty open target `U : Opens X`, a family of initial points `p : Nat.Partrec.Code → X`
-represented in `W.chart` by disk coordinates `coord : Nat.Partrec.Code → UnitDisk2`, and a
-**single `Computable` dyadic approximation procedure** `approx : Nat.Partrec.Code × ℕ →
-RatFrac × RatFrac` such that:
-1. `U.1.Nonempty`,
+represented in `W.chart` by disk coordinates `coord : Nat.Partrec.Code → UnitDisk2`, a **single
+`Computable` dyadic approximation procedure** `approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac`,
+and a **`Computable` rational-box enumerator** `targetBoxes : ℕ → RatBox2` such that:
+1. `U.1.Nonempty`, `∀ j, (evalRatBox2 (targetBoxes j)).1.Nonempty`, and
+   `U.1 = W.openChart '' (Set.univ ×ˢ ⋃ j, (evalRatBox2 (targetBoxes j)).1)`,
 2. `p c = W.chart (coord c)` and `‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ 2⁻ᵐ`
    for all `c, m`,
 3. `p c ∉ U` at `n = 0` for all `c`,
 4. `(∃ n : ℕ, φ^[n] (p c) ∈ U) ↔ (c.eval 0).Dom` for all `c`,
 5. forward-orbit reachability `fun c ↦ ∃ n : ℕ, φ^[n] (p c) ∈ U` is recursively enumerable
    (`REPred`) yet **algorithmically undecidable** (`¬ ComputablePred`). -/
+-- tier: T2
 theorem TuringCompleteWitness.undecidable_orbit_reachability {X : Type*} [TopologicalSpace X]
     {φ : X → X} (W : TuringCompleteWitness φ) :
     ∃ (U : Opens X) (p : Nat.Partrec.Code → X) (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       U.1.Nonempty ∧
       (∀ c : Nat.Partrec.Code, p c = W.chart (coord c)) ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = W.openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, p c ∉ U) ∧
       (∀ c : Nat.Partrec.Code, (∃ n : ℕ, φ^[n] (p c) ∈ U) ↔ (c.eval 0).Dom) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, φ^[n] (p c) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, φ^[n] (p c) ∈ U) := by
   obtain ⟨encΓ, approx₀, hcomp₀, hbound₀⟩ := W.computable_approx universalHaltingTM0
+  obtain ⟨encΓ_open, enumBoxes, hcomp_boxes, hboxes⟩ :=
+    W.computable_encodeOpen universalHaltingTM0
   let U : Opens X := W.encodeOpen universalHaltingTM0 0 universalTargetWindow
   let p : Nat.Partrec.Code → X :=
     fun c ↦ W.encodePoint universalHaltingTM0 (universalInputTape c)
@@ -639,12 +647,16 @@ theorem TuringCompleteWitness.undecidable_orbit_reachability {X : Type*} [Topolo
     fun c ↦ W.coordPoint universalHaltingTM0 (universalInputTape c)
   let approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac :=
     fun cm ↦ approx₀ ([], (universalInputList cm.1).map encΓ, cm.2)
+  let w₀_enc : List (Fin (Fintype.card universalHaltingTM0.Γ)) :=
+    encodeWindow encΓ_open 0 universalTargetWindow
+  let targetBoxes : ℕ → RatBox2 := fun j ↦ enumBoxes (0, w₀_enc, j)
+  obtain ⟨hbox_nonempty, hU_eq⟩ := hboxes 0 universalTargetWindow
   have hiff : ∀ c : Nat.Partrec.Code, (∃ n : ℕ, φ^[n] (p c) ∈ U) ↔ (c.eval 0).Dom := by
     intro c
     exact (W.orbit_mem_encodeOpen_iff universalHaltingTM0 (universalInputTape c) 0
       universalTargetWindow).trans (haltsWithWindow_universalHaltingTM0_iff c)
-  refine ⟨U, p, coord, approx, W.encodeOpen_nonempty _ _ _,
-    fun c ↦ W.encodePoint_eq_chart _ _, ?_, ?_, ?_, hiff, ?_, ?_⟩
+  refine ⟨U, p, coord, approx, targetBoxes, W.encodeOpen_nonempty _ _ _,
+    fun c ↦ W.encodePoint_eq_chart _ _, ?_, ?_, ?_, hbox_nonempty, hU_eq, ?_, hiff, ?_, ?_⟩
   · have hR : Computable (fun cm : Nat.Partrec.Code × ℕ ↦
         (universalInputList cm.1).map encΓ) :=
       (primrec_map_universalInputList encΓ).to_comp.comp Computable.fst
@@ -653,6 +665,8 @@ theorem TuringCompleteWitness.undecidable_orbit_reachability {X : Type*} [Topolo
     have hmk : Turing.Tape.mk₂ ([] : List universalHaltingTM0.Γ) (universalInputList c) =
         universalInputTape c := rfl
     simpa [approx, coord, hmk] using hbound₀ [] (universalInputList c) m
+  · exact hcomp_boxes.comp
+      ((Computable.const 0).pair ((Computable.const w₀_enc).pair Computable.id))
   · intro c
     exact W.notMem_encodeOpen_of_step_ne_none universalHaltingTM0 (universalInputTape c) 0
       universalTargetWindow (step_initCfg_universalHaltingTM0_ne_none c)
@@ -663,18 +677,30 @@ theorem TuringCompleteWitness.undecidable_orbit_reachability {X : Type*} [Topolo
 /-- **Halting Undecidability Transfer (`IsTuringComplete` headline form)**:
 For any topological space `X` and Turing complete map `φ : X → X`, forward-orbit reachability from
 computably constructible points (approximable at dyadic rate `2⁻ᵐ` inside a continuous injective
-disk chart) into a fixed nonempty open target `U : Opens X` is algorithmically undecidable
-(`¬ ComputablePred`), and no total computable decision procedure exists. -/
+disk slice `chart y = openChart (param₀, y)` of an open-tube embedding `openChart`) into a fixed
+nonempty open target `U : Opens X` generated by a `Computable` rational-box sequence
+`targetBoxes : ℕ → RatBox2` is algorithmically undecidable (`¬ ComputablePred`), and no total
+computable decision procedure exists. -/
+-- tier: T2
 theorem IsTuringComplete.undecidable_orbit_reachability {X : Type*} [TopologicalSpace X]
     {φ : X → X} (hφ : IsTuringComplete φ) :
-    ∃ (U : Opens X) (chart : UnitDisk2 → X) (coord : Nat.Partrec.Code → UnitDisk2)
-      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac),
+    ∃ (U : Opens X) (Param : Type) (instTopParam : TopologicalSpace Param) (param₀ : Param)
+      (openChart : Param × UnitDisk2 → X) (chart : UnitDisk2 → X)
+      (coord : Nat.Partrec.Code → UnitDisk2)
+      (approx : Nat.Partrec.Code × ℕ → RatFrac × RatFrac)
+      (targetBoxes : ℕ → RatBox2),
       U.1.Nonempty ∧
+      @Topology.IsOpenEmbedding _ _ (@instTopologicalSpaceProd _ _ instTopParam _) _
+        openChart ∧
+      (∀ y : UnitDisk2, chart y = openChart (param₀, y)) ∧
       Continuous chart ∧
       Function.Injective chart ∧
       Computable approx ∧
       (∀ (c : Nat.Partrec.Code) (m : ℕ),
         ‖ratFracPairToEuclidean2 (approx (c, m)) - (coord c).1‖ ≤ (1 / 2 : ℝ) ^ m) ∧
+      Computable targetBoxes ∧
+      (∀ j : ℕ, (evalRatBox2 (targetBoxes j)).1.Nonempty) ∧
+      U.1 = openChart '' (Set.univ ×ˢ ⋃ j : ℕ, (evalRatBox2 (targetBoxes j)).1) ∧
       (∀ c : Nat.Partrec.Code, chart (coord c) ∉ U) ∧
       REPred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, φ^[n] (chart (coord c)) ∈ U) ∧
       ¬ ComputablePred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, φ^[n] (chart (coord c)) ∈ U) ∧
@@ -682,12 +708,14 @@ theorem IsTuringComplete.undecidable_orbit_reachability {X : Type*} [Topological
           Computable dec ∧
           ∀ c : Nat.Partrec.Code, dec c = true ↔ ∃ n : ℕ, φ^[n] (chart (coord c)) ∈ U := by
   obtain ⟨W⟩ := hφ
-  obtain ⟨U, p, coord, approx, hU, hp, hcomp, hbound, hnot0, _, hre, hnotcomp⟩ :=
+  obtain ⟨U, p, coord, approx, targetBoxes, hU, hp, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq,
+      hnot0, _, hre, hnotcomp⟩ :=
     W.undecidable_orbit_reachability
   have hp_eq : p = fun c ↦ W.chart (coord c) := funext hp
   subst hp_eq
-  refine ⟨U, W.chart, coord, approx, hU, W.chart_continuous, W.chart_injective, hcomp, hbound,
-    hnot0, hre, hnotcomp, ?_⟩
+  refine ⟨U, W.Param, W.instTopologicalSpaceParam, W.param₀, W.openChart, W.chart, coord, approx,
+    targetBoxes, hU, W.openChart_isOpenEmbedding, W.chart_eq_openChart, W.chart_continuous,
+    W.chart_injective, hcomp, hbound, hcomp_boxes, hbox_ne, hU_eq, hnot0, hre, hnotcomp, ?_⟩
   rintro ⟨dec, hdec_comp, hdec_iff⟩
   apply hnotcomp
   let instDec : DecidablePred (fun c : Nat.Partrec.Code ↦ ∃ n : ℕ, φ^[n] (W.chart (coord c)) ∈ U) :=
@@ -745,10 +773,11 @@ theorem mem_liftProductOpen_iff {B Y M : Type*} [TopologicalSpace B] [Topologica
 Transfer a `TuringCompleteWitness d` on a fiber space `Y` (e.g. `UnitDisk2` or regular surface
 fiber `F`) across an open product embedding `Ψ : B × Y → M` (`Topology.IsOpenEmbedding Ψ`) over an
 open set `B₀` containing `c` on which `d_bar (Ψ (b, y)) = Ψ (b, d y)`.
-Preserves `W.computable_approx` **verbatim** (`coordPoint := W.coordPoint`,
-`chart := fun y ↦ Ψ (c, W.chart y)`). -/
-def TuringCompleteWitness.transfer {B Y M : Type*} [TopologicalSpace B] [TopologicalSpace Y]
-    [TopologicalSpace M] {Ψ : B × Y → M} (hΨ : Topology.IsOpenEmbedding Ψ)
+Preserves `W.computable_approx` and `W.computable_encodeOpen` **verbatim** (`Param := ↥B₀ ×
+W.Param`, `coordPoint := W.coordPoint`, `chart := fun y ↦ Ψ (c, W.chart y)`). -/
+-- tier: T2
+def TuringCompleteWitness.transfer {B : Type} {Y M : Type*} [TopologicalSpace B]
+    [TopologicalSpace Y] [TopologicalSpace M] {Ψ : B × Y → M} (hΨ : Topology.IsOpenEmbedding Ψ)
     {B₀ : Set B} (hB₀ : IsOpen B₀) {c : B} (hc : c ∈ B₀)
     {d : Y → Y} {d_bar : M → M}
     (hcomm : ∀ b ∈ B₀, ∀ y : Y, d_bar (Ψ (b, y)) = Ψ (b, d y))
@@ -765,19 +794,48 @@ def TuringCompleteWitness.transfer {B Y M : Type*} [TopologicalSpace B] [Topolog
   notMem_encodeOpen_of_step_ne_none M_tm t k w hstep := by
     rw [mem_liftProductOpen_iff hΨ hB₀ hc (W.encodeOpen M_tm k w)]
     exact W.notMem_encodeOpen_of_step_ne_none M_tm t k w hstep
+  Param := ↥B₀ × W.Param
+  instTopologicalSpaceParam := @instTopologicalSpaceProd ↥B₀ W.Param inferInstance
+    W.instTopologicalSpaceParam
+  param₀ := (⟨c, hc⟩, W.param₀)
+  openChart q := Ψ (q.1.1.1, W.openChart (q.1.2, q.2))
+  openChart_isOpenEmbedding := by
+    let _ := W.instTopologicalSpaceParam
+    exact hΨ.comp
+      ((hB₀.isOpenEmbedding_subtypeVal.prodMap W.openChart_isOpenEmbedding).comp
+        (Homeomorph.prodAssoc ↥B₀ W.Param UnitDisk2).isOpenEmbedding)
   chart y := Ψ (c, W.chart y)
+  chart_eq_openChart y := congrArg (fun z ↦ Ψ (c, z)) (W.chart_eq_openChart y)
   chart_continuous := hΨ.continuous.comp (continuous_const.prodMk W.chart_continuous)
   chart_injective y₁ y₂ h := W.chart_injective (Prod.mk.inj (hΨ.injective h)).2
   coordPoint := W.coordPoint
   encodePoint_eq_chart M_tm t := congrArg (fun z ↦ Ψ (c, z)) (W.encodePoint_eq_chart M_tm t)
   computable_approx := W.computable_approx
+  computable_encodeOpen M_tm := by
+    obtain ⟨encΓ, enumBoxes, hcomp, hboxes⟩ := W.computable_encodeOpen M_tm
+    refine ⟨encΓ, enumBoxes, hcomp, fun k w ↦ ⟨(hboxes k w).1, ?_⟩⟩
+    change Ψ '' (B₀ ×ˢ (W.encodeOpen M_tm k w).1) = _
+    rw [(hboxes k w).2]
+    set S : Set UnitDisk2 :=
+      ⋃ j : ℕ, (evalRatBox2 (enumBoxes (k, encodeWindow encΓ k w, j))).1
+    ext m
+    constructor
+    · rintro ⟨⟨b, z⟩, ⟨hb, ⟨⟨p, y⟩, ⟨_, hy⟩, rfl⟩⟩, rfl⟩
+      exact ⟨((⟨b, hb⟩, p), y), ⟨ trivial, hy ⟩, rfl⟩
+    · rintro ⟨⟨⟨⟨b, hb⟩, p⟩, y⟩, ⟨_, hy⟩, rfl⟩
+      exact ⟨(b, W.openChart (p, y)), ⟨hb, ⟨(p, y), ⟨trivial, hy⟩, rfl⟩⟩, rfl⟩
+  orbit_encodePoint_injective M_tm t := by
+    intro n₁ n₂ h
+    dsimp only at h
+    rw [iterate_eq_on_fiber Ψ hcomm hc _ n₁, iterate_eq_on_fiber Ψ hcomm hc _ n₂] at h
+    exact W.orbit_encodePoint_injective M_tm t (Prod.mk.inj (hΨ.injective h)).2
 
 /-- **Fiber-to-4-Manifold `IsTuringComplete` Transfer Lemma**:
 If `Ψ : B × Y → M` is an open embedding, `c ∈ B₀` with `IsOpen B₀`, and
 `∀ b ∈ B₀, ∀ y : Y, d_bar (Ψ (b, y)) = Ψ (b, d y)`, then
 `IsTuringComplete d → IsTuringComplete d_bar`. -/
-theorem IsTuringComplete.transfer {B Y M : Type*} [TopologicalSpace B] [TopologicalSpace Y]
-    [TopologicalSpace M] {Ψ : B × Y → M} (hΨ : Topology.IsOpenEmbedding Ψ)
+theorem IsTuringComplete.transfer {B : Type} {Y M : Type*} [TopologicalSpace B]
+    [TopologicalSpace Y] [TopologicalSpace M] {Ψ : B × Y → M} (hΨ : Topology.IsOpenEmbedding Ψ)
     {B₀ : Set B} (hB₀ : IsOpen B₀) {c : B} (hc : c ∈ B₀)
     {d : Y → Y} {d_bar : M → M}
     (hcomm : ∀ b ∈ B₀, ∀ y : Y, d_bar (Ψ (b, y)) = Ψ (b, d y))
@@ -789,10 +847,10 @@ theorem IsTuringComplete.transfer {B Y M : Type*} [TopologicalSpace B] [Topologi
 /-- Specialization of `IsTuringComplete.transfer` to an open subset `B : Set Base` of an ambient
 base manifold `Base` (such as `B ⊂ S²`), an open subdisk `B₀ ⊆ B` (`IsOpen B₀`, `c ∈ B₀`), and the
 open unit disk fiber `UnitDisk2`. -/
-theorem IsTuringComplete.transfer_unitDisk2_of_subset {Base M : Type*} [TopologicalSpace Base]
-    [TopologicalSpace M] {B B₀ : Set Base} (hB₀_sub : B₀ ⊆ B) (hB₀ : IsOpen B₀)
-    {c : Base} (hc : c ∈ B₀) {Ψ : B × UnitDisk2 → M} (hΨ : Topology.IsOpenEmbedding Ψ)
-    {d : UnitDisk2 → UnitDisk2} {d_bar : M → M}
+theorem IsTuringComplete.transfer_unitDisk2_of_subset {Base : Type} {M : Type*}
+    [TopologicalSpace Base] [TopologicalSpace M] {B B₀ : Set Base} (hB₀_sub : B₀ ⊆ B)
+    (hB₀ : IsOpen B₀) {c : Base} (hc : c ∈ B₀) {Ψ : B × UnitDisk2 → M}
+    (hΨ : Topology.IsOpenEmbedding Ψ) {d : UnitDisk2 → UnitDisk2} {d_bar : M → M}
     (hcomm : ∀ (b : B), b.1 ∈ B₀ → ∀ y : UnitDisk2, d_bar (Ψ (b, y)) = Ψ (b, d y))
     (hd : IsTuringComplete d) :
     IsTuringComplete d_bar := by
@@ -803,7 +861,8 @@ theorem IsTuringComplete.transfer_unitDisk2_of_subset {Base M : Type*} [Topologi
 
 /-- Direct single-fiber open-embedding transfer (e.g. lifting `d : UnitDisk2 → UnitDisk2` along a
 Darboux or stereographic disk open embedding `ι : UnitDisk2 → F` into a closed surface fiber `F`
-where `d_F (ι y) = ι (d y)`). -/
+where `d_F (ι y) = ι (d y)`, or conjugating by a global diffeomorphism `ψ : M ≃ₘ M`). -/
+-- tier: T2
 def TuringCompleteWitness.ofOpenEmbedding {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
     {ι : X → Y} (hι : Topology.IsOpenEmbedding ι) {φ : X → X} {ψ : Y → Y}
     (hcomm : ∀ x : X, ψ (ι x) = ι (φ x)) (W : TuringCompleteWitness φ) :
@@ -825,12 +884,35 @@ def TuringCompleteWitness.ofOpenEmbedding {X Y : Type*} [TopologicalSpace X] [To
     change ι (W.encodePoint M_tm t) ∉ ι '' (W.encodeOpen M_tm k w).1
     rw [hι.injective.mem_set_image]
     exact W.notMem_encodeOpen_of_step_ne_none M_tm t k w hstep
+  Param := W.Param
+  instTopologicalSpaceParam := W.instTopologicalSpaceParam
+  param₀ := W.param₀
+  openChart := ι ∘ W.openChart
+  openChart_isOpenEmbedding := by
+    let _ := W.instTopologicalSpaceParam
+    exact hι.comp W.openChart_isOpenEmbedding
   chart y := ι (W.chart y)
+  chart_eq_openChart y := congrArg ι (W.chart_eq_openChart y)
   chart_continuous := hι.continuous.comp W.chart_continuous
   chart_injective := hι.injective.comp W.chart_injective
   coordPoint := W.coordPoint
   encodePoint_eq_chart M_tm t := congrArg ι (W.encodePoint_eq_chart M_tm t)
   computable_approx := W.computable_approx
+  computable_encodeOpen M_tm := by
+    obtain ⟨encΓ, enumBoxes, hcomp, hboxes⟩ := W.computable_encodeOpen M_tm
+    refine ⟨encΓ, enumBoxes, hcomp, fun k w ↦ ⟨(hboxes k w).1, ?_⟩⟩
+    change ι '' (W.encodeOpen M_tm k w).1 = _
+    rw [(hboxes k w).2, ← Set.image_comp]
+  orbit_encodePoint_injective M_tm t := by
+    have hiter : ∀ (x : X) (n : ℕ), ψ^[n] (ι x) = ι (φ^[n] x) := by
+      intro x n
+      induction n with
+      | zero => rfl
+      | succ n ih => rw [Function.iterate_succ_apply', ih, hcomm, Function.iterate_succ_apply']
+    intro n₁ n₂ h
+    dsimp only at h
+    rw [hiter _ n₁, hiter _ n₂] at h
+    exact W.orbit_encodePoint_injective M_tm t (hι.injective h)
 
 theorem IsTuringComplete.of_openEmbedding {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
     {ι : X → Y} (hι : Topology.IsOpenEmbedding ι) {φ : X → X} {ψ : Y → Y}
